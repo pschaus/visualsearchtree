@@ -1,0 +1,303 @@
+package org.uclouvain.visualsearchtree;
+
+
+import javafx.animation.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
+
+public class AnimationFactory {
+
+    /**
+     * increment the x and y values of a node using an animation
+     * @param node node to animate
+     * @param duration duration for the animation
+     * @param x increment for the x values
+     * @param y increment for the y values
+     */
+    public static void moveBy(Node node, Duration duration, double x, double y) {
+        TranslateTransition translateTransition = new TranslateTransition(duration, node);
+        translateTransition.setByX(x);
+        translateTransition.setByY(y);
+        translateTransition.play();
+    }
+
+    /**
+     * increment the x and y values of a node using an animation
+     * @param node node to animate
+     * @param x increment for the x values
+     * @param y increment for the y values
+     */
+    public static void moveBy(Node node, double x, double y) {
+        moveBy(node, Duration.ONE, x, y);
+    }
+
+    /**
+     * move a rectangle at a specified position using an animation
+     * @param rectangle rectangle to move
+     * @param duration duration of the animation
+     * @param x new x coordinate after animation
+     * @param y new y coordinate after animation
+     */
+    public static void moveTo(Rectangle rectangle, Duration duration, double x, double  y) {
+        TranslateTransition translateTransition = new TranslateTransition(duration, rectangle);
+        translateTransition.setToX(x - rectangle.getX());
+        translateTransition.setToY(y - rectangle.getY());
+        translateTransition.play();
+    }
+
+    /**
+     * move a circle at a specified position using an animation
+     * @param circle circle to move
+     * @param duration duration of the animation
+     * @param x new x coordinate after animation
+     * @param y new y coordinate after animation
+     */
+    public static void moveTo(Circle circle, Duration duration, double x, double y) {
+        TranslateTransition translateTransition = new TranslateTransition(duration, circle);
+        translateTransition.setToX(x - circle.getCenterX());
+        translateTransition.setToY(y - circle.getCenterY());
+        translateTransition.play();
+    }
+
+    /**
+     * move a rectangle at a specified position
+     * @param rectangle rectangle to move
+     * @param x new x coordinate after animation
+     * @param y new y coordinate after animation
+     */
+    public static void moveTo(Rectangle rectangle, double x, double  y) {
+        rectangle.setTranslateX(x - rectangle.getX());
+        rectangle.setTranslateY(y - rectangle.getY());
+    }
+
+
+
+    /**
+     * auto resize a set of items according to the dimensions of the scene
+     * changes both their scale and their position to fit to the scene
+     * @param scene scene that might be resized
+     * @param items items that will be resized whenever the dimensions of the scene change
+     */
+    public static void autoResize(Scene scene, Parent items) {
+        double initWidth = scene.getWidth();
+        double initHeight = scene.getHeight();
+
+        // changes in width
+        long threshold = 125;
+        Duration delay = Duration.millis(500);
+        ScaleTransition stX = new ScaleTransition(Duration.ONE, items);
+        TranslateTransition ttX = new TranslateTransition(Duration.ONE, items);
+        stX.setDelay(delay);
+        ttX.setDelay(delay);
+
+        scene.widthProperty().addListener((ObservableValue<? extends Number> obs, Number oldVal, Number newVal) -> {
+            stX.stop();
+            ttX.stop();
+            stX.setToX(scene.getWidth() / initWidth);
+            ttX.setToX((scene.getWidth() - initWidth) / 2);
+            ttX.playFromStart();
+            stX.playFromStart();
+        });
+
+        // changes in height
+        ScaleTransition stY = new ScaleTransition(Duration.ONE, items);
+        TranslateTransition ttY = new TranslateTransition(Duration.ONE, items);
+        stY.setDelay(delay);
+        ttY.setDelay(delay);
+
+        scene.heightProperty().addListener((ObservableValue<? extends Number> obs, Number oldVal, Number newVal) -> {
+            stY.stop();
+            ttY.stop();
+            stY.setToY(scene.getHeight()/ initHeight);
+            ttY.setToY((scene.getHeight() - initHeight) / 2);
+            stY.playFromStart();
+            ttY.playFromStart();
+        });
+    }
+
+    /**
+     * auto resize all items within the scene according to its current dimensions
+     * @param scene
+     */
+    public static void autoResize(Scene scene) {
+        autoResize(scene, scene.getRoot());
+    }
+
+    /**
+     * auto resize all items within the scene according to its current dimensions and preserving the x/y ratio if specified
+     * @param scene scene that might be resized
+     * @param preserveRatio true if the x/y ratio needs to be preserved
+     */
+    public static void autoResize(Scene scene, boolean preserveRatio) {
+        autoResize(scene, scene.getRoot(), preserveRatio);
+    }
+
+    /**
+     * auto resize all items within the scene according to its current dimensions and preserving the x/y ratio if specified
+     * @param scene scene that might be resized
+     * @param items items that will be resized whenever the dimensions of the scene change
+     * @param preserveRatio true if the x/y ratio needs to be preserved
+     */
+    public static void autoResize(Scene scene, Parent items, boolean preserveRatio) {
+        if (preserveRatio)
+            autoResizePreserveRatio(scene, items);
+        else
+            autoResize(scene, items);
+    }
+
+    /**
+     * auto resize all items within the scene according to its current dimensions and preserving the x/y ratio
+     * @param scene scene that might be resized
+     * @param items items that will be resized whenever the dimensions of the scene change
+     */
+    public static void autoResizePreserveRatio(Scene scene, Parent items) {
+        double initWidth = scene.getWidth();
+        double initHeight = scene.getHeight();
+        // changes in width
+        long threshold = 125;
+        Duration delay = Duration.millis(500);
+        ScaleTransition st = new ScaleTransition(Duration.ONE, items);
+        TranslateTransition tt = new TranslateTransition(Duration.ONE, items);
+        st.setDelay(delay);
+        tt.setDelay(delay);
+
+        ChangeListener<Number> listener = (observableValue, o, t1) -> {
+            st.stop();
+            st.stop();
+            double scaling = Math.min(scene.getWidth() / initWidth, scene.getHeight()/ initHeight);
+            st.setToX(scaling);
+            st.setToY(scaling);
+            double translation = Math.min((scene.getWidth() - initWidth) / 2, (scene.getHeight() - initHeight) / 2);
+            tt.setToX(translation);
+            tt.setToY(translation);
+            tt.playFromStart();
+            st.playFromStart();
+        };
+        scene.heightProperty().addListener(listener);
+        scene.widthProperty().addListener(listener);
+    }
+
+    public static void moveOnDrag(Parent parent, Node itemsToMove) { new MoveOnDragParent(parent, itemsToMove);}
+
+    public static void moveOnDrag(Scene scene, Node itemsToMove) {
+        new MoveOnDragScene(scene, itemsToMove);
+    }
+
+    private static class MoveOnDragScene {
+
+        private final Scene scene;
+        private final Node itemsToMove;
+        private double mouseAnchorX; // used for the position when dragging nodes
+        private double mouseAnchorY;
+        private double canvasTranslateX;
+        private double canvasTranslateY;
+
+        public MoveOnDragScene(Scene scene, Node itemsToMove) {
+            this.scene = scene;
+            this.itemsToMove = itemsToMove;
+            registerDragListener();
+        }
+
+        /**
+         * move all objects within the scene when a drag event occurs
+         */
+        private void registerDragListener() {
+            scene.setOnMousePressed((MouseEvent event) -> { // register the initial position for the dragging
+                mouseAnchorX = event.getSceneX();
+                mouseAnchorY = event.getSceneY();
+                canvasTranslateX = itemsToMove.getTranslateX();
+                canvasTranslateY = itemsToMove.getTranslateY();
+            });
+            scene.setOnMouseDragged((MouseEvent event) -> { // move the objects in the scene
+                if (event.isPrimaryButtonDown()) { // only drag using the primary button
+                    itemsToMove.setTranslateX(canvasTranslateX + (event.getSceneX() - mouseAnchorX) / itemsToMove.getScaleX());
+                    itemsToMove.setTranslateY(canvasTranslateY + (event.getSceneY() - mouseAnchorY) / itemsToMove.getScaleY());
+                    event.consume();
+                }
+            });
+        }
+    }
+
+    private static class MoveOnDragParent{
+
+        private final Parent parent;
+        private final Node itemsToMove;
+        private double mouseAnchorX; // used for the position when dragging nodes
+        private double mouseAnchorY;
+        private double canvasTranslateX;
+        private double canvasTranslateY;
+
+        public MoveOnDragParent (Parent parent, Node itemsToMove) {
+            this.parent = parent;
+            this.itemsToMove = itemsToMove;
+            registerDragListener();
+        }
+
+        /**
+         * move all objects within the scene when a drag event occurs
+         */
+        private void registerDragListener() {
+            parent.setOnMousePressed((MouseEvent event) -> { // register the initial position for the dragging
+                mouseAnchorX = event.getSceneX();
+                mouseAnchorY = event.getSceneY();
+                canvasTranslateX = itemsToMove.getTranslateX();
+                canvasTranslateY = itemsToMove.getTranslateY();
+            });
+            parent.setOnMouseDragged((MouseEvent event) -> { // move the objects in the scene
+                if (event.isPrimaryButtonDown()) { // only drag using the primary button
+                    itemsToMove.setTranslateX(canvasTranslateX + (event.getSceneX() - mouseAnchorX) / itemsToMove.getScaleX());
+                    itemsToMove.setTranslateY(canvasTranslateY + (event.getSceneY() - mouseAnchorY) / itemsToMove.getScaleY());
+                    event.consume();
+                }
+            });
+        }
+    }
+
+    /**
+     * zoom on all elements located in the parent whenever a scroll occurs
+     * @param parent container for all nodes that needs to be zoomed on
+     */
+    public static void zoomOnSCroll(Parent parent) {
+        parent.setOnScroll((ScrollEvent event) -> {
+            if (event.getDeltaY() != 0) {
+                event.consume();
+                double factor = 1.5;
+
+                double x = event.getSceneX();
+                double y = event.getSceneY();
+                if (event.getDeltaY() < 0) {
+                    factor = 1.0 / factor;
+                }
+                double oldScale = parent.getScaleX();
+                double scale = oldScale * factor;
+                double f = (scale / oldScale) - 1;
+
+                // determine offset that we will have to move the group
+                Bounds bounds = parent.localToScene(parent.getBoundsInLocal());
+                double dx = (x - (bounds.getWidth() / 2 + bounds.getMinX()));
+                double dy = (y - (bounds.getHeight() / 2 + bounds.getMinY()));
+
+                // timeline that scales and moves the group
+                Timeline timeline = new Timeline();
+                timeline.getKeyFrames().clear();
+                timeline.getKeyFrames().addAll(
+                        new KeyFrame(Duration.millis(150), new KeyValue(parent.translateXProperty(), parent.getTranslateX() - f * dx)),
+                        new KeyFrame(Duration.millis(150), new KeyValue(parent.translateYProperty(), parent.getTranslateY() - f * dy)),
+                        new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleXProperty(), scale)),
+                        new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleYProperty(), scale))
+                );
+                timeline.play();
+            }
+        });
+    }
+
+}
