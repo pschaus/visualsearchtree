@@ -255,13 +255,10 @@ public class Tree {
         public static List<Double> fitList(List<Extent> extents) {
             List<Double> left = fitListLeft(extents);
             List<Double> right = fitListRight(extents);
-            //System.out.println("left"+left);
-            //System.out.println("right"+right);
             List<Double> res = new LinkedList<>();
             for (Iterator<Double> leftIte = left.iterator(), rightIte = right.iterator(); leftIte.hasNext() && rightIte.hasNext(); ) {
                 res.add((leftIte.next() + rightIte.next()) / 2);
             }
-            //System.out.println(res);
             return res;
         }
 
