@@ -13,13 +13,17 @@ import java.util.Stack;
 
 
 public class VisualTree extends Application {
+
+
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.setTitle("Draw tree - first test");
 
-        primaryStage.setTitle("Connected Shapes");
+        //TODO: NEXT STEP BUILD TREE FROM SERVER NOT FOR Tree.staticTree
+        //VisualTreeServer server = new VisualTreeServer(6666);
 
-        Tree.Node<String> node = Tree.randomTree();
-
+        //Tree.Node<String> node = Tree.randomTree();
+        Tree.Node<String> node = Tree.staticTree();
         StackPane sp = new StackPane();
         AnimationFactory.zoomOnSCroll(sp);
         Group treeGroup = TreeVisual.getGroup(node);
