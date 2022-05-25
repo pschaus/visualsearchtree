@@ -13,8 +13,6 @@ import java.util.Stack;
 
 
 public class VisualTree extends Application {
-
-
     @Override
     public void start(Stage primaryStage) {
 
@@ -32,8 +30,6 @@ public class VisualTree extends Application {
         primaryStage.setScene(scene);
 
         primaryStage.show();
-
-
     }
 
     /**

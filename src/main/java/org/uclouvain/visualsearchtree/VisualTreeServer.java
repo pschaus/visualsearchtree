@@ -5,13 +5,23 @@ package org.uclouvain.visualsearchtree;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VisualTreeServer {
 
-    //initialize socket and input stream
+    // initialize socket and input stream
     private Socket socket = null;
     private ServerSocket server = null;
     private DataInputStream in = null;
+
+    // are there enough bytes to read something
+    private boolean canReadMore = true;
+    private List<Byte> buffer = new ArrayList<>();
+    private boolean sizeRead = false;
+    private int bytesRead = 0;
+    private int msgSize = 0;
+    private boolean DEBUG = true;
 
     // constructor with port
     public VisualTreeServer(int port) {
@@ -22,27 +32,56 @@ public class VisualTreeServer {
             System.out.println("Waiting for a client ...");
             socket = server.accept();
             System.out.println("Client accepted");
-            // takes input from the client socket
 
-            //InputStream stream = socket.getInputStream();
-            //byte[] data = new byte[100];
-            //int count = stream.read(data);
+            in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
+            while (!server.isClosed() || canReadMore) {
+                if (socket.getInputStream().available() > 0)
+                    canReadMore = true;
 
-            in = new DataInputStream(
-                    new BufferedInputStream(socket.getInputStream()));
-            String line = "";
-            // reads message from client until "Over" is sent
-            while (!line.equals("Over")) {
-                try {
-                    line = in.readUTF();
-                    System.out.println(line);
+                Decoder.addToBuffer(buffer, socket.getInputStream().readAllBytes());
+                if(DEBUG) {
+                    //System.out.println(buffer);
+                }
 
+                // read the size of the next field if haven't already
+                if (!sizeRead) {
+                    if (buffer.size() < 4) {
+                        /// can't read, need to wait for more bytes
+                        canReadMore = false;
+                        continue;
+                    }
 
-                } catch (IOException e) {
-                    System.out.println(e);
+                    /// enough bytes to read size
+                    byte[] msgSizeBytes = new byte[4];
+                    Decoder.readBuffer(msgSizeBytes, buffer, 4);
+                    msgSize = Decoder.byteArrayToInt(msgSizeBytes, "LITTLE_ENDIAN");
+                    bytesRead += 4;
+                    sizeRead = true;
+                } else {
+                    if (buffer.size() < msgSize) {
+                        /// can't read, need to wait for more bytes
+                        canReadMore = false;
+                        continue;
+                    }
+
+                    Decoder.DecodedMessage msgBody = Decoder.deserialize(buffer, msgSize);
+                    if(DEBUG) {
+                        System.out.println(msgBody.toString());
+                        System.out.println("-----");
+                    }
+                    // TODO: WRITE HANDLE MSG FUNCTION TO EMIT INCOMING DATA
+                    //handleMessage(msg);
+
+                    if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
+                        server.close();
+                    }
+
+                    bytesRead = 0;
+                    sizeRead = false;
                 }
             }
+
             System.out.println("Closing connection");
             // close connection
             socket.close();
