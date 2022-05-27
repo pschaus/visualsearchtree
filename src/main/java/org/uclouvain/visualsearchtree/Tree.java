@@ -128,6 +128,8 @@ public class Tree {
     }
 
     public static class Node<T> {
+        int nodeId;
+        int nodePid;
         T label;
         List<Node<T>> children;
         List<T> edgeLabels;
@@ -147,6 +149,17 @@ public class Tree {
         String branch;
 
         public Node(T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+            this.label = label;
+            this.children = children;
+            this.edgeLabels = edgeLabels;
+            this.onClick = onClick;
+            this.branch = branch;
+
+        }
+
+        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+            this.nodeId = nodeId;
+            this.nodePid = nodePid;
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;

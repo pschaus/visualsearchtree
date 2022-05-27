@@ -23,6 +23,12 @@ public class VisualTreeServer {
     private int msgSize = 0;
     private boolean DEBUG = true;
 
+    // stack of decoded incoming message
+    private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
+
+    // node we have to send to VisualTree for visualization
+    private Tree.Node<String> NodeTree;
+
     // constructor with port
     public VisualTreeServer(int port) {
         // starts server and waits for a connection
@@ -66,6 +72,9 @@ public class VisualTreeServer {
                     }
 
                     Decoder.DecodedMessage msgBody = Decoder.deserialize(buffer, msgSize);
+                    if(msgBody.msgType == Message.MsgType.NODE.getNumber())
+                        decodedMessagesList.add(msgBody);
+
                     if(DEBUG) {
                         System.out.println(msgBody.toString());
                         System.out.println("-----");
@@ -75,6 +84,7 @@ public class VisualTreeServer {
 
                     if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
                         server.close();
+                        NodeTree = Decoder.treeBuilder(decodedMessagesList);
                     }
 
                     bytesRead = 0;
@@ -89,6 +99,10 @@ public class VisualTreeServer {
         } catch (IOException i) {
             System.out.println(i);
         }
+    }
+
+    public Tree.Node<String> getNodeTree() {
+        return NodeTree;
     }
 
     public static void main(String args[]) {

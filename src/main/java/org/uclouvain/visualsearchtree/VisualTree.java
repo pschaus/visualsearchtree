@@ -20,10 +20,11 @@ public class VisualTree extends Application {
         primaryStage.setTitle("Draw tree - first test");
 
         //TODO: NEXT STEP BUILD TREE FROM SERVER NOT FOR Tree.staticTree
-        //VisualTreeServer server = new VisualTreeServer(6666);
+        VisualTreeServer server = new VisualTreeServer(6666);
+        Tree.Node<String> node = server.getNodeTree();
 
         //Tree.Node<String> node = Tree.randomTree();
-        Tree.Node<String> node = Tree.staticTree();
+        //Tree.Node<String> node = Tree.staticTree();
         StackPane sp = new StackPane();
         AnimationFactory.zoomOnSCroll(sp);
         Group treeGroup = TreeVisual.getGroup(node);

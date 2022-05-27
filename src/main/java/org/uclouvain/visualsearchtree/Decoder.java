@@ -3,8 +3,7 @@ package org.uclouvain.visualsearchtree;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Decoder {
     private static final int NODE = 0;
@@ -12,7 +11,7 @@ public class Decoder {
     private static final int START = 2;
     private static final int RESTART = 3;
 
-    public static class DecodedMessage{
+    public static class DecodedMessage implements Map<Integer, DecodedMessage> {
         public String msgTypeName;
         public int msgType;
         public int nodeId;
@@ -32,6 +31,66 @@ public class Decoder {
             else
                 return "\n\n["+msgTypeName+" {  }]";
         }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return false;
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return false;
+        }
+
+        @Override
+        public DecodedMessage get(Object key) {
+            return null;
+        }
+
+        @Override
+        public DecodedMessage put(Integer key, DecodedMessage value) {
+            return null;
+        }
+
+        @Override
+        public DecodedMessage remove(Object key) {
+            return null;
+        }
+
+        @Override
+        public void putAll(Map<? extends Integer, ? extends DecodedMessage> m) {
+
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public Set<Integer> keySet() {
+            return null;
+        }
+
+        @Override
+        public Collection<DecodedMessage> values() {
+            return null;
+        }
+
+        @Override
+        public Set<Entry<Integer, DecodedMessage>> entrySet() {
+            return null;
+        }
     }
 
     private static DecodedMessage formatData;
@@ -41,6 +100,7 @@ public class Decoder {
             buffer.add(byteData);
         }
     }
+
     public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) {
         formatData = new DecodedMessage();
         byte[] msgBody = new byte[msgSize];
@@ -100,6 +160,7 @@ public class Decoder {
         }
         return formatData;
     };
+
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
         if(len<=0 && buffer.size() == 0)
             return false;
@@ -108,6 +169,7 @@ public class Decoder {
         }
         return true;
     }
+
     private static byte[] readBytes(byte[] bytes, int off, int len) {
         byte[] b = new byte[len];
         int j = 0;
@@ -121,6 +183,7 @@ public class Decoder {
             return b;
         }
     }
+
     public static int byteArrayToInt(byte[] bytes, String endian) {
         final ByteBuffer bb = ByteBuffer.wrap(bytes);
         if(endian == "BIG_ENDIAN")
@@ -128,5 +191,56 @@ public class Decoder {
         else
             bb.order(ByteOrder.LITTLE_ENDIAN);
         return bb.getInt();
+    }
+
+    private static int rootNodeFinder(Map<Integer, DecodedMessage> data, int firstNodePid) {
+        for(Integer d : data.keySet()) {
+            if(data.get(d).nodeId == firstNodePid ) {
+                rootNodeFinder(data, data.get(d).nodePid);
+            }
+        }
+        for(Integer d : data.keySet()) {
+            if(data.get(d).nodePid == firstNodePid ) {
+                return d;
+            }
+        }
+        return 0;
+    }
+
+    private static Tree.Node<String> createNode(Map<Integer, DecodedMessage> data, int i) {
+        Tree.Node<String> NodeRoot = new Tree.Node<>((data.get(i).nodeLabel != null) ? data.get(i).nodeLabel : "root", new LinkedList<>(), new LinkedList<>(), null, NodeTypeString(data.get(i).nodeStatus));
+        for (int j : data.keySet()) {
+            if(data.get(j).nodePid == i) {
+                NodeRoot.children.add(createNode(data, j));
+            }
+        }
+        return NodeRoot;
+    }
+
+    public static Tree.Node<String> treeBuilder(List<Decoder.DecodedMessage> decodedMessageList) {
+        Map<Integer, DecodedMessage> preFormat = new HashMap<Integer, DecodedMessage>();
+        for (DecodedMessage msg: decodedMessageList) {
+            preFormat.put(msg.nodeId,  msg);
+        }
+
+        int firstNodePid = preFormat.get(0).nodePid;
+        int rootNodeId = rootNodeFinder(preFormat, firstNodePid);
+
+        Tree.Node<String> NodeRoot = createNode(preFormat, rootNodeId);
+
+        return NodeRoot;
+    }
+
+    private static String NodeTypeString(int type) {
+        switch (type) {
+            case 0:
+                return "SOLVED";
+            case 1:
+                return "FAILED";
+            case 6:
+                return "SKIPPED";
+            default:
+                return "BRANCH";
+        }
     }
 }
