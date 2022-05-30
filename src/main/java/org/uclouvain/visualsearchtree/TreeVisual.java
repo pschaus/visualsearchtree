@@ -2,46 +2,80 @@ package org.uclouvain.visualsearchtree;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class TreeVisual {
 
+    static List<Integer> legendStats = new ArrayList<>(){{
+        add(0);
+        add(0);
+        add(0);
+        add(0);
+    }};
+
     public static Group getGroup(Tree.Node<String> node) {
         Group root = new Group();
+
         Tree.PositionedNode<String> pnode = node.design();
-        drawNodeRecur(root, pnode, 0.0, 0);
+        Text nodeLabel = new Text();
+        nodeLabel.setTextAlignment(TextAlignment.RIGHT);
+        drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
         return  root;
     }
 
-    public static Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth) {
-        // circles
+    public static Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
-        System.out.println("root Position: "+root.position);
 
-        Rectangle r = createRectangle(400 + absolute * 10, 50 + depth * 20, root.branch);
+        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.branch);
+        styleLabel(nLabel, absolute, depth);
+
+        //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
-            root.nodeAction();
+            r.setFill(Color.ORANGE);
+            //root.nodeAction();
+            //Display Node Label
+            nLabel.setX(400 + absolute * 40);
+            nLabel.setY( 45 + depth * 50);
+            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
+            nLabel.setText(root.label);
         });
 
+
         g.getChildren().add(r);
+        g.getChildren().add(nLabel);
+
         for (Tree.PositionedNode<String> child : root.children) {
-            Rectangle childR = drawNodeRecur(g, child, absolute, depth + 1);
+            Rectangle childR = drawNodeRecur(g, child, absolute, depth + 1, new Text());
             Line line = connectRectangle(r, childR);
             g.getChildren().add(line);
+
+            //Make rectangle toFront
             r.toFront();
             childR.toFront();
-
         }
+
+        if (depth > legendStats.get(3)) {
+            legendStats.set(3, depth);
+        }
+        
         return r;
     }
- 
     private static Circle createCircle(double x, double y, double r, Color color) {
         Circle circle = new Circle(x, y, r, color);
         circle.setCursor(Cursor.CROSSHAIR);
@@ -50,36 +84,78 @@ public class TreeVisual {
         return circle;
     }
     private static Rectangle createRectangle(double x, double y, String branch) {
-        Rectangle rect = new Rectangle();
-        rect.setX(x);
-        rect.setY(y);
-        rect.setWidth(5);
-        rect.setHeight(5);
+        Rectangle rect = new Rectangle(x,y,20,20);
+        rect.setStrokeType(StrokeType.OUTSIDE);
+        rect.setStrokeWidth(1);
+        rect.setStroke(Color.BLACK);
+        rect.setOnMouseEntered(e -> rect.setFill(Color.ORANGE));
 
-        switch (branch){
-            case "BRANCH":{
-                rect.setArcHeight(10);
-                rect.setArcWidth(10);
+        switch (branch) {
+            case "BRANCH" -> {
+                rect.setArcHeight(40);
+                rect.setArcWidth(40);
                 rect.setFill(Color.BLUE);
-                break;
+                rect.setOnMouseExited(e -> rect.setFill(Color.BLUE));
+                rect.setOnMouseReleased(e -> rect.setFill(Color.BLUE));
+                legendStats.set(0, legendStats.get(0) +1);
             }
-            case "FAILED":{
+            case "FAILED" -> {
                 rect.setFill(Color.RED);
-                break;
+                rect.setOnMouseExited(e -> rect.setFill(Color.RED));
+                rect.setOnMouseReleased(e -> rect.setFill(Color.RED));
+                legendStats.set(1, legendStats.get(1) +1);
             }
-            case "SOLVED":{
+            case "SOLVED" -> {
                 rect.setFill(Color.GREEN);
+                rect.setOnMouseExited(e -> rect.setFill(Color.GREEN));
+                rect.setOnMouseReleased(e -> rect.setFill(Color.GREEN));
                 rect.setRotate(45);
-                break;
+                legendStats.set(2, legendStats.get(2) +1);
             }
-            default:break;
-
+            default -> {
+            }
         }
-
         rect.setCursor(Cursor.CROSSHAIR);
         return rect;
     }
 
+    private static Rectangle createRectangleForLegendBox(String branch) {
+        Rectangle rect = new Rectangle();
+        rect.setWidth(20);
+        rect.setHeight(20);
+        rect.setStrokeType(StrokeType.OUTSIDE);
+        rect.setStrokeWidth(1);
+        rect.setStroke(Color.BLACK);
+
+        switch (branch) {
+            case "BRANCH" -> {
+                rect.setArcHeight(40);
+                rect.setArcWidth(40);
+                rect.setFill(Color.BLUE);
+            }
+            case "FAILED" -> {
+                rect.setFill(Color.RED);
+            }
+            case "SOLVED" -> {
+                rect.setFill(Color.GREEN);
+                rect.setRotate(45);
+            }
+            default -> {
+            }
+        }
+        return rect;
+    }
+
+    private static void styleLabel(Text theLabel, double absolute , double depth){
+
+        theLabel.setFont(Font.font("verdana", 12));
+        theLabel.setFill(Color.GRAY);
+        theLabel.setX(400 + absolute * 40);
+        theLabel.setY( 50+ depth * 40);
+        theLabel.setTextAlignment(TextAlignment.CENTER);
+        theLabel.setOpacity(0);
+
+    }
     private static Line connect(Circle c1, Circle c2) {
         Line line = new Line();
 
@@ -91,7 +167,7 @@ public class TreeVisual {
 
 
 
-        line.setStrokeWidth(0.2);
+        line.setStrokeWidth(3);
         return line;
     }
     private static Line connectRectangle(Rectangle r1, Rectangle r2) {
@@ -102,9 +178,28 @@ public class TreeVisual {
         line.setEndX(r2.getX()+r2.getWidth()/2);
         line.setEndY(r2.getY());
 
-        line.setStrokeWidth(0.2);
+        line.setStrokeWidth(1);
 
         return line;
+    }
+
+
+    public static HBox generateLegendsStack(){
+        HBox hbox = new HBox();
+        hbox.setMaxWidth(500);
+        hbox.setPadding(new Insets(10));
+        hbox.setAlignment(Pos.BASELINE_CENTER);
+        Rectangle branchRect = createRectangleForLegendBox("BRANCH");
+        Rectangle solvedRect = createRectangleForLegendBox("SOLVED");
+        Rectangle failedRect = createRectangleForLegendBox("FAILED");
+        FlowPane s1 = new FlowPane();
+        FlowPane s2 = new FlowPane();
+        FlowPane s3 = new FlowPane();
+        s1.getChildren().addAll(new  Text("BRANCH => "), branchRect, new Text(" : "+ legendStats.get(0)));
+        s2.getChildren().addAll(new  Text("FAILED => "), failedRect, new Text(" : "+ legendStats.get(1)));
+        s3.getChildren().addAll(new  Text("SOLVED =>  "), solvedRect, new Text(" : "+ legendStats.get(2)));
+        hbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : "+ legendStats.get(3)));
+        return hbox;
     }
 
 

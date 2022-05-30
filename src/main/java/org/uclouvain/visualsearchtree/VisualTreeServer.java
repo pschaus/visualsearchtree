@@ -14,6 +14,7 @@ public class VisualTreeServer {
     private Socket socket = null;
     private ServerSocket server = null;
     private DataInputStream in = null;
+    private int port = 6666;
 
     // are there enough bytes to read something
     private boolean canReadMore = true;
@@ -32,6 +33,7 @@ public class VisualTreeServer {
     // constructor with port
     public VisualTreeServer(int port) {
         // starts server and waits for a connection
+        this.port = port;
         try {
             server = new ServerSocket(port);
             System.out.println("Server started");
@@ -103,6 +105,10 @@ public class VisualTreeServer {
 
     public Tree.Node<String> getNodeTree() {
         return NodeTree;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public static void main(String args[]) {
