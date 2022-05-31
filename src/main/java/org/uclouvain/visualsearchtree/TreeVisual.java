@@ -28,6 +28,7 @@ public class TreeVisual {
         add(0);
         add(0);
     }};
+    static List<Text> labels = new ArrayList<>(){};
 
     public static Group getGroup(Tree.Node<String> node) {
         Group root = new Group();
@@ -43,15 +44,12 @@ public class TreeVisual {
         double absolute = center + root.position;
 
         Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.branch);
-        styleLabel(nLabel, absolute, depth);
+        styleLabel(nLabel, absolute, depth, root.label);
 
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
             r.setFill(Color.ORANGE);
             //root.nodeAction();
-            //Display Node Label
-            nLabel.setX(400 + absolute * 40);
-            nLabel.setY( 45 + depth * 50);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
         });
@@ -146,14 +144,15 @@ public class TreeVisual {
         return rect;
     }
 
-    private static void styleLabel(Text theLabel, double absolute , double depth){
+    private static void styleLabel(Text theLabel, double absolute , double depth, String content){
 
-        theLabel.setFont(Font.font("verdana", 12));
+        theLabel.setFont(Font.font("verdana", 10));
         theLabel.setFill(Color.GRAY);
         theLabel.setX(400 + absolute * 40);
-        theLabel.setY( 50+ depth * 40);
-        theLabel.setTextAlignment(TextAlignment.CENTER);
+        theLabel.setY( 45+ depth * 50);
         theLabel.setOpacity(0);
+        theLabel.setText(content);
+        labels.add(theLabel);
 
     }
     private static Line connect(Circle c1, Circle c2) {
