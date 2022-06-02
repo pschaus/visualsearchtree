@@ -1,4 +1,4 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.bridge;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

@@ -1,4 +1,4 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public  class ServerUIController {
     
     @FXML
     public void initialize() {
-        System.out.println("initiali....");
+        System.out.println("Profiler UI Started ....");
     }
 
     // Add a public no-args constructor
@@ -52,5 +52,4 @@ public  class ServerUIController {
     public void loadTree(Event e){
         
     }
-
 }

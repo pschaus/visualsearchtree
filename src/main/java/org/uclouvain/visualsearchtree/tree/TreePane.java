@@ -1,4 +1,4 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.tree;
 
 import javafx.scene.layout.Pane;
 

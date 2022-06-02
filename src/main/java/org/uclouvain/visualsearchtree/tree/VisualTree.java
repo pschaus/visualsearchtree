@@ -1,4 +1,4 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.tree;
 
 
 import javafx.application.Application;
@@ -10,22 +10,25 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.uclouvain.visualsearchtree.server.VisualTreeServer;
+
+import java.io.IOException;
 
 
 public class VisualTree extends Application {
-
+    private Tree.Node<String> node;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Draw tree");
-        VisualTreeServer server = new VisualTreeServer(6666);
-        Tree.Node<String> node  = server.getNodeTree();
-        
-        try {
+        //VisualTreeServer server = new VisualTreeServer(6666);
+        //Tree.Node<String> node  = server.getNodeTree();
+        this.node  = Tree.staticTree();
 
+        try {
             // THE SERVER DRAWING......
-            Parent root = FXMLLoader.load(getClass().getResource("ThreeUI.fxml"));
-            Group treeGroup = TreeVisual.getGroup(node);
+            Parent root = FXMLLoader.load(getClass().getResource("TreeUI.fxml"));
+            Group treeGroup = TreeVisual.getGroup(this.node);
     
             Scene scene = new Scene(root, 500, 700);
             scene.setOnKeyPressed(ev ->{
@@ -48,6 +51,7 @@ public class VisualTree extends Application {
 
         } catch (Exception e) {
             //TODO: handle exception
+            e.printStackTrace();
         }
     }
 
@@ -57,5 +61,4 @@ public class VisualTree extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }

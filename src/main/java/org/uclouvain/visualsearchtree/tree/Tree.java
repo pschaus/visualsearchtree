@@ -1,4 +1,4 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.tree;
 
 // https://www.microsoft.com/en-us/research/wp-content/uploads/1996/01/drawingtrees.pdf
 
@@ -202,6 +202,10 @@ public class Tree {
 
             PositionedNode<T> resTree = new PositionedNode<T>(label, subtreesMoved, edgeLabels, onClick, 0,branch);
             return new Pair(resTree, resExtent);
+        }
+
+        public void addChildren(Node<T> newChild) {
+            children.add(newChild);
         }
     }
 

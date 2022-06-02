@@ -1,16 +1,12 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.bridge;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Connector {
     // ATTRIBUTE

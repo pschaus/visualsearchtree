@@ -8,7 +8,7 @@
 
 <VBox id="vbox" prefHeight="400" prefWidth="300"
       xmlns:fx="http://javafx.com/fxml" alignment="CENTER"
-      fx:controller="org.uclouvain.visualsearchtree.ServerUIController"
+      fx:controller="org.uclouvain.visualsearchtree.server.ServerUIController"
     >
 
     <VBox fx:id="listViewcontainer" alignment="TOP_CENTER" prefHeight="380" prefWidth="290" spacing="8">
@@ -17,9 +17,9 @@
                 <GridPane xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER" prefHeight="260" prefWidth="290">
                     <ListView  prefHeight="250" prefWidth="280" fx:id="threelistView" />
                 </GridPane>
-                <Button onAction="#showTree" text="Show Tree" prefWidth="270" prefHeight="35" fx:id="showtree" style= "-fx-color: rgb(150,150,150);" />
-                <Button onAction="#saveTree" text="Save Tree" prefWidth="270" prefHeight="35" fx:id="savetree" style= "-fx-color: rgb(150,150,150);" />
-                <Button onAction="#loadTree" text="Load Tree" prefWidth="270" prefHeight="35" fx:id="loadtree" style= "-fx-color: rgb(150,150,150);" />
+                <Button onAction="#showTree" text="Show Tree" prefWidth="280" prefHeight="35" fx:id="showtree" style= "-fx-color: rgb(247,247,247);" />
+                <Button onAction="#saveTree" text="Save Tree" prefWidth="280" prefHeight="35" fx:id="savetree" style= "-fx-color: rgb(247,247,247);" />
+                <Button onAction="#loadTree" text="Load Tree" prefWidth="280" prefHeight="35" fx:id="loadtree" style= "-fx-color: rgb(247,247,247);" />
                 <Label fx:id="portLabel" text="CONNECTION PORT: " style= "-fx-textFill: rgb(255, 0, 0);" />
             </children>
     </VBox>

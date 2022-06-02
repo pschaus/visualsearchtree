@@ -1,18 +1,18 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.server;
 
-
-// A Java program for a Serverside
+import org.uclouvain.visualsearchtree.bridge.Decoder;
+import org.uclouvain.visualsearchtree.bridge.Message;
+import org.uclouvain.visualsearchtree.tree.Tree;
+import org.uclouvain.visualsearchtree.tree.VisualTree;
 
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisualTreeServer {
-
+class ServerClientThread extends VisualTree implements Runnable {
     // initialize socket and input stream
     private Socket socket = null;
-    private ServerSocket server = null;
     private DataInputStream in = null;
     private int port = 6666;
 
@@ -30,20 +30,19 @@ public class VisualTreeServer {
     // node we have to send to VisualTree for visualization
     private Tree.Node<String> NodeTree;
 
-    // constructor with port
-    public VisualTreeServer(int port) {
-        // starts server and waits for a connection
-        this.port = port;
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Server started");
-            System.out.println("Waiting for a client ...");
-            socket = server.accept();
-            System.out.println("Client accepted");
+    private int clientNo;
 
+    ServerClientThread(Socket inSocket,int counter, int port){
+        socket = inSocket;
+        clientNo = counter;
+        this.port = port;
+    }
+
+    public void run(){
+        try {
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
-            while (!server.isClosed() || canReadMore) {
+            while (canReadMore) {
                 if (socket.getInputStream().available() > 0)
                     canReadMore = true;
 
@@ -85,7 +84,8 @@ public class VisualTreeServer {
                     //handleMessage(msg);
 
                     if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
-                        server.close();
+                        //socket.close();
+                        canReadMore = false;
                         NodeTree = Decoder.treeBuilder(decodedMessagesList);
                     }
 
@@ -94,12 +94,20 @@ public class VisualTreeServer {
                 }
             }
 
+            main(new String[] {"dd"});
+            //launch(VisualTree.class);
+
+            //VisualTree treeDrawer = new VisualTree(getNodeTree());
             System.out.println("Closing connection");
             // close connection
             socket.close();
             in.close();
-        } catch (IOException i) {
+        }
+        catch (IOException i) {
             System.out.println(i);
+        }
+        finally {
+            System.out.println("Client No:" + clientNo + " exit!! ");
         }
     }
 
@@ -110,9 +118,4 @@ public class VisualTreeServer {
     public int getPort() {
         return port;
     }
-
-    public static void main(String args[]) {
-        VisualTreeServer server = new VisualTreeServer(6666);
-    }
 }
-

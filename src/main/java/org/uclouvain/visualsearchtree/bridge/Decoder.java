@@ -1,4 +1,6 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.bridge;
+
+import org.uclouvain.visualsearchtree.tree.Tree;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -211,7 +213,7 @@ public class Decoder {
         Tree.Node<String> NodeRoot = new Tree.Node<>((data.get(i).nodeLabel != null) ? data.get(i).nodeLabel : "root", new LinkedList<>(), new LinkedList<>(), null, NodeTypeString(data.get(i).nodeStatus));
         for (int j : data.keySet()) {
             if(data.get(j).nodePid == i) {
-                NodeRoot.children.add(createNode(data, j));
+                NodeRoot.addChildren(createNode(data, j));// children.add();
             }
         }
         return NodeRoot;
