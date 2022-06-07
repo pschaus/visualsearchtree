@@ -28,14 +28,16 @@ class ServerClientThread extends VisualTree implements Runnable {
     private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
 
     // node we have to send to VisualTree for visualization
-    private Tree.Node<String> NodeTree;
+    private Tree.Node<String> nodeTree;
 
     private int clientNo;
+    private ProfilingData profilingData;
 
-    ServerClientThread(Socket inSocket,int counter, int port){
+    ServerClientThread(Socket inSocket,int counter, int port, ProfilingData profilingData){
         socket = inSocket;
         clientNo = counter;
         this.port = port;
+        this.profilingData = profilingData;
     }
 
     public void run(){
@@ -86,7 +88,7 @@ class ServerClientThread extends VisualTree implements Runnable {
                     if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
                         //socket.close();
                         canReadMore = false;
-                        NodeTree = Decoder.treeBuilder(decodedMessagesList);
+                        nodeTree = Decoder.treeBuilder(decodedMessagesList);
                     }
 
                     bytesRead = 0;
@@ -94,8 +96,9 @@ class ServerClientThread extends VisualTree implements Runnable {
                 }
             }
 
-            main(new String[] {"dd"});
-            //launch(VisualTree.class);
+            // LET NOTIFY NEW DATA IN ORDER TO DRAW
+            profilingData.addToProfilingNameList("Profiling : " + nodeTree.getLabel());
+            profilingData.addToProfilingNodesList(nodeTree);
 
             //VisualTree treeDrawer = new VisualTree(getNodeTree());
             System.out.println("Closing connection");
@@ -112,7 +115,7 @@ class ServerClientThread extends VisualTree implements Runnable {
     }
 
     public Tree.Node<String> getNodeTree() {
-        return NodeTree;
+        return nodeTree;
     }
 
     public int getPort() {

@@ -207,6 +207,10 @@ public class Tree {
         public void addChildren(Node<T> newChild) {
             children.add(newChild);
         }
+
+        public T getLabel() {
+            return label;
+        }
     }
 
     public static class PositionedNode<T> implements NodeAction{

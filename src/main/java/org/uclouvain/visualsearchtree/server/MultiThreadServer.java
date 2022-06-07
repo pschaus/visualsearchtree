@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 
 public class MultiThreadServer {
-    public MultiThreadServer(int port) {
+    public MultiThreadServer(int port, ProfilingData profilingData) {
         try{
             ServerSocket server = new ServerSocket(port);
             int counter = 0;
@@ -13,7 +13,7 @@ public class MultiThreadServer {
                 counter++;
                 Socket serverClient = server.accept();
                 System.out.println(">> " + "Listener No:" + counter + " started!");
-                ServerClientThread sct = new ServerClientThread(serverClient, counter, port);
+                ServerClientThread sct = new ServerClientThread(serverClient, counter, port, profilingData);
                 sct.run();
             }
         }
@@ -22,7 +22,7 @@ public class MultiThreadServer {
         }
     }
 
-    public static void main(String args[]) {
-        MultiThreadServer server = new MultiThreadServer(6666);
-    }
+//    public static void main(String args[]) {
+//        MultiThreadServer server = new MultiThreadServer(6666);
+//    }
 }

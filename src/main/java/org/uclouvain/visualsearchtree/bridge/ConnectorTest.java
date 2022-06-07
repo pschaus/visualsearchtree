@@ -12,7 +12,7 @@ public class ConnectorTest {
             connector.start("premier_test",-1);
 
             connector.sendNode(0,-1,-1,2, Connector.NodeStatus.BRANCH);
-            /*connector.createNode(1, 0, 0, 0, Connector.NodeStatus.FAILED).setNodeLabel("test").send();
+            connector.createNode(1, 0, 0, 0, Connector.NodeStatus.FAILED).setNodeLabel("test").send();
             connector.createNode(2, 0, 1, 2, Connector.NodeStatus.BRANCH).setNodeLabel("HIJ").setNodeInfo("some info").send();
             connector.createNode(3, 2, 1, 2, Connector.NodeStatus.BRANCH).setNodeLabel("EFG").setNodeInfo("some info").send();
             connector.createNode(5, 3, 1, 0, Connector.NodeStatus.FAILED).setNodeLabel("ABC").setNodeInfo("some info").send();
@@ -22,7 +22,7 @@ public class ConnectorTest {
             connector.createNode(8, 4, 1, 2, Connector.NodeStatus.BRANCH).setNodeLabel("XYZ").setNodeInfo("some info").send();
             connector.createNode(9, 8, 1, 2, Connector.NodeStatus.FAILED).setNodeLabel("XYZ").setNodeInfo("some info").send();
             connector.createNode(10, 8, 1, 2, Connector.NodeStatus.SOLVED).setNodeLabel("XYZ").setNodeInfo("some info").send();
-*/
+
             connector.disconnect();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

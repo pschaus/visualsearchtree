@@ -1,6 +1,7 @@
 module org.uclouvain.visualsearchtree {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens org.uclouvain.visualsearchtree to javafx.fxml;

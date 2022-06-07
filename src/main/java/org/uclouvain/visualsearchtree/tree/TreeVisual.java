@@ -36,6 +36,10 @@ public class TreeVisual {
         return  root;
     }
 
+    public static List<Text> getLabels() {
+        return labels;
+    }
+
     public static Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
 
