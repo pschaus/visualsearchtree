@@ -97,7 +97,7 @@ class ServerClientThread extends VisualTree implements Runnable {
             }
 
             // LET NOTIFY NEW DATA IN ORDER TO DRAW
-            profilingData.addToProfilingNameList("Profiling : " + nodeTree.getLabel());
+            profilingData.addToProfilingNameList("<new> " + nodeTree.getLabel());
             profilingData.addToProfilingNodesList(nodeTree);
 
             //VisualTree treeDrawer = new VisualTree(getNodeTree());
