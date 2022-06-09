@@ -147,6 +147,7 @@ public class Tree {
         public List<Node<T>> children;
         public List<T> edgeLabels;
 
+
         @Override
         public String toString() {
             return "Node [" +
@@ -160,6 +161,10 @@ public class Tree {
 
         public NodeAction onClick;
         public String branch;
+
+        public Node(){
+
+        }
 
         public Node(T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
             this.label = label;
