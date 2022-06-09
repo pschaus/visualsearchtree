@@ -45,6 +45,11 @@
             </StackPane>
          </content>
       </ScrollPane>
+
+<!--      <ScrollPane fx:id="scrollInfo" hbarPolicy="NEVER" vbarPolicy="ALWAYS" fitToWidth="true" fitToHeight="true">-->
+<!--         <VBox maxHeight="200" maxWidth="500" minHeight="100"  prefHeight="100" prefWidth="500" fx:id="infobox" />-->
+<!--      </ScrollPane>-->
+
       <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"></VBox>
    </children>
 
