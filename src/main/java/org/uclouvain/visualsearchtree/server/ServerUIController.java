@@ -3,9 +3,12 @@ package org.uclouvain.visualsearchtree.server;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -86,9 +89,8 @@ public  class ServerUIController {
                 ev.printStackTrace();
             }
             System.out.println(profilingNode.toString());
-            // TODO : SAVE DATA ONCORRECT FORMAT HERE
-            Type tokenType = new TypeToken<Tree.Node>() {}.getType();
-            outFile.println(new Gson().toJson(profilingNode, tokenType));
+            // TODO : SAVE DATA ON CORRECT FORMAT HERE - DONE(✅️)
+            outFile.println(new Gson().toJson(profilingNode,  new TypeToken<Tree.Node<String>>(){}.getType()));
             // ---------------------------------------
             outFile.close();
         }
@@ -105,53 +107,36 @@ public  class ServerUIController {
         }
     }
 
+    /*
+    * Load an old file
+    * */
     private void fileLoader() {
-        // TODO : DECODE FILE HERE AND CONVERT TO TREE.NODE
-        // ---------------format data here----------------
-//        JFileChooser fileChooser = new JFileChooser();
-//        fileChooser.setDialogTitle("Select minicp profiling backup file");
-//        fileChooser.requestFocus();
-//        int userSelection = fileChooser.showOpenDialog(null);
-//
-//        if (userSelection == JFileChooser.APPROVE_OPTION) {
-//            File fileToRead = fileChooser.getSelectedFile();
-//            String absPath = fileToRead.getAbsolutePath();
-//            Tree.Node<String> nodeFromFile;
-//            String fileContent = "";
-//
-//            try( FileReader fileStream = new FileReader( fileToRead );
-//                BufferedReader bufferedReader = new BufferedReader( fileStream ) ) {
-//
-//                String line = null;
-//
-//                while( (line = bufferedReader.readLine()) != null ) {
-//                    // do something with line
-//                    fileContent += line;
-//                }
-//
-//                Gson gson = new GsonBuilder().create();
-//                nodeFromFile = gson.fromJson(fileContent, Tree.Node.class);
-//                System.out.println(nodeFromFile.toString());
-//
-//            } catch ( FileNotFoundException ex ) {
-//                //exception Handling
-//            } catch ( IOException ex ) {
-//                //exception Handling
-//            }
-//
-//
-//
-//            //System.out.println(fileToSave);
-//            System.out.println(absPath);
-//        }
-        // ------------------------------------------------
+        // TODO : DECODE FILE HERE AND CONVERT TO TREE.NODE - DONE(✅️)
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select minicp profiling backup file");
+        fileChooser.requestFocus();
+        int userSelection = fileChooser.showOpenDialog(null);
 
-        Tree.Node nodeLoaded = Tree.staticTree();
-        pData.addToProfilingNameList("<old> " + nodeLoaded.getLabel());
-        if(!pData.getProfilingNodesList().contains(nodeLoaded)) {
-            pData.addSilentlyToProfilingNodesList(nodeLoaded);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToRead = fileChooser.getSelectedFile();
+
+            try {
+                Reader reader = Files.newBufferedReader(Paths.get(fileToRead.getAbsolutePath()));
+                Gson gson = new Gson();
+                Tree.Node<String> nodeFromFile = gson.fromJson(reader, new TypeToken<Tree.Node<String>>(){}.getType());
+
+                pData.addToProfilingNameList("<old> " + nodeFromFile.getLabel());
+                if(!pData.getProfilingNodesList().contains(nodeFromFile)) {
+                    pData.addSilentlyToProfilingNodesList(nodeFromFile);
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
     }
+
     @FXML
     public void loadTree(Event e){
         fileLoader();
