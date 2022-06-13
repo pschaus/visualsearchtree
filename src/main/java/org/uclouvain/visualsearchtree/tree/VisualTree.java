@@ -66,8 +66,8 @@ public class VisualTree {
                     VBox legendbox = (VBox) scene.lookup("#legendbox");
                     legendbox.getChildren().add(TreeVisual.generateLegendsStack());
 
-                    VBox infoBox = (VBox) scene.lookup("#infobox");
-                    infoBox.getChildren().add(label);
+//                    VBox infoBox = (VBox) scene.lookup("#infobox");
+//                    infoBox.getChildren().add(label);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
