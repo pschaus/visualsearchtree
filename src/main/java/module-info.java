@@ -2,7 +2,7 @@ module org.uclouvain.visualsearchtree {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop;
-    requires gson;
+    requires com.google.gson;
 
 
     opens org.uclouvain.visualsearchtree to javafx.fxml;
