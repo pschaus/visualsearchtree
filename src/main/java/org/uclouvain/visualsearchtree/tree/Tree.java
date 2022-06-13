@@ -56,21 +56,21 @@ public class Tree {
             System.out.println(children);
             labels.add("x = " + i);
         }
-        return new Tree.Node<String>("Node" + depth, children, labels, null, branch);
+        return new Tree.Node<String>("Node" + depth, "{\"other\": \"A node\"}", children, labels, null, branch);
     }
 
     public static Tree.Node<String> staticTree(){
-        Node<String> node11 = new Tree.Node<>("Node 11", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
-        Node<String> node12 = new Tree.Node<>("Node 12", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node11 = new Tree.Node<>("Node 11","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node12 = new Tree.Node<>("Node 12","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
 
-        Node<String> node9 = new Tree.Node<>("Node 9", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
-        Node<String> node10 = new Tree.Node<>("Node 10", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node9 = new Tree.Node<>("Node 9", "{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
+        Node<String> node10 = new Tree.Node<>("Node 10","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
 
-        Node<String> node8 = new Tree.Node<>("Node 8", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
-        Node<String> node7 = new Tree.Node<>("Node 7", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
-        Node<String> node5 = new Tree.Node<>("Node 5", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
-        Node<String> node4 = new Tree.Node<>("Node 4", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
-        Node<String> node3 = new Tree.Node<>("Node 3", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node8 = new Tree.Node<>("Node 8","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
+        Node<String> node7 = new Tree.Node<>("Node 7","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
+        Node<String> node5 = new Tree.Node<>("Node 5","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
+        Node<String> node4 = new Tree.Node<>("Node 4","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node3 = new Tree.Node<>("Node 3","{\"other\": \"A node\"}", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
 
         // Node 5 children
         node5.children.add(node11);
@@ -90,7 +90,7 @@ public class Tree {
         label6.add("x = "+0);
         label6.add("x ="+1);
 
-        Node<String> node6 = new Tree.Node<>("Node 6", children6, label6, null, "BRANCH");
+        Node<String> node6 = new Tree.Node<>("Node 6","{\"other\": \"A node\"}", children6, label6, null, "BRANCH");
 
         //Node 2 children
         List<Tree.Node<String>> children2 = new LinkedList<>();
@@ -102,7 +102,7 @@ public class Tree {
         label2.add("x = "+0);
         label2.add("x ="+1);
 
-        Node<String> node2 = new Tree.Node<>("Node 2", children2, label2, null, "BRANCH");
+        Node<String> node2 = new Tree.Node<>("Node 2","{\"other\": \"A node\"}", children2, label2, null, "BRANCH");
 
         //Node 1 children
         List<Tree.Node<String>> children1 = new LinkedList<>();
@@ -114,7 +114,7 @@ public class Tree {
         label1.add("x = "+0);
         label1.add("x ="+1);
 
-        Node<String> node1 = new Tree.Node<>("Node 2", children1, label1, null, "BRANCH");
+        Node<String> node1 = new Tree.Node<>("Node 2","{\"other\": \"A node\"}", children1, label1, null, "BRANCH");
 
         //Node 0 children
         List<Tree.Node<String>> children0 = new LinkedList<>();
@@ -127,7 +127,7 @@ public class Tree {
         label0.add("x ="+1);
 
 
-        return new Tree.Node<>("staticTree", children0, label0, null, "BRANCH");
+        return new Tree.Node<>("staticTree","{\"other\": \"A node\"}", children0, label0, null, "BRANCH");
 
     }
 
@@ -143,6 +143,7 @@ public class Tree {
     public static class Node<T> {
         public int nodeId;
         public int nodePid;
+        public T info;
         public T label;
         public List<Node<T>> children;
         public List<T> edgeLabels;
@@ -166,12 +167,13 @@ public class Tree {
 
         }
 
-        public Node(T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
             this.branch = branch;
+            this.info = info;
 
         }
 
@@ -240,6 +242,10 @@ public class Tree {
         }
         public String getBranch() {
             return branch;
+        }
+
+        public T getInfo() {
+            return info;
         }
     }
 
