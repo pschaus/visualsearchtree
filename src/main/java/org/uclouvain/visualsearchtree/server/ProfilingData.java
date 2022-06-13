@@ -33,6 +33,9 @@ public class ProfilingData {
         profilingNodesList.add(newProfilingNode);
         fireProfilingNodesListChanged(newProfilingNode);
     }
+    public void addSilentlyToProfilingNodesList(Tree.Node<String> newProfilingNode) {
+        profilingNodesList.add(newProfilingNode);
+    }
 
     // profilingNameList listener handler
     public void addProfilingDataListener(ProfilingDataListener listener) {

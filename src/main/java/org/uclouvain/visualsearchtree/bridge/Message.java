@@ -146,7 +146,7 @@ public final class Message {
             if (restartLabel != "-") {
                 byte[] msg_info = this.convertToBytes(OptionalArgs.INFO.getNumber(), 1);
 
-                // CONFIG FZN FILE TITLE(CPP SIDE)
+                // CONFIG FILE TITLE(CPP SIDE)
                 String reformat_data = "{\"name\": \"" + this.restartLabel + "\"}";
                 byte[] msg_data = reformat_data.getBytes(StandardCharsets.UTF_8);
 

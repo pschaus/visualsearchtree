@@ -1,7 +1,6 @@
 package org.uclouvain.visualsearchtree;
 
 import org.uclouvain.visualsearchtree.server.StartServer;
-
 import static javafx.application.Application.launch;
 
 public class StartProfiler {
