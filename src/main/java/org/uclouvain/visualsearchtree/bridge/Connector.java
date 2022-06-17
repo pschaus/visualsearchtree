@@ -112,8 +112,8 @@ public class Connector {
         out.write(size_buffer);
         // 02 -> SEND MSG NOW
         out.write(msg);
-        //out.flush();
-        TimeUnit.SECONDS.sleep(1);
+        out.flush();
+        TimeUnit.SECONDS.sleep(0);
     }
 
     // ---------- FOR DEBUG -----------

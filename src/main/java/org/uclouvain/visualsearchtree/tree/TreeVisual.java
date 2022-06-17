@@ -1,6 +1,5 @@
 package org.uclouvain.visualsearchtree.tree;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -12,9 +11,13 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
+import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
+import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeVisual {
 
@@ -25,6 +28,12 @@ public class TreeVisual {
         add(0);
     }};
     static List<Text> labels = new ArrayList<>(){};
+    static String info = "";
+
+    public static List focusedRect = new ArrayList<>(){{
+        add(new Rectangle());
+        add(" ");
+    }};
 
     public static Group getGroup(Tree.Node<String> node) {
         Group root = new Group();
@@ -36,10 +45,6 @@ public class TreeVisual {
         return  root;
     }
 
-    public static List<Text> getLabels() {
-        return labels;
-    }
-
     public static Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
 
@@ -48,12 +53,15 @@ public class TreeVisual {
 
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
-            r.setFill(Color.ORANGE);
             //root.nodeAction();
+            r.fireEvent(new BackToNormalEvent());
+            r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
+            info = String.valueOf(root.label);
+            focusedRect.set(0, r);
+            focusedRect.set(1, root.branch);
         });
-
 
         g.getChildren().add(r);
         g.getChildren().add(nLabel);
@@ -71,42 +79,35 @@ public class TreeVisual {
         if (depth > legendStats.get(3)) {
             legendStats.set(3, depth);
         }
-        
+
         return r;
     }
-    private static Circle createCircle(double x, double y, double r, Color color) {
-        Circle circle = new Circle(x, y, r, color);
-        circle.setCursor(Cursor.CROSSHAIR);
-        System.out.println("x:"+x +
-                "y:"+y);
-        return circle;
-    }
+
     private static Rectangle createRectangle(double x, double y, String branch) {
         Rectangle rect = new Rectangle(x,y,20,20);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
-        rect.setOnMouseEntered(e -> rect.setFill(Color.ORANGE));
+        rect.addEventHandler(CustomEvent.CUSTOM_EVENT_TYPE, new BackToNormalEventHandler() {
+            @Override
+            public void unClick() {
+                makeNotFocus();
+            }
+        });
 
         switch (branch) {
             case "BRANCH" -> {
                 rect.setArcHeight(40);
                 rect.setArcWidth(40);
                 rect.setFill(Color.BLUE);
-                rect.setOnMouseExited(e -> rect.setFill(Color.BLUE));
-                rect.setOnMouseReleased(e -> rect.setFill(Color.BLUE));
                 legendStats.set(0, legendStats.get(0) +1);
             }
             case "FAILED" -> {
                 rect.setFill(Color.RED);
-                rect.setOnMouseExited(e -> rect.setFill(Color.RED));
-                rect.setOnMouseReleased(e -> rect.setFill(Color.RED));
                 legendStats.set(1, legendStats.get(1) +1);
             }
             case "SOLVED" -> {
                 rect.setFill(Color.GREEN);
-                rect.setOnMouseExited(e -> rect.setFill(Color.GREEN));
-                rect.setOnMouseReleased(e -> rect.setFill(Color.GREEN));
                 rect.setRotate(45);
                 legendStats.set(2, legendStats.get(2) +1);
             }
@@ -119,16 +120,16 @@ public class TreeVisual {
 
     private static Rectangle createRectangleForLegendBox(String branch) {
         Rectangle rect = new Rectangle();
-        rect.setWidth(20);
-        rect.setHeight(20);
+        rect.setWidth(18);
+        rect.setHeight(18);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
 
         switch (branch) {
             case "BRANCH" -> {
-                rect.setArcHeight(40);
-                rect.setArcWidth(40);
+                rect.setArcHeight(36);
+                rect.setArcWidth(36);
                 rect.setFill(Color.BLUE);
             }
             case "FAILED" -> {
@@ -154,20 +155,6 @@ public class TreeVisual {
         theLabel.setText(content);
         labels.add(theLabel);
 
-    }
-    private static Line connect(Circle c1, Circle c2) {
-        Line line = new Line();
-
-        line.startXProperty().bind(c1.centerXProperty());
-        line.startYProperty().bind(c1.centerYProperty());
-
-        line.endXProperty().bind(c2.centerXProperty());
-        line.endYProperty().bind(new SimpleDoubleProperty(c2.getCenterY()-2));
-
-
-
-        line.setStrokeWidth(3);
-        return line;
     }
     private static Line connectRectangle(Rectangle r1, Rectangle r2) {
         Line line = new Line();
@@ -202,5 +189,25 @@ public class TreeVisual {
     }
 
 
+    public static void makeNotFocus(){
+        System.out.println("I'm in the event handler");
+        var r = (Rectangle) TreeVisual.focusedRect.get(0);
+        var branch = (String) TreeVisual.focusedRect.get(1);
+        if(!Objects.equals(branch, " ")){
+            switch (branch) {
+                case "BRANCH" -> {
+                    r.setFill(Color.BLUE);
+                }
+                case "FAILED" -> {
+                    r.setFill(Color.RED);
+                }
+                case "SOLVED" -> {
+                    r.setFill(Color.GREEN);
+                }
+                default -> {
+                }
+            }
+        }
 
+    }
 }

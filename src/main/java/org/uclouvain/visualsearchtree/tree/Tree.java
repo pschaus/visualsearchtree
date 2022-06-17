@@ -60,12 +60,25 @@ public class Tree {
     }
 
     public static Tree.Node<String> staticTree(){
+        Node<String> node11 = new Tree.Node<>("Node 11", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node12 = new Tree.Node<>("Node 12", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+
+        Node<String> node9 = new Tree.Node<>("Node 9", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
+        Node<String> node10 = new Tree.Node<>("Node 10", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
 
         Node<String> node8 = new Tree.Node<>("Node 8", new LinkedList<>(), new LinkedList<>(), null, "SOLVED");
-        Node<String> node7 = new Tree.Node<>("Node 7", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
-        Node<String> node5 = new Tree.Node<>("Node 5", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+        Node<String> node7 = new Tree.Node<>("Node 7", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
+        Node<String> node5 = new Tree.Node<>("Node 5", new LinkedList<>(), new LinkedList<>(), null, "BRANCH");
         Node<String> node4 = new Tree.Node<>("Node 4", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
         Node<String> node3 = new Tree.Node<>("Node 3", new LinkedList<>(), new LinkedList<>(), null, "FAILED");
+
+        // Node 5 children
+        node5.children.add(node11);
+        node5.children.add(node12);
+
+        // Node 7 children
+        node7.children.add(node9);
+        node7.children.add(node10);
 
         //Node 6 children
         List<Tree.Node<String>> children6 = new LinkedList<>();
@@ -114,7 +127,7 @@ public class Tree {
         label0.add("x ="+1);
 
 
-        return new Tree.Node<>("Node 1", children0, label0, null, "BRANCH");
+        return new Tree.Node<>("staticTree", children0, label0, null, "BRANCH");
 
     }
 
@@ -128,25 +141,30 @@ public class Tree {
     }
 
     public static class Node<T> {
-        int nodeId;
-        int nodePid;
-        T label;
-        List<Node<T>> children;
-        List<T> edgeLabels;
+        public int nodeId;
+        public int nodePid;
+        public T label;
+        public List<Node<T>> children;
+        public List<T> edgeLabels;
+
 
         @Override
         public String toString() {
-            return "Node{" +
+            return "Node [" +
                     "label=" + label +
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
                     ", onClick=" + onClick +
                     ", branch=" + branch +
-                    '}';
+                    ']';
         }
 
-        NodeAction onClick;
-        String branch;
+        public NodeAction onClick;
+        public String branch;
+
+        public Node(){
+
+        }
 
         public Node(T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
             this.label = label;
@@ -210,6 +228,18 @@ public class Tree {
 
         public T getLabel() {
             return label;
+        }
+        public int getNodeId() {
+            return nodeId;
+        }
+        public int getNodePid() {
+            return nodePid;
+        }
+        public NodeAction getOnClick() {
+            return onClick;
+        }
+        public String getBranch() {
+            return branch;
         }
     }
 

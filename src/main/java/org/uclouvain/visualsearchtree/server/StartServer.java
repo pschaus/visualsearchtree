@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.uclouvain.visualsearchtree.tree.Tree;
 import org.uclouvain.visualsearchtree.tree.VisualTree;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class StartServer extends Application {
             return true;
         }
     }
+    private Thread serverThread;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -36,11 +38,10 @@ public class StartServer extends Application {
 
             // THREAD1: SERVER BACKEND
             Runnable r = () -> {
-             server = new MultiThreadServer(currentAvailablePort, pData);
+                server = new MultiThreadServer(currentAvailablePort, pData);
             };
-            new Thread(r).start();
-            new  Thread(r).interrupt();
-
+            serverThread = new Thread(r);
+            serverThread.start();
 
             // THREAD2: SERVER UI
             FXMLLoader loader = new FXMLLoader();
@@ -51,6 +52,12 @@ public class StartServer extends Application {
             primaryStage.setTitle("miniCp Profiler");
             primaryStage.setScene(scene);
             Label portLabel = (Label) scene.lookup("#portLabel");
+
+            //server ui position
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            primaryStage.setAlwaysOnTop(true);
+            primaryStage.setX(screenSize.getWidth()- scene.getWidth()-30);
+            primaryStage.setY((screenSize.getHeight()/2)-(scene.getHeight()/2));
 
             //TODO: Make it dynamic - DONE(✅️)
             portLabel.setText(portLabel.getText() + currentAvailablePort);
@@ -66,16 +73,26 @@ public class StartServer extends Application {
                 @Override
                 public void newProfilingNodeReady(Tree.Node<String> node) {
                     VisualTree.treeProfilerLauncher(node, primaryStage);
+                    uiController.addToTreeDrawList(node);
                 }
             });
 
             //Show Server UI
             primaryStage.show();
-            uiController.addProfilingDataListener(pData);
+            uiController.addProfilingDataListener(pData, primaryStage);
 
         } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
+    }
+
+    @Override
+    public void stop(){
+        // TODO: [ToBeFixed] We have serious problem here.
+        //  We can't stop multithread server when we close server ui
+        //  Not Yet
+        System.out.println("Stage is closing");
+        serverThread.interrupt();
     }
 
     public static void main(String[] args) {
