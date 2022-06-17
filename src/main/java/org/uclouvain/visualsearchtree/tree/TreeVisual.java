@@ -60,6 +60,10 @@ public class TreeVisual {
         return info;
     }
 
+    public List getFocusedRect() {
+        return focusedRect;
+    }
+
     public void setLegendStats(int i, int value) {
         this.legendStats.set(i, value);
     }
@@ -101,7 +105,7 @@ public class TreeVisual {
             r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
-            this.setInfo(String.valueOf(root.label));
+            this.setInfo(root.info);
             this.setFocusedRect(r, root.branch, nLabel);
         });
 
@@ -141,7 +145,7 @@ public class TreeVisual {
             case "BRANCH" -> {
                 rect.setArcHeight(40);
                 rect.setArcWidth(40);
-                rect.setFill(Color.BLUE);
+                rect.setFill(Color.CORNFLOWERBLUE);
                 this.setLegendStats(0,this.legendStats.get(0) +1);
             }
             case "FAILED" -> {
@@ -162,17 +166,17 @@ public class TreeVisual {
 
     private Rectangle createRectangleForLegendBox(String branch) {
         Rectangle rect = new Rectangle();
-        rect.setWidth(18);
-        rect.setHeight(18);
+        rect.setWidth(12);
+        rect.setHeight(12);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
 
         switch (branch) {
             case "BRANCH" -> {
-                rect.setArcHeight(36);
-                rect.setArcWidth(36);
-                rect.setFill(Color.BLUE);
+                rect.setArcHeight(24);
+                rect.setArcWidth(24);
+                rect.setFill(Color.CORNFLOWERBLUE);
             }
             case "FAILED" -> rect.setFill(Color.RED);
             case "SOLVED" -> {
@@ -226,19 +230,18 @@ public class TreeVisual {
 
     public HBox generateLegendsStack(){
         HBox hbox = new HBox();
-        hbox.setMaxWidth(500);
         hbox.setPadding(new Insets(10));
-        hbox.setAlignment(Pos.BASELINE_CENTER);
+        hbox.setAlignment(Pos.BASELINE_LEFT);
         Rectangle branchRect = createRectangleForLegendBox("BRANCH");
         Rectangle solvedRect = createRectangleForLegendBox("SOLVED");
         Rectangle failedRect = createRectangleForLegendBox("FAILED");
         FlowPane s1 = new FlowPane();
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
-        s1.getChildren().addAll(new  Text("BRANCH => "), branchRect, new Text(" : "+ this.legendStats.get(0)));
-        s2.getChildren().addAll(new  Text("FAILED => "), failedRect, new Text(" : "+ this.legendStats.get(1)));
-        s3.getChildren().addAll(new  Text("SOLVED =>  "), solvedRect, new Text(" : "+ this.legendStats.get(2)));
-        hbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : "+ this.legendStats.get(3)));
+        s1.getChildren().addAll(branchRect, new Text("  ("+ this.legendStats.get(0)+")"));
+        s2.getChildren().addAll(failedRect, new Text("  ("+ this.legendStats.get(1)+")"));
+        s3.getChildren().addAll(solvedRect, new Text("  ("+ this.legendStats.get(2)+")"));
+        hbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : ("+ this.legendStats.get(3)+")"));
         return hbox;
     }
 
@@ -250,7 +253,7 @@ public class TreeVisual {
         label.setOpacity(0);
         if(!Objects.equals(branch, " ")){
             switch (branch) {
-                case "BRANCH" -> r.setFill(Color.BLUE);
+                case "BRANCH" -> r.setFill(Color.CORNFLOWERBLUE);
                 case "FAILED" -> r.setFill(Color.RED);
                 case "SOLVED" -> r.setFill(Color.GREEN);
                 default -> {
@@ -296,7 +299,6 @@ public class TreeVisual {
         }
         Gson g = new Gson();
         NodeInfoData info = g.fromJson(node.getInfo(), new TypeToken<NodeInfoData>(){}.getType());
-        System.out.println(info);
 
         if(info != null) {
             try {
