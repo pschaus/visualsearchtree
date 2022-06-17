@@ -210,7 +210,7 @@ public class Decoder {
     }
 
     private static Tree.Node<String> createNode(Map<Integer, DecodedMessage> data, int i) {
-        Tree.Node<String> NodeRoot = new Tree.Node<>((data.get(i).nodeLabel != null) ? data.get(i).nodeLabel : "root", new LinkedList<>(), new LinkedList<>(), null, NodeTypeString(data.get(i).nodeStatus));
+        Tree.Node<String> NodeRoot = new Tree.Node<>((data.get(i).nodeLabel != null) ? data.get(i).nodeLabel : "root", data.get(i).nodeInfo, new LinkedList<>(), new LinkedList<>(), null, NodeTypeString(data.get(i).nodeStatus));
         for (int j : data.keySet()) {
             if(data.get(j).nodePid == i) {
                 NodeRoot.addChildren(createNode(data, j));// children.add();

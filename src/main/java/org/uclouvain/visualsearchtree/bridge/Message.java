@@ -134,7 +134,8 @@ public final class Message {
         System.out.println("\n" + this.toString() + "\n");
         if (this.msgType == MsgType.DONE.getNumber()) {
             return this.convertToBytes(MsgType.DONE.getNumber(), 1);
-        } else if (this.msgType == MsgType.START.getNumber()) {
+        }
+        else if (this.msgType == MsgType.START.getNumber()) {
             // CREATE OUTPUT STREAM
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -162,7 +163,8 @@ public final class Message {
         } else if (this.msgType == MsgType.RESTART.getNumber()) {
             byte[] msg_type = this.convertToBytes(MsgType.RESTART.getNumber(), 1);
             return msg_type;
-        } else if (this.msgType == MsgType.NODE.getNumber()) {
+        }
+        else if (this.msgType == MsgType.NODE.getNumber()) {
             // CREATE OUTPUT STREAM
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -216,7 +218,8 @@ public final class Message {
 
                 // CONFIG FZN FILE TITLE(CPP SIDE)
                 String reformat_data = "{\"name\": \"" + this.nodeInfo + "\"}";
-                byte[] msg_data3 = reformat_data.getBytes(StandardCharsets.UTF_8);
+                // Use NodInfo AS incoming data is already on json format
+                byte[] msg_data3 = this.nodeInfo.getBytes(StandardCharsets.UTF_8);
 
                 // INFO DATA SIZE
                 byte[] size_data3 = this.convertToBytes(msg_data3.length, 4, "BIG_ENDIAN");

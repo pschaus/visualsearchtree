@@ -1,56 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox id="vbox" prefHeight="400" prefWidth="800"
+      fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController"
+      onKeyPressed="#attachEvent"
       xmlns:fx="http://javafx.com/fxml">
-   <children>
-      <MenuBar fx:id="menuBar" >
-         <menus>
-            <Menu text="Node">
-               <items>
-                  <MenuItem text="New"/>
-                  <MenuItem text="Open"/>
-                  <MenuItem text="Save"/>
-                  <MenuItem text="Save As"/>
-                  <SeparatorMenuItem  />
-                  <MenuItem text="Exit"/>
-               </items>
-            </Menu>
-            <Menu text="Edit">
-               <items>
-                  <MenuItem text="Copy"/>
-                  <MenuItem text="Cut"/>
-                  <MenuItem text="Paste"/>
-               </items>
-            </Menu>
-            <Menu text="Help">
-               <items>
-                  <MenuItem text="Search" disable="true"/>
-                  <MenuItem text="Online Manual" visible="false"/>
-                  <SeparatorMenuItem />
-                  <MenuItem text="About" />
-               </items>
-            </Menu>
-         </menus>
-      </MenuBar>
 
-      <ScrollPane fx:id="sasd">
-         <content>
-            <StackPane fx:id="treeroot" maxHeight="650" maxWidth="500" minHeight="300" minWidth="500" prefHeight="650" prefWidth="500" style="">
-            </StackPane>
-         </content>
-      </ScrollPane>
+   <MenuBar fx:id="menuBar">
+      <Menu text="Node" onShowing="#alignMenuItemText">
+         <MenuItem text="Show Labels" fx:id="showLabels" onAction="#showNodeLabels"/>
+         <MenuItem text="Show Infos" fx:id="showInfos" onAction="#showNodeInfos"/>
+         <MenuItem text="Optimization graph" fx:id="showGaph" onAction="#displayGraph"/>
+         <MenuItem text="Save File" onAction="#saveTree" disable="true"/>
+         <SeparatorMenuItem/>
+         <MenuItem text="Exit" fx:id="closeMenu" onAction="#closeWindow"/>
+      </Menu>
+      <Menu text="Help">
+         <MenuItem text="Search" disable="true"/>
+         <MenuItem text="Help" visible="false"/>
+         <SeparatorMenuItem/>
+         <MenuItem text="About" fx:id="about" onAction="#aboutUs"/>
+      </Menu>
+   </MenuBar>
 
-<!--      <ScrollPane fx:id="scrollInfo" hbarPolicy="NEVER" vbarPolicy="ALWAYS" fitToWidth="true" fitToHeight="true">-->
-<!--         <VBox maxHeight="200" maxWidth="500" minHeight="100"  prefHeight="100" prefWidth="500" fx:id="infobox" />-->
-<!--      </ScrollPane>-->
+   <ScrollPane fx:id="sasd">
+      <StackPane fx:id="treeroot" maxHeight="550" maxWidth="500" minHeight="300" minWidth="500" prefHeight="450"
+                 prefWidth="500" style="">
+      </StackPane>
+   </ScrollPane>
+   <VBox maxHeight="50" maxWidth="210" minHeight="50" prefHeight="50" prefWidth="500" fx:id="legendbox"/>
 
-      <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"></VBox>
-   </children>
+   <TabPane fx:id="tabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+      <tabs>
+         <Tab fx:id="graph" text="Optimization Graph">
+            <AnchorPane id="Content">
+               <VBox minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" fx:id="chartUI"
+                     style="-fx-cursor: crosshair"/>
+            </AnchorPane>
+         </Tab>
+         <Tab fx:id="infoTab" text="Node Infos" onSelectionChanged="#showNodeInfos">
+            <AnchorPane id="Content" maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+               <Label fx:id="infoLabel" style="-fx-padding: 10" textAlignment="CENTER"/>
+            </AnchorPane>
+         </Tab>
+      </tabs>
+   </TabPane>
 
 </VBox>
