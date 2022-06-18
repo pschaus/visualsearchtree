@@ -30,28 +30,22 @@
                  prefWidth="500" style="">
       </StackPane>
    </ScrollPane>
-   <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"/>
-
-   <!--   <VBox maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300" fx:id="chartUI"/>-->
+   <VBox maxHeight="50" maxWidth="210" minHeight="50" prefHeight="50" prefWidth="500" fx:id="legendbox"/>
 
    <TabPane fx:id="tabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <tabs>
-         <Tab text="Optimization Graph">
-            <content>
-               <AnchorPane id="Content">
-                  <VBox minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" fx:id="chartUI" style="-fx-cursor: crosshair"/>
-               </AnchorPane>
-            </content>
+         <Tab fx:id="graph" text="Optimization Graph">
+            <AnchorPane id="Content">
+               <VBox minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" fx:id="chartUI"
+                     style="-fx-cursor: crosshair"/>
+            </AnchorPane>
          </Tab>
-         <Tab text="Node Infos">
-            <content >
-               <AnchorPane id="Content" maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
-                  <Label style="-fx-padding: 10">Klaus ! You've to write node infos here onkeyup</Label>
-               </AnchorPane>
-            </content>
+         <Tab fx:id="infoTab" text="Node Infos" onSelectionChanged="#showNodeInfos">
+            <AnchorPane id="Content" maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+               <Label fx:id="infoLabel" style="-fx-padding: 10" textAlignment="CENTER"/>
+            </AnchorPane>
          </Tab>
       </tabs>
    </TabPane>
 
-<!--   <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"/>-->
 </VBox>
