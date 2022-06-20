@@ -13,4 +13,6 @@ module org.uclouvain.visualsearchtree {
     opens org.uclouvain.visualsearchtree.bridge to javafx.fxml;
     exports org.uclouvain.visualsearchtree.server;
     opens org.uclouvain.visualsearchtree.server to javafx.fxml;
+    opens org.uclouvain.visualsearchtree.examples to javafx.fxml;
+    exports org.uclouvain.visualsearchtree.examples;
 }
