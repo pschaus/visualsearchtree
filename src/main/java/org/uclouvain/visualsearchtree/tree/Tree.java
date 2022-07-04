@@ -48,7 +48,7 @@ public class Tree {
             System.out.println(children);
             labels.add("x = " + i);
         }
-        return new Tree.Node<String>("Node" + depth, "{\"cost\": 10, \"param1\": 1, \"other\": \"Some info on node 1\"}", children, labels, null, branch);
+        return new Tree.Node<String>("n=" + depth, "{\"cost\": 10, \"param1\": 1, \"other\": \"Some info on node 1\"}", children, labels, null, branch);
     }
     static record Pair<L, R>(L left, R right) {
 

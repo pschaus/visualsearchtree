@@ -1,16 +1,18 @@
 package org.uclouvain.visualsearchtree.tree;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -19,6 +21,7 @@ import javafx.stage.Stage;
 public class VisualTree {
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
+        final double SCALE_DELTA = 1.1;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -38,11 +41,17 @@ public class VisualTree {
                     outputStage.setScene(scene);
                     outputStage.show();
 
+//                    Slider sl =(Slider) scene.lookup("#zoomSlider");
+
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(treeGroup);
+                    //sp.translateYProperty().bind(sl.valueProperty());
+
+                    AnimationFactory.zoomOnSCroll(sp);
 
                     VBox legendbox = (VBox) scene.lookup("#legendbox");
                     legendbox.getChildren().add(instance.generateLegendsStack());
+                    treeController.init();
 
                     /** TEST GRAPH **/
                     final NumberAxis xAxis = new NumberAxis();

@@ -60,6 +60,9 @@ public class TreeVisual {
         return info;
     }
 
+    public List<Integer> getLegendStats() {
+        return legendStats;
+    }
     public List getFocusedRect() {
         return focusedRect;
     }
@@ -103,6 +106,7 @@ public class TreeVisual {
             //root.nodeAction();
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
+            System.out.println(root.position);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
             this.setInfo(root.info);
@@ -130,7 +134,7 @@ public class TreeVisual {
     }
 
     private Rectangle createRectangle(double x, double y, String branch) {
-        Rectangle rect = new Rectangle(x,y,20,20);
+        Rectangle rect = new Rectangle(x,y,18,18);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
@@ -143,6 +147,8 @@ public class TreeVisual {
 
         switch (branch) {
             case "BRANCH" -> {
+                rect.setHeight(20);
+                rect.setWidth(20);
                 rect.setArcHeight(40);
                 rect.setArcWidth(40);
                 rect.setFill(Color.CORNFLOWERBLUE);
@@ -194,15 +200,21 @@ public class TreeVisual {
         theLabel.setFont(Font.font("Roboto", 10));
         theLabel.setFill(Color.rgb(13, 15, 16));
         if (nChild == 0) {
-            theLabel.setX(392 + absolute * 40);
+            theLabel.setX(400 + absolute * 40);
             theLabel.setY(82 + depth * 50);
         } else {
             if (pos == 0.0) {
-                theLabel.setX(400 + absolute * 40);
+                theLabel.setX(402 + absolute * 40);
                 theLabel.setY(45 + depth * 50);
             } else if (pos < 0) {
-                theLabel.setX(355 + absolute * 40);
-                theLabel.setY(55 + depth * 50);
+                if(pos == -1){
+                    theLabel.setX(378 + absolute * 40);
+                    theLabel.setY(50 + depth * 50);
+                }
+                else{
+                    theLabel.setX(420 + absolute * 40);
+                    theLabel.setY(50 + depth * 50);
+                }
             } else {
                 theLabel.setX(422 + absolute * 40);
                 theLabel.setY(48 + depth * 50);

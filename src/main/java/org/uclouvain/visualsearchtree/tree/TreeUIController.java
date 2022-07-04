@@ -2,10 +2,17 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TouchEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -17,6 +24,8 @@ public class TreeUIController {
     public TabPane tabPane;
     public Tab graph;
     public Tab infoTab;
+    public StackPane treeroot;
+    public Slider zoomSlider;
     private TreeVisual instance;
 
     public void setInstance(TreeVisual instance) {
@@ -32,6 +41,18 @@ public class TreeUIController {
     public MenuItem about;
 
     // Menu actions methodes
+
+    public  void init(){
+        resize();
+        attachEvent();
+    }
+    public void resize(){
+        int depth = instance.getLegendStats().get(3);
+        if(depth>4){
+            treeroot.setMinHeight(depth*60);
+            treeroot.setMinWidth(depth*130);
+        }
+    }
     public void attachEvent(){
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
@@ -40,19 +61,28 @@ public class TreeUIController {
             if(ev.getCode()== KeyCode.I){
                 displayNodeInfos();
             }
+            if(ev.getCode()== KeyCode.O){
+                displayGraph();
+            }
+        });
+
+        zoomSlider.valueChangingProperty().addListener((observableValue, aBoolean, t1) -> {
+            treeroot.setPrefSize(400+zoomSlider.getValue(), 400+zoomSlider.getValue());
+            treeroot.setScaleX(1 + zoomSlider.getValue()*0.01);
+            treeroot.setScaleY(1 + zoomSlider.getValue()*0.01);
         });
     }
+
     public void showNodeLabels(ActionEvent actionEvent) {
         showAllLabels();
     }
     public void showNodeInfos(Event actionEvent) {
         displayNodeInfos();
     }
-    public void displayGraph(ActionEvent actionEvent) {
-        if(tabPane.getSelectionModel().getSelectedItem()!=graph){
-            tabPane.getSelectionModel().select(graph);
-        }
+    public void showGraph(Event actionEvent){
+        displayGraph();
     }
+
     public void closeWindow(ActionEvent actionEvent) {
         Stage st = (Stage) menuBar.getScene().getWindow();
         st.close();
@@ -89,6 +119,11 @@ public class TreeUIController {
             }
         }
     }
+    public void displayGraph() {
+        if(tabPane.getSelectionModel().getSelectedItem()!=graph){
+            tabPane.getSelectionModel().select(graph);
+        }
+    }
 
     public void aboutUs(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -113,5 +148,7 @@ public class TreeUIController {
         System.out.println("Been Clicked");
         showLabels.setText("Show Labels \t\t L");
         showInfos.setText("Show Infos \t\t I");
+        showGaph.setText("Show graph \t\t O");
     }
+
 }
