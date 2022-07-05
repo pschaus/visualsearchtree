@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -17,16 +20,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class TreeUIController {
-
     public Label infoLabel;
     public TabPane tabPane;
     public Tab graph;
     public Tab infoTab;
     public StackPane treeroot;
     public Slider zoomSlider;
+    public TableView tableView;
     private TreeVisual instance;
 
     public void setInstance(TreeVisual instance) {
@@ -46,6 +51,7 @@ public class TreeUIController {
     public  void init(){
         resize();
         attachEvent();
+        initTableInfo();
     }
     public void resize(){
         int depth = instance.getLegendStats().get(3);
@@ -105,22 +111,44 @@ public class TreeUIController {
         }
     }
 
+    private void initTableInfo () {
+        TableColumn<Map, String> keyColumn = new TableColumn<>("Key");
+        keyColumn.setCellValueFactory(new MapValueFactory<>("Key"));
+        keyColumn.setMinWidth(150);
+
+        TableColumn<Map, String> valueColumn = new TableColumn<>("Value");
+        valueColumn.setCellValueFactory(new MapValueFactory<>("Value"));
+        valueColumn.setMinWidth(150);
+
+        tableView.getColumns().add(keyColumn);
+        tableView.getColumns().add(valueColumn);
+    }
+
     public void displayNodeInfos(){
-        if(tabPane.getSelectionModel().getSelectedItem()!=infoTab){
+        if(tabPane.getSelectionModel().getSelectedItem() != infoTab){
             tabPane.getSelectionModel().select(infoTab);
         }
         Gson g = new Gson();
         TreeVisual.NodeInfoData info = g.fromJson(instance.getInfo(), new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-        if(info!=null){
-            infoLabel.setText(info.other);
+        tableView.getItems().clear();
+        if(info != null) {
+            ObservableList<Map<String, Object>> items = FXCollections.<Map<String, Object>>observableArrayList();
+            Map<String, Object> item1 = new HashMap<>();
+            item1.put("Key", "cost");
+            item1.put("Value" , info.cost);
+            items.add(item1);
+            Map<String, Object> item2 = new HashMap<>();
+            item2.put("Key", "param1");
+            item2.put("Value"  , info.param1);
+            items.add(item2);
+            Map<String, Object> item3 = new HashMap<>();
+            item3.put("Key", "other");
+            item3.put("Value" , info.other);
+            items.add(item3);
+            tableView.getItems().addAll(items);
         }
         else{
-            if(Objects.equals(((Text) instance.getFocusedRect().get(2)).getText(), "root")){
-                infoLabel.setText("Root node selected\n No infos to display");
-            }
-            else{
-                infoLabel.setText("No node selected!\n Please select a node yet.");
-            }
+            tableView.setPlaceholder(new Label("Select one Node and press 'I' to display this Node infos."));
         }
     }
     public void displayGraph() {
