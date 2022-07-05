@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -63,6 +64,9 @@ public class TreeUIController {
             }
             if(ev.getCode()== KeyCode.O){
                 displayGraph();
+            }
+            if(ev.getCode()== KeyCode.Q || ev.getCode() == KeyCode.LEFT || ev.getCode() == KeyCode.RIGHT || ev.getCode() == KeyCode.UP || ev.getCode() == KeyCode.DOWN){
+                changeHighlightedNode(ev.getCode());
             }
         });
 
@@ -151,4 +155,26 @@ public class TreeUIController {
         showGaph.setText("Show graph \t\t O");
     }
 
+    // Aborted functionality: Direction keys are already used for tree navigation.
+    // Alternative: Gamer keys.
+    // [ lowered priority ]
+    private void changeHighlightedNode(KeyCode code) {
+        switch (code) {
+            case LEFT -> {
+                System.out.println(KeyCode.LEFT);
+            }
+            case RIGHT -> {
+                System.out.println(KeyCode.RIGHT);
+            }
+            case UP -> {
+                System.out.println(KeyCode.UP);
+            }
+            case DOWN -> {
+                System.out.println(KeyCode.DOWN);
+            }
+            default -> {
+
+            }
+        }
+    }
 }
