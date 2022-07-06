@@ -2,7 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox id="vbox" prefHeight="400" prefWidth="800"  xmlns:fx="http://javafx.com/fxml" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
       <Menu onShowing="#alignMenuItemText" text="Node">
@@ -25,7 +26,7 @@
       <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400.0" />
    </ScrollPane>
    <Slider fx:id="zoomSlider"  min="-100" />
-   <VBox fx:id="legendbox" maxHeight="50" maxWidth="210" minHeight="50" prefHeight="50" prefWidth="500" />
+   <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <tabs>
          <Tab fx:id="graph" text="Optimization Graph">
@@ -46,9 +47,8 @@
             </AnchorPane>
          </Tab>
          <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
-            <AnchorPane id="Content" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
-               <Label fx:id="infoLabel" style="-fx-padding: 10" textAlignment="CENTER" />
-            </AnchorPane>
+            <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+            </TableView>
          </Tab>
       </tabs>
    </TabPane>

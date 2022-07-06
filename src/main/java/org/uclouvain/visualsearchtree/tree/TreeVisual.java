@@ -96,12 +96,11 @@ public class TreeVisual {
 
     public Group getGroup() {
         Group root = new Group();
-
         Tree.PositionedNode<String> pnode = this.getNode().design();
         Text nodeLabel = new Text();
         nodeLabel.setTextAlignment(TextAlignment.RIGHT);
         drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
-        return  root;
+        return root;
     }
 
     public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
@@ -210,7 +209,6 @@ public class TreeVisual {
     }
 
     private void styleLabel(Text theLabel, double absolute , double depth, String content, double pos, int nChild) {
-
         theLabel.setFont(Font.font("Roboto", 10));
         theLabel.setFill(Color.rgb(13, 15, 16));
         if (nChild == 0) {
@@ -240,6 +238,7 @@ public class TreeVisual {
         this.setLabels(theLabel);
 
     }
+
     private Line connectRectangle(Rectangle r1, Rectangle r2) {
         Line line = new Line();
         line.setStartX(r1.getX()+r1.getWidth()/2);

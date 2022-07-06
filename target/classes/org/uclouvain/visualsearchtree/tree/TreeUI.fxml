@@ -2,56 +2,43 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<VBox id="vbox" prefHeight="400" prefWidth="800"
-      fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController"
-      onKeyPressed="#attachEvent"
-      xmlns:fx="http://javafx.com/fxml">
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
-      <Menu text="Node" onShowing="#alignMenuItemText">
-         <MenuItem text="Show Labels" fx:id="showLabels" onAction="#showNodeLabels"/>
-         <MenuItem text="Show Infos" fx:id="showInfos" onAction="#showNodeInfos"/>
-         <MenuItem text="Optimization graph" fx:id="showGaph" onAction="#displayGraph"/>
-         <MenuItem text="Save File" onAction="#saveTree" disable="true"/>
-         <SeparatorMenuItem/>
-         <MenuItem text="Exit" fx:id="closeMenu" onAction="#closeWindow"/>
+      <Menu onShowing="#alignMenuItemText" text="Node">
+         <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />
+         <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />
+         <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />
+         <MenuItem disable="true" onAction="#saveTree" text="Save File" />
+         <SeparatorMenuItem />
+         <MenuItem fx:id="closeMenu" onAction="#closeWindow" text="Exit" />
       </Menu>
       <Menu text="Help">
-         <MenuItem text="Search" disable="true"/>
-         <MenuItem text="Help" visible="false"/>
-         <SeparatorMenuItem/>
-         <MenuItem text="About" fx:id="about" onAction="#aboutUs"/>
+         <MenuItem disable="true" text="Search" />
+         <MenuItem text="Help" visible="false" />
+         <SeparatorMenuItem />
+         <MenuItem fx:id="about" onAction="#aboutUs" text="About" />
       </Menu>
    </MenuBar>
 
-   <ScrollPane fx:id="sasd">
-      <StackPane fx:id="treeroot" maxHeight="550" maxWidth="500" minHeight="300" minWidth="500" prefHeight="450"
-                 prefWidth="500" style="">
-      </StackPane>
+   <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
+      <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400.0" />
    </ScrollPane>
-   <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"/>
-
-   <!--   <VBox maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300" fx:id="chartUI"/>-->
-
-   <TabPane fx:id="tabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+   <Slider fx:id="zoomSlider"  min="-100" />
+   <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
+   <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <tabs>
-         <Tab text="Optimization Graph">
-            <content>
-               <AnchorPane id="Content">
-                  <VBox minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" fx:id="chartUI" style="-fx-cursor: crosshair"/>
-               </AnchorPane>
-            </content>
+         <Tab fx:id="graph" text="Optimization Graph">
+            <AnchorPane id="Content">
+               <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" style="-fx-cursor: crosshair" />
+            </AnchorPane>
          </Tab>
-         <Tab text="Node Infos">
-            <content >
-               <AnchorPane id="Content" maxHeight="300" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
-                  <Label style="-fx-padding: 10">Klaus ! You've to write node infos here onkeyup</Label>
-               </AnchorPane>
-            </content>
+         <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
+            <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+            </TableView>
          </Tab>
       </tabs>
    </TabPane>
 
-<!--   <VBox maxHeight="50" maxWidth="500" minHeight="50" minWidth="500" prefHeight="50" prefWidth="500" fx:id="legendbox"/>-->
 </VBox>
