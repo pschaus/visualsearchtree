@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
+<VBox id="vbox" prefHeight="400" prefWidth="800"  xmlns:fx="http://javafx.com/fxml" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
       <Menu onShowing="#alignMenuItemText" text="Node">
@@ -30,7 +30,19 @@
       <tabs>
          <Tab fx:id="graph" text="Optimization Graph">
             <AnchorPane id="Content">
-               <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="480" prefHeight="220" prefWidth="280" style="-fx-cursor: crosshair" />
+               <HBox>
+                  <fx:define>
+                     <ToggleGroup  fx:id="graphType" />
+                  </fx:define>
+
+                  <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="380" style="-fx-cursor: crosshair" />
+                  <VBox spacing="10">
+                     <children>
+                        <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
+                        <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
+                     </children>
+                  </VBox>
+               </HBox>
             </AnchorPane>
          </Tab>
          <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">

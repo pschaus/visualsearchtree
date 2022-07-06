@@ -2,6 +2,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -9,20 +10,21 @@ import javafx.scene.Group;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TreeVisual {
     private final Tree.Node<String> node;
@@ -30,6 +32,10 @@ public class TreeVisual {
     private List<Text> labels;
     private String info;
     private List focusedRect;
+
+    private Map<String, Rectangle> allNodesRects;
+    private Map<String, XYChart.Data> allNodesChartDatas;
+    private Map<String, Tree.PositionedNode<String>> allNodesPositions;
 
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
@@ -46,6 +52,9 @@ public class TreeVisual {
             add(0);
             add(0);
         }};
+        this.allNodesRects = new Hashtable<>();
+        this.allNodesPositions = new Hashtable<>();
+        this.allNodesChartDatas = new Hashtable<>();
     }
 
     public Tree.Node<String> getNode() {
@@ -97,22 +106,20 @@ public class TreeVisual {
 
     public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
+        Gson gz = new Gson();
+        NodeInfoData info = null;
 
         Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.branch);
         styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
-
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
-            //root.nodeAction();
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
-            System.out.println(root.position);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
             this.setInfo(root.info);
             this.setFocusedRect(r, root.branch, nLabel);
         });
-
         g.getChildren().add(r);
         g.getChildren().add(nLabel);
 
@@ -130,6 +137,13 @@ public class TreeVisual {
             this.setLegendStats(3, depth);
         }
 
+        info = gz.fromJson(root.info, new TypeToken<NodeInfoData>(){}.getType());
+        if (info != null) {
+            String nodeID = UUID.randomUUID().toString();
+            this.allNodesPositions.put(nodeID, root);
+            this.allNodesRects.put(nodeID, r);
+            this.allNodesChartDatas.put(nodeID, (new XYChart.Data(info.cost, info.param1)));
+        }
         return r;
     }
 
@@ -276,23 +290,40 @@ public class TreeVisual {
     }
 
     /**
-     * Create optimization graph
-     *
-     * @param  rootNode   the root node of the tree.
-     * @return         line chart representing the graph
+     * Create the optimization chart
+     * @param all_sol
+     * @return
      */
-    public static LineChart<Number, Number> getTreeChart(Tree.Node<String> rootNode){
+    public LineChart<Number, Number> getTreeChart(boolean all_sol){
+        // variables
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Node Cost");
-        xAxis.setLabel("Number of Solution");
-        //creating the chart
-        final LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
-//        lineChart.setTitle("Optimization Graph");
-
-        //defining a series
         XYChart.Series series = new XYChart.Series();
-        getchildRecursvly(series, rootNode);
+        String x_label = "Number of Solution";
+        yAxis.setLabel("Node Cost");
+        if (!all_sol){
+            x_label = "Number of Nodes";
+        }
+        xAxis.setLabel(x_label);
+        //creating the chart
+        final LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
+        if (all_sol)
+        {
+            for (String key: this.allNodesPositions.keySet())
+            {
+                System.out.println(this.allNodesChartDatas.get(key));
+                series.getData().add(this.allNodesChartDatas.get(key));
+            }
+        }
+        else
+        {
+            for (String key: this.allNodesPositions.keySet())
+            {
+                if (this.allNodesPositions.get(key).branch == "SOLVED")
+                    series.getData().add(this.allNodesChartDatas.get(key));
+            }
+        }
+
         lineChart.getData().add(series);
         return  lineChart;
     }
@@ -303,21 +334,39 @@ public class TreeVisual {
         public String other = "";
     }
 
-    private static void getchildRecursvly(XYChart.Series series, Tree.Node<String> node){
-        if (node.children.size() > 0) {
-            for (Tree.Node<String> child: node.children) {
-                getchildRecursvly(series, child);
-            }
-        }
-        Gson g = new Gson();
-        NodeInfoData info = g.fromJson(node.getInfo(), new TypeToken<NodeInfoData>(){}.getType());
+    /**
+     * Use function to add event on chart
+     */
+    public void addEventOnChart()
+    {
+        for (String key: this.allNodesPositions.keySet())
+        {
+            if (this.allNodesChartDatas.get(key) != null)
+            {
+                //variables
+                Data tmp_data = (Data)this.allNodesChartDatas.get(key);
+                Rectangle tmp_rect = this.allNodesRects.get(key);
 
-        if(info != null) {
-            try {
-                Integer x = Integer.parseInt(info.cost+"");
-                Integer y = Integer.parseInt(info.param1+"");
-                series.getData().add(new XYChart.Data(x, y));
-            } catch (NumberFormatException e) {
+                tmp_data.getNode().setCursor(Cursor.HAND);
+                Color old_col = (Color) tmp_rect.getFill();
+                tmp_data.getNode().setOnMouseClicked(event -> {
+                    //Make focus and animate to ease visibility
+
+                    //Animate
+                    ScaleTransition st = new ScaleTransition(Duration.millis(200), tmp_rect);
+                    st.setByX(0.5f);
+                    st.setByY(0.5f);
+                    st.setCycleCount(4);
+                    st.setAutoReverse(true);
+                    st.play();
+
+                    //focus
+                    tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
+                    tmp_rect.setFill(Color.ORANGE);
+                });
+                tmp_data.getNode().setOnMouseExited(event -> {
+                    this.allNodesRects.get(key).setFill(old_col);
+                });
             }
         }
     }

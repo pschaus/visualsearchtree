@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -27,6 +28,18 @@ public class TreeUIController {
     public StackPane treeroot;
     public Slider zoomSlider;
     private TreeVisual instance;
+
+    @FXML
+    public ToggleGroup graphType;
+
+    @FXML
+    public RadioButton radioOnlySol;
+
+    @FXML
+    public RadioButton radioAllNods;
+
+    @FXML
+    public VBox chartUI;
 
     public void setInstance(TreeVisual instance) {
         this.instance = instance;
@@ -45,6 +58,23 @@ public class TreeUIController {
     public  void init(){
         resize();
         attachEvent();
+
+        // Check if radio btn changed
+        graphType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                RadioButton tmp = (RadioButton)newValue;
+
+                chartUI.getChildren().remove(0);
+                if (tmp.getText() == radioAllNods.getText()) {
+                    chartUI.getChildren().add(instance.getTreeChart(true));
+                    instance.addEventOnChart();
+                }else {
+                    chartUI.getChildren().add(instance.getTreeChart(false));
+                    instance.addEventOnChart();
+                }
+            }
+        });
     }
     public void resize(){
         int depth = instance.getLegendStats().get(3);

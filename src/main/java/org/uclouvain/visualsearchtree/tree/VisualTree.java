@@ -41,7 +41,7 @@ public class VisualTree {
                     outputStage.setScene(scene);
                     outputStage.show();
 
-//                    Slider sl =(Slider) scene.lookup("#zoomSlider");
+                    //Slider sl =(Slider) scene.lookup("#zoomSlider");
 
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(treeGroup);
@@ -53,16 +53,13 @@ public class VisualTree {
                     legendbox.getChildren().add(instance.generateLegendsStack());
                     treeController.init();
 
-                    /** TEST GRAPH **/
-                    final NumberAxis xAxis = new NumberAxis();
-                    final NumberAxis yAxis = new NumberAxis();
-                    yAxis.setLabel("Node Cost");
-                    xAxis.setLabel("Number of Solution");
+                    /** GRAPH **/
                     //creating the chart
-                    final LineChart<Number,Number> lineChart = TreeVisual.getTreeChart(node);
+                    final LineChart<Number,Number> lineChart = instance.getTreeChart(true);
+                    VBox chart = (VBox) scene.lookup("#chartUI");
+                    chart.getChildren().add(lineChart);
 
-                    VBox chartbox = (VBox) scene.lookup("#chartUI");
-                    chartbox.getChildren().add(lineChart);
+                    instance.addEventOnChart();
                 }
                 catch (Exception e) {
                     e.printStackTrace();

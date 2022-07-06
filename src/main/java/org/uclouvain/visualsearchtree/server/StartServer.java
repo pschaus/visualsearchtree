@@ -88,11 +88,8 @@ public class StartServer extends Application {
 
     @Override
     public void stop(){
-        // TODO: [ToBeFixed] We have serious problem here.
-        //  We can't stop multithread server when we close server ui
-        //  Not Yet
         System.out.println("Stage is closing");
-        serverThread.interrupt();
+        System.exit(0);
     }
 
     public static void main(String[] args) {
