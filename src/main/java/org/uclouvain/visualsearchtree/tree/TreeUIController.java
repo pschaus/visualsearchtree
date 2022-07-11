@@ -2,74 +2,87 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class TreeUIController {
-
-
-    private TreeVisual instance;
+    public Label infoLabel;
+    public TabPane tabPane;
+    public Tab graph;
+    public Tab infoTab;
     public StackPane treeroot;
     public Slider zoomSlider;
+    public TableView tableView;
+    private TreeVisual instance;
 
-    //Menu items variables
+    @FXML
+    public ToggleGroup graphType;
+
+    @FXML
+    public RadioButton radioOnlySol;
+
+    @FXML
+    public RadioButton radioAllNods;
+
+    @FXML
+    public VBox chartUI;
+
+    public void setInstance(TreeVisual instance) {
+        this.instance = instance;
+    }
+
     public MenuBar menuBar;
-    public MenuItem manageBookMarksItem;
-    public MenuItem showBookMarksItem;
+
     public MenuItem closeMenu;
     public MenuItem showLabels;
     public MenuItem showGaph;
     public MenuItem showInfos;
     public MenuItem about;
 
-    //Tab variables
-    public TabPane tabPane;
-    public Tab graph;
-    public Tab infoTab;
-    public HBox tableHbox;
-    public Tab bookMarksTab;
-    public Label infoLabel;
-    public TableView<Map.Entry<String,String>> allBookMarks;
+    // Menu actions methodes
 
-
-
-    public void setInstance(TreeVisual instance) {
-        this.instance = instance;
-    }
-
-    /**
-     * Initialize window
-     */
     public  void init(){
         resize();
-        alignMenuItemText();
         attachEvent();
-        initBookMarksTable();
-    }
 
-    /**
-     * Resize the window in terms of the tree size
-     */
+        // Check if radio btn changed
+        graphType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                RadioButton tmp = (RadioButton)newValue;
+
+                chartUI.getChildren().remove(0);
+                if (tmp.getText() == radioAllNods.getText()) {
+                    chartUI.getChildren().add(instance.getTreeChart(true));
+                    instance.addEventOnChart();
+                }else {
+                    chartUI.getChildren().add(instance.getTreeChart(false));
+                    instance.addEventOnChart();
+                }
+            }
+        });
+        initTableInfo();
+    }
     public void resize(){
         int depth = instance.getLegendStats().get(3);
         if(depth>4){
@@ -77,10 +90,6 @@ public class TreeUIController {
             treeroot.setMinWidth(depth*130);
         }
     }
-
-    /**
-     * Attaching Event for Menu items and for Slider for zoom Effect
-     */
     public void attachEvent(){
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
@@ -92,16 +101,8 @@ public class TreeUIController {
             if(ev.getCode()== KeyCode.O){
                 displayGraph();
             }
-            if(ev.getCode()== KeyCode.B){
-                if(ev.isControlDown()){
-                    try {
-                        addOrRemoveBookMarks();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }else{
-                    displayBookMarks();
-                }
+            if(ev.getCode()== KeyCode.Q || ev.getCode() == KeyCode.LEFT || ev.getCode() == KeyCode.RIGHT || ev.getCode() == KeyCode.UP || ev.getCode() == KeyCode.DOWN){
+                changeHighlightedNode(ev.getCode());
             }
         });
 
@@ -121,42 +122,17 @@ public class TreeUIController {
     public void showGraph(Event actionEvent){
         displayGraph();
     }
-    public void saveTree(ActionEvent actionEvent) {
-        //
-    }
-    /**
-     * Show Form for adding bookmark or remove bookmark from a node if it has already been marked
-     * @param actionEvent Event
-     * @throws IOException Exception
-     */
-    public void manageBookMarks(Event actionEvent) throws IOException {
-        addOrRemoveBookMarks();
-    }
-
-    public void showBookMarks(Event actionEvent) {
-        displayBookMarks();
-    }
-
-    public void aboutUs(ActionEvent actionEvent) {
-        String message = """
-                MiniCP-Profiler version 2022.1.0
-
-                Build: javac 18.0.1.1\s
-                Runtime version: To be soon precised
-                VM: OpenJDK 18 64-Bit IntelliJ IDEA
-
-                Powered by: UC Louvain Belgium
-                Copyright © May-June 2022 MiniCP-Profiler
-                """;
-        showInformationAlert("About MiniCP-Profiler", message);
-    }
 
     public void closeWindow(ActionEvent actionEvent) {
         Stage st = (Stage) menuBar.getScene().getWindow();
         st.close();
     }
 
-    /* Intermediates methodes */
+    public void saveTree(ActionEvent actionEvent) {
+        //
+    }
+
+    // Helper methodes
     public  void showAllLabels(){
         int length = instance.getLabels().size();
         for (int i = 0; i < length; i++) {
@@ -165,120 +141,98 @@ public class TreeUIController {
         }
     }
 
-    /*Change selection for TabPane and display infos for selected Node*/
+    private void initTableInfo () {
+        TableColumn<Map, String> keyColumn = new TableColumn<>("Key");
+        keyColumn.setCellValueFactory(new MapValueFactory<>("Key"));
+        keyColumn.setMinWidth(150);
+
+        TableColumn<Map, String> valueColumn = new TableColumn<>("Value");
+        valueColumn.setCellValueFactory(new MapValueFactory<>("Value"));
+        valueColumn.setMinWidth(150);
+
+        tableView.getColumns().add(keyColumn);
+        tableView.getColumns().add(valueColumn);
+    }
+
     public void displayNodeInfos(){
-        if(tabPane.getSelectionModel().getSelectedItem()!=infoTab){
+        if(tabPane.getSelectionModel().getSelectedItem() != infoTab){
             tabPane.getSelectionModel().select(infoTab);
         }
         Gson g = new Gson();
         TreeVisual.NodeInfoData info = g.fromJson(instance.getInfo(), new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-        if(info!=null){
-            infoLabel.setText(info.other);
+        tableView.getItems().clear();
+        if(info != null) {
+            ObservableList<Map<String, Object>> items = FXCollections.<Map<String, Object>>observableArrayList();
+            Map<String, Object> item1 = new HashMap<>();
+            item1.put("Key", "cost");
+            item1.put("Value" , info.cost);
+            items.add(item1);
+            Map<String, Object> item2 = new HashMap<>();
+            item2.put("Key", "param1");
+            item2.put("Value"  , info.param1);
+            items.add(item2);
+            Map<String, Object> item3 = new HashMap<>();
+            item3.put("Key", "other");
+            item3.put("Value" , info.other);
+            items.add(item3);
+            tableView.getItems().addAll(items);
         }
         else{
-            if(Objects.equals(((Text) instance.getFocusedRect().get(2)).getText(), "root")){
-                infoLabel.setText("Root node selected\n No infos to display");
-            }
-            else{
-                infoLabel.setText("No node selected!\n Please select a node yet.");
-            }
+            tableView.setPlaceholder(new Label("Select one Node and press 'I' to display this Node infos."));
         }
     }
-
-    /* Change selection for TabPane and display graph optimization*/
     public void displayGraph() {
         if(tabPane.getSelectionModel().getSelectedItem()!=graph){
             tabPane.getSelectionModel().select(graph);
         }
     }
 
-    public void addOrRemoveBookMarks() throws IOException {
-        Text focusedNodeLabel = (Text) instance.getFocusedRect().get(2);
-        var allBookMarks = instance.getBoookMarks();
-
-        if(!Objects.equals(focusedNodeLabel.getText(), " ")){
-            if(allBookMarks.containsKey(focusedNodeLabel.getText())){
-                removeBookMarks(focusedNodeLabel.getText());
-                Rectangle r = (Rectangle) instance.getFocusedRect().get(0);
-                r.setStrokeWidth(1);
-            }else{
-                displayBookMarkForm();
-            }
-        }else{
-            showInformationAlert("BookMarks", "Please select a node first for adding a bookmark");
-        }
-    }
-    public void displayBookMarkForm() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AddBookMarksUI.fxml"));
-        Parent formRoot = fxmlLoader.load();
-        AddBookMarksUI boookMarkController = fxmlLoader.getController();
-        boookMarkController.setInstance(instance);
-
-        Scene scene = new Scene(formRoot, 400, 200);
-
-        Stage bookMarkStage = new Stage();
-        bookMarkStage.setTitle("BookMarks");
-        bookMarkStage.setScene(scene);
-        bookMarkStage.toFront();
-        bookMarkStage.show();
-    }
-
-    private void displayBookMarks() {
-        if(tabPane.getSelectionModel().getSelectedItem()!=bookMarksTab){
-            tabPane.getSelectionModel().select(bookMarksTab);
-        }
-        allBookMarks.getItems().clear();
-        for(Map.Entry<String, String> entry : instance.getBoookMarks().entrySet()){
-            allBookMarks.getItems().add(entry);
-        }
-    }
-    /**
-     * @param key String
-     */
-    public void removeBookMarks(String key){
-        instance.getBoookMarks().remove(key);
-        //Delete mark point on the node after here
-    }
-    /**
-     *Show Alert for displaying information
-     * @param headerText String
-     * @param contentText String
-     */
-    public void showInformationAlert(String headerText, String contentText){
+    public void aboutUs(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("MiniCP-Profiler");
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
+        alert.setHeaderText("About MiniCP-Profiler");
+        alert.setContentText("""
+                MiniCP-Profiler version 2022.1.0
+
+                Build: javac 18.0.1.1\s
+                Runtime version: To be soon precised
+                VM: OpenJDK 18 64-Bit IntelliJ IDEA
+
+                Powered by: UC Louvain Belgium
+                Copyright © May-June 2022 MiniCP-Profiler
+                """);
         alert.initOwner(menuBar.getScene().getWindow());
         alert.showAndWait();
     }
 
-    public void initBookMarksTable(){
-        Map<String, String> bookMarksMap = instance.getBoookMarks();
 
-        TableColumn<Map.Entry<String, String>, String> idColumn = new TableColumn<>("Node Id");
-        idColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-        idColumn.setMinWidth(100);
-
-        TableColumn<Map.Entry<String, String>, String> valueColumn = new TableColumn<>("BookMarks");
-        valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-        valueColumn.setMinWidth(300);
-
-        ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
-        allBookMarks = new TableView<>(items);
-        allBookMarks.setMaxWidth(400);
-        allBookMarks.setPrefHeight(200);
-
-        allBookMarks.getColumns().setAll(idColumn, valueColumn);
-        tableHbox.getChildren().add(allBookMarks);
-    }
-    public void alignMenuItemText() {
-        showLabels.setText("Show Labels \t\t\t\t L");
-        showInfos.setText("Show Infos \t\t\t\t I");
-        showGaph.setText("Show Graph \t\t\t\t O");
-        showBookMarksItem.setText("Show BookMarks \t\t\t B");
-        manageBookMarksItem.setText("Add/ Remove BookMarks \t Ctrl+B");
+    public void alignMenuItemText(Event event) {
+        System.out.println("Been Clicked");
+        showLabels.setText("Show Labels \t\t L");
+        showInfos.setText("Show Infos \t\t I");
+        showGaph.setText("Show graph \t\t O");
     }
 
+    // Aborted functionality: Direction keys are already used for tree navigation.
+    // Alternative: Gamer keys.
+    // [ lowered priority ]
+    private void changeHighlightedNode(KeyCode code) {
+        switch (code) {
+            case LEFT -> {
+                System.out.println(KeyCode.LEFT);
+            }
+            case RIGHT -> {
+                System.out.println(KeyCode.RIGHT);
+            }
+            case UP -> {
+                System.out.println(KeyCode.UP);
+            }
+            case DOWN -> {
+                System.out.println(KeyCode.DOWN);
+            }
+            default -> {
 
+            }
+        }
+    }
 }
