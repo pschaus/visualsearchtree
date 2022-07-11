@@ -76,9 +76,9 @@ public class TreeVisual {
         this.info = info;
     }
 
-    public void setFocusedRect(Rectangle r, String branch, Text label) {
+    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label) {
         this.focusedRect.set(0, r);
-        this.focusedRect.set(1, branch);
+        this.focusedRect.set(1, type);
         this.focusedRect.set(2, label);
     }
 
@@ -95,7 +95,7 @@ public class TreeVisual {
     public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
 
-        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.branch);
+        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.type);
         styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
 
         //Add Event to each rectangle
@@ -105,8 +105,8 @@ public class TreeVisual {
             r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
-            this.setInfo(root.info);
-            this.setFocusedRect(r, root.branch, nLabel);
+            this.setInfo(root.label);
+            this.setFocusedRect(r, root.type, nLabel);
         });
 
         g.getChildren().add(r);
@@ -129,7 +129,7 @@ public class TreeVisual {
         return r;
     }
 
-    private Rectangle createRectangle(double x, double y, String branch) {
+    private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
         Rectangle rect = new Rectangle(x,y,20,20);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
@@ -141,18 +141,18 @@ public class TreeVisual {
             }
         });
 
-        switch (branch) {
-            case "BRANCH" -> {
+        switch (type) {
+            case INNER -> {
                 rect.setArcHeight(40);
                 rect.setArcWidth(40);
                 rect.setFill(Color.CORNFLOWERBLUE);
                 this.setLegendStats(0,this.legendStats.get(0) +1);
             }
-            case "FAILED" -> {
+            case FAIL -> {
                 rect.setFill(Color.RED);
                 this.setLegendStats(1,this.legendStats.get(1) +1);
             }
-            case "SOLVED" -> {
+            case SOLUTION -> {
                 rect.setFill(Color.GREEN);
                 rect.setRotate(45);
                 this.setLegendStats(2,this.legendStats.get(2) +1);
@@ -164,7 +164,7 @@ public class TreeVisual {
         return rect;
     }
 
-    private Rectangle createRectangleForLegendBox(String branch) {
+    private Rectangle createRectangleForLegendBox(Tree.NodeType type) {
         Rectangle rect = new Rectangle();
         rect.setWidth(12);
         rect.setHeight(12);
@@ -172,14 +172,14 @@ public class TreeVisual {
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
 
-        switch (branch) {
-            case "BRANCH" -> {
+        switch (type) {
+            case INNER -> {
                 rect.setArcHeight(24);
                 rect.setArcWidth(24);
                 rect.setFill(Color.CORNFLOWERBLUE);
             }
-            case "FAILED" -> rect.setFill(Color.RED);
-            case "SOLVED" -> {
+            case FAIL -> rect.setFill(Color.RED);
+            case SOLUTION -> {
                 rect.setFill(Color.GREEN);
                 rect.setRotate(45);
             }
@@ -232,9 +232,9 @@ public class TreeVisual {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(10));
         hbox.setAlignment(Pos.BASELINE_LEFT);
-        Rectangle branchRect = createRectangleForLegendBox("BRANCH");
-        Rectangle solvedRect = createRectangleForLegendBox("SOLVED");
-        Rectangle failedRect = createRectangleForLegendBox("FAILED");
+        Rectangle branchRect = createRectangleForLegendBox(Tree.NodeType.INNER);
+        Rectangle solvedRect = createRectangleForLegendBox(Tree.NodeType.SOLUTION);
+        Rectangle failedRect = createRectangleForLegendBox(Tree.NodeType.FAIL);
         FlowPane s1 = new FlowPane();
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
@@ -246,7 +246,7 @@ public class TreeVisual {
     }
 
 
-    public void makeNotFocus(){
+    public void makeNotFocus() {
         var r = (Rectangle) this.focusedRect.get(0);
         var branch = (String) this.focusedRect.get(1);
         var label = (Text) this.focusedRect.get(2);
@@ -260,7 +260,6 @@ public class TreeVisual {
                 }
             }
         }
-
     }
 
     /**
@@ -280,7 +279,7 @@ public class TreeVisual {
 
         //defining a series
         XYChart.Series series = new XYChart.Series();
-        getchildRecursvly(series, rootNode);
+        //getchildRecursvly(series, rootNode);
         lineChart.getData().add(series);
         return  lineChart;
     }
@@ -291,6 +290,7 @@ public class TreeVisual {
         public String other = "";
     }
 
+    /*
     private static void getchildRecursvly(XYChart.Series series, Tree.Node<String> node){
         if (node.children.size() > 0) {
             for (Tree.Node<String> child: node.children) {
@@ -308,5 +308,5 @@ public class TreeVisual {
             } catch (NumberFormatException e) {
             }
         }
-    }
+    }*/
 }

@@ -13,7 +13,8 @@ public class Decoder {
     private static final int START = 2;
     private static final int RESTART = 3;
 
-    public static class DecodedMessage implements Map<Integer, DecodedMessage> {
+    public static class DecodedMessage {
+
         public String msgTypeName;
         public int msgType;
         public int nodeId;
@@ -34,68 +35,7 @@ public class Decoder {
                 return "\n\n["+msgTypeName+" {  }]";
         }
 
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public boolean containsKey(Object key) {
-            return false;
-        }
-
-        @Override
-        public boolean containsValue(Object value) {
-            return false;
-        }
-
-        @Override
-        public DecodedMessage get(Object key) {
-            return null;
-        }
-
-        @Override
-        public DecodedMessage put(Integer key, DecodedMessage value) {
-            return null;
-        }
-
-        @Override
-        public DecodedMessage remove(Object key) {
-            return null;
-        }
-
-        @Override
-        public void putAll(Map<? extends Integer, ? extends DecodedMessage> m) {
-
-        }
-
-        @Override
-        public void clear() {
-
-        }
-
-        @Override
-        public Set<Integer> keySet() {
-            return null;
-        }
-
-        @Override
-        public Collection<DecodedMessage> values() {
-            return null;
-        }
-
-        @Override
-        public Set<Entry<Integer, DecodedMessage>> entrySet() {
-            return null;
-        }
     }
-
-    private static DecodedMessage formatData;
 
     public static void addToBuffer(List<Byte> buffer, byte[] incomingBytes) {
         for (byte byteData: incomingBytes) {
@@ -104,7 +44,7 @@ public class Decoder {
     }
 
     public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) {
-        formatData = new DecodedMessage();
+        DecodedMessage formatData = new DecodedMessage();
         byte[] msgBody = new byte[msgSize];
 
         readBuffer(msgBody, buffer, msgSize);
@@ -136,7 +76,7 @@ public class Decoder {
                         else{
                             formatData.nodeInfo = opt_msg.trim();
                         }
-                    }while(msgBody.length > i);
+                    } while(msgBody.length > i);
                 }
                 break;
             case DONE:
@@ -164,7 +104,7 @@ public class Decoder {
     };
 
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
-        if(len<=0 && buffer.size() == 0)
+        if (len <= 0 && buffer.size() == 0)
             return false;
         for (int i = 0; i < len; i++) {
             b[i] = buffer.remove(0);
@@ -195,54 +135,33 @@ public class Decoder {
         return bb.getInt();
     }
 
-    private static int rootNodeFinder(Map<Integer, DecodedMessage> data, int firstNodePid) {
-        for(Integer d : data.keySet()) {
-            if(data.get(d).nodeId == firstNodePid ) {
-                rootNodeFinder(data, data.get(d).nodePid);
-            }
-        }
-        for(Integer d : data.keySet()) {
-            if(data.get(d).nodePid == firstNodePid ) {
-                return d;
-            }
-        }
-        return 0;
-    }
-
-    private static Tree.Node<String> createNode(Map<Integer, DecodedMessage> data, int i) {
-        Tree.Node<String> NodeRoot = new Tree.Node<>((data.get(i).nodeLabel != null) ? data.get(i).nodeLabel : "root", data.get(i).nodeInfo, new LinkedList<>(), new LinkedList<>(), null, NodeTypeString(data.get(i).nodeStatus));
-        for (int j : data.keySet()) {
-            if(data.get(j).nodePid == i) {
-                NodeRoot.addChildren(createNode(data, j));// children.add();
-            }
-        }
-        return NodeRoot;
-    }
-
-    public static Tree.Node<String> treeBuilder(List<Decoder.DecodedMessage> decodedMessageList) {
+    public static Tree treeBuilder(List<Decoder.DecodedMessage> decodedMessageList) {
         Map<Integer, DecodedMessage> preFormat = new HashMap<Integer, DecodedMessage>();
         for (DecodedMessage msg: decodedMessageList) {
             preFormat.put(msg.nodeId,  msg);
         }
 
         int firstNodePid = preFormat.get(0).nodePid;
-        int rootNodeId = rootNodeFinder(preFormat, firstNodePid);
+        Tree tree = new Tree(firstNodePid);
 
-        Tree.Node<String> NodeRoot = createNode(preFormat, rootNodeId);
+        for (DecodedMessage msg: decodedMessageList) {
+            System.out.println("create node ==================>"+msg.nodeId);
+            tree.createNode(msg.nodeId, msg.nodePid,nodeType(msg.nodeStatus),() -> {});
+        }
 
-        return NodeRoot;
+        return tree;
     }
 
-    private static String NodeTypeString(int type) {
+    private static Tree.NodeType nodeType(int type) {
         switch (type) {
             case 0:
-                return "SOLVED";
+                return Tree.NodeType.SOLUTION;
             case 1:
-                return "FAILED";
+                return Tree.NodeType.FAIL;
             case 6:
-                return "SKIPPED";
+                return Tree.NodeType.SKIP;
             default:
-                return "BRANCH";
+                return Tree.NodeType.INNER;
         }
     }
 }

@@ -12,6 +12,7 @@ public class Tree2 {
 
     public enum NodeType {
         INNER,
+        SKIP,
         FAIL,
         SOLUTION
     }

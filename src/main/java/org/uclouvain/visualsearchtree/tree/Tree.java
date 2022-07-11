@@ -7,104 +7,69 @@ import java.util.*;
 
 public class Tree {
 
-    public static void main(String[] args) {
+    HashMap<Integer,Node> nodeMap;
+    int rootId;
 
-        Node<String> root = randomTree(0);
-
-        PositionedNode<String> proot = root.design();
-
-        //System.out.println(proot);
-
-
+    public enum NodeType {
+        INNER,
+        SKIP,
+        FAIL,
+        SOLUTION
     }
 
-    static Random rand = new Random(1);
-
-    public static Tree.Node<String> randomTree() {
-        return randomTree(0);
+    public Tree(int rootId) {
+        nodeMap = new HashMap<>();
+        this.rootId = rootId;
+        System.out.println("put root "+rootId);
+        nodeMap.put(rootId, new Node("root"));
     }
 
-    private static Tree.Node<String> randomTree(int depth) {
-
-        int nChildren = 2;
-        String branch = "BRANCH";
-
-        if ((rand.nextInt(20) < 15 && depth > 3)) {
-            nChildren = 0;
-        }
-        int nRandom = rand.nextInt(3);
-        if (nRandom < 2 && nChildren==0) {
-            branch = "FAILED";
-        }
-        if (nRandom >= 2 && nChildren==0) {
-            branch = "SOLVED";
-        }
-
-        List<Tree.Node<String>> children = new LinkedList<>();
-        List<String> labels = new LinkedList<>();
-
-        for (int i = 0; i < nChildren; i++) {
-            children.add(randomTree(depth + 1));
-            System.out.println(children);
-            labels.add("x = " + i);
-        }
-        return new Tree.Node<String>("Node" + depth, "{\"cost\": 10, \"param1\": 1, \"other\": \"Some info on node 1\"}", children, labels, null, branch);
+    public void createNode(int id,int pId, NodeType type, NodeAction onClick) {
+        System.out.println("get pId "+pId);
+        Node n = nodeMap.get(pId).addChild("child",type,"branch",onClick);
+        System.out.println("put id "+id);
+        nodeMap.put(id,n);
     }
+
+    public Node root() {
+        return nodeMap.get(rootId);
+    }
+
     static record Pair<L, R>(L left, R right) {
 
     }
 
-    @FunctionalInterface
-    interface NodeAction {
-        void nodeAction();
-    }
+
 
     public static class Node<T> {
-        public int nodeId;
-        public int nodePid;
-        public T info;
-        public T label;
-        public List<Node<T>> children;
-        public List<T> edgeLabels;
 
+        T label;
+        NodeType type;
+        List<Node<T>> children;
+        List<T> edgeLabels;
+        NodeAction onClick;
 
-        @Override
-        public String toString() {
-            return "Node [" +
-                    "label=" + label +
-                    ", children=" + children +
-                    ", edgeLabels=" + edgeLabels +
-                    ", onClick=" + onClick +
-                    ", branch=" + branch +
-                    ']';
-        }
-
-        public NodeAction onClick;
-        public String branch;
-
-        public Node(){
-
-        }
-
-        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+        public Node(T label) {
             this.label = label;
+            this.type = NodeType.INNER;
+            this.children = new LinkedList<>();
+            this.edgeLabels = new LinkedList<>();
+            this.onClick = () -> {};
+        }
+
+        public Node(T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick) {
+            this.label = label;
+            this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
-            this.branch = branch;
-            this.info = info;
-
         }
 
-        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
-            this.nodeId = nodeId;
-            this.nodePid = nodePid;
-            this.label = label;
-            this.children = children;
-            this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
-            this.branch = branch;
-
+        public Node addChild(T nodeLabel, NodeType type, T branchLabel, NodeAction onClick) {
+            Node child = new Node(nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick);
+            children.add(child);
+            edgeLabels.add(branchLabel);
+            return child;
         }
 
         public PositionedNode<T> design() {
@@ -139,58 +104,31 @@ public class Tree {
             Extent resExtent = Extent.merge(extentsMoved);
             resExtent.addFirst(0, 0);
 
-            PositionedNode<T> resTree = new PositionedNode<T>(label, subtreesMoved, edgeLabels, info, onClick, 0,branch);
+            PositionedNode<T> resTree = new PositionedNode<T>(label, type, subtreesMoved, edgeLabels, onClick, 0);
             return new Pair(resTree, resExtent);
-        }
-
-        public void addChildren(Node<T> newChild) {
-            children.add(newChild);
-        }
-
-        public T getLabel() {
-            return label;
-        }
-        public int getNodeId() {
-            return nodeId;
-        }
-        public int getNodePid() {
-            return nodePid;
-        }
-        public NodeAction getOnClick() {
-            return onClick;
-        }
-        public String getBranch() {
-            return branch;
-        }
-
-        public T getInfo() {
-            return  info;
         }
     }
 
-    public static class PositionedNode<T> implements NodeAction{
+    public static class PositionedNode<T> {
 
         public double position;
         public T label;
-        String branch;
+        public NodeType type;
         public List<PositionedNode<T>> children;
         public List<T> edgeLabels;
-        public T info;
         public NodeAction onClick;
 
-        public PositionedNode(T label, List<PositionedNode<T>> children, List<T> edgeLabels, T info, NodeAction onClick, double position, String branch) {
+        public PositionedNode(T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, NodeAction onClick, double position) {
             this.label = label;
+            this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
             this.position = position;
-            this.branch = branch;
-            this.info = info;
-
         }
 
         public PositionedNode moveTree(double x) {
-            return new PositionedNode(label, children, edgeLabels, info, onClick, position + x, branch);
+            return new PositionedNode(label, type, children, edgeLabels, onClick, position + x);
         }
 
         @Override
@@ -198,17 +136,10 @@ public class Tree {
             return "PositionedNode{" +
                     "position=" + position +
                     ", label=" + label +
-                    ", branch=" + branch +
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
-                    ", info=" + info +
                     ", onClick=" + onClick +
                     '}';
-        }
-
-        @Override
-        public void nodeAction() {
-            System.out.println("Clicked"+ this);
         }
     }
 
@@ -327,10 +258,13 @@ public class Tree {
         public static List<Double> fitList(List<Extent> extents) {
             List<Double> left = fitListLeft(extents);
             List<Double> right = fitListRight(extents);
+            //System.out.println("left"+left);
+            //System.out.println("right"+right);
             List<Double> res = new LinkedList<>();
             for (Iterator<Double> leftIte = left.iterator(), rightIte = right.iterator(); leftIte.hasNext() && rightIte.hasNext(); ) {
                 res.add((leftIte.next() + rightIte.next()) / 2);
             }
+            //System.out.println(res);
             return res;
         }
 

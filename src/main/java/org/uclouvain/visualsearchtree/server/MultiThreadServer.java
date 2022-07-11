@@ -5,11 +5,11 @@ import java.io.*;
 
 public class MultiThreadServer {
     public MultiThreadServer(int port, ProfilingData profilingData) {
-        try{
+        try {
             ServerSocket server = new ServerSocket(port);
             int counter = 0;
             System.out.println("Profiler Server Started ....");
-            while(true) {
+            while (true) {
                 counter++;
                 Socket serverClient = server.accept();
                 System.out.println(">> " + "Listener No:" + counter + " started!");

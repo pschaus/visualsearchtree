@@ -59,11 +59,11 @@ public  class ServerUIController {
     }
 
     @FXML
-    public void showTree(Event e){
-        if(!threelistView.getSelectionModel().isEmpty()) {
+    public void showTree(Event e) {
+        if (!threelistView.getSelectionModel().isEmpty()) {
             int nodeKey = threelistView.getSelectionModel().getSelectedIndex();
             Tree.Node<String> profilingNode = pData.getProfilingNodesList().get(nodeKey);
-            if(!treeListCurrentlyDraw.contains(profilingNode)) {
+            if (!treeListCurrentlyDraw.contains(profilingNode)) {
                 VisualTree.treeProfilerLauncher(profilingNode, primaryStage);
                 addToTreeDrawList(profilingNode);
             }
@@ -125,7 +125,7 @@ public  class ServerUIController {
                 Gson gson = new Gson();
                 Tree.Node<String> nodeFromFile = gson.fromJson(reader, new TypeToken<Tree.Node<String>>(){}.getType());
 
-                pData.addToProfilingNameList("<old> " + nodeFromFile.getLabel());
+                //pData.addToProfilingNameList("<old> " + nodeFromFile.getLabel());
                 if(!pData.getProfilingNodesList().contains(nodeFromFile)) {
                     pData.addSilentlyToProfilingNodesList(nodeFromFile);
                 }

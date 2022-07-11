@@ -28,7 +28,7 @@ class ServerClientThread extends VisualTree implements Runnable {
     private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
 
     // node we have to send to VisualTree for visualization
-    private Tree.Node<String> nodeTree;
+    private Tree tree;
 
     private int clientNo;
     private ProfilingData profilingData;
@@ -42,6 +42,8 @@ class ServerClientThread extends VisualTree implements Runnable {
 
     public void run(){
         try {
+
+            System.out.println(" start server ..................");
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
             while (canReadMore) {
@@ -49,7 +51,7 @@ class ServerClientThread extends VisualTree implements Runnable {
                     canReadMore = true;
 
                 Decoder.addToBuffer(buffer, socket.getInputStream().readAllBytes());
-                if(DEBUG) {
+                if (DEBUG) {
                     //System.out.println(buffer);
                 }
 
@@ -75,20 +77,22 @@ class ServerClientThread extends VisualTree implements Runnable {
                     }
 
                     Decoder.DecodedMessage msgBody = Decoder.deserialize(buffer, msgSize);
-                    if(msgBody.msgType == Message.MsgType.NODE.getNumber())
+                    if (msgBody.msgType == Message.MsgType.NODE.getNumber()) {
                         decodedMessagesList.add(msgBody);
+                    }
 
-                    if(DEBUG) {
+                    if (DEBUG) {
                         System.out.println(msgBody.toString());
                         System.out.println("-----");
                     }
                     // TODO: WRITE HANDLE MSG FUNCTION TO EMIT INCOMING DATA
                     //handleMessage(msg);
 
-                    if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
+                    if (msgBody.msgType == Message.MsgType.DONE.getNumber()) {
+                        System.out.println("create tree");
                         //socket.close();
                         canReadMore = false;
-                        nodeTree = Decoder.treeBuilder(decodedMessagesList);
+                        tree = Decoder.treeBuilder(decodedMessagesList);
                     }
 
                     bytesRead = 0;
@@ -97,8 +101,8 @@ class ServerClientThread extends VisualTree implements Runnable {
             }
 
             // LET NOTIFY NEW DATA IN ORDER TO DRAW
-            profilingData.addToProfilingNameList("<new> " + nodeTree.getLabel());
-            profilingData.addToProfilingNodesList(nodeTree);
+            profilingData.addToProfilingNameList("<new> " + tree.root());
+            profilingData.addToProfilingNodesList(tree.root());
 
             //VisualTree treeDrawer = new VisualTree(getNodeTree());
             System.out.println("Closing connection");
@@ -106,16 +110,17 @@ class ServerClientThread extends VisualTree implements Runnable {
             socket.close();
             in.close();
         }
-        catch (IOException i) {
-            System.out.println(i);
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
         }
         finally {
             System.out.println("Client No:" + clientNo + " exit!! ");
         }
     }
 
-    public Tree.Node<String> getNodeTree() {
-        return nodeTree;
+    public Tree getTree() {
+        return tree;
     }
 
     public int getPort() {
