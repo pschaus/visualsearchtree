@@ -31,19 +31,21 @@
       <tabs>
          <Tab fx:id="graph" text="Optimization Graph">
             <AnchorPane id="Content">
-               <HBox>
-                  <fx:define>
-                     <ToggleGroup  fx:id="graphType" />
-                  </fx:define>
+               <VBox>
+                     <fx:define>
+                        <ToggleGroup  fx:id="graphType" />
+                     </fx:define>
+                     <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
+                        <children>
+                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
+                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
+                        </children>
+                     </HBox>
 
-                  <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="380" style="-fx-cursor: crosshair" />
-                  <VBox spacing="10">
-                     <children>
-                        <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
-                        <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
-                     </children>
-                  </VBox>
-               </HBox>
+                     <HBox>
+                        <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair" />
+                     </HBox>
+               </VBox>
             </AnchorPane>
          </Tab>
          <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">

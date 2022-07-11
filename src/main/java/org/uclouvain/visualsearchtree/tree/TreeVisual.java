@@ -141,7 +141,7 @@ public class TreeVisual {
             String nodeID = UUID.randomUUID().toString();
             this.allNodesPositions.put(nodeID, root);
             this.allNodesRects.put(nodeID, r);
-            this.allNodesChartDatas.put(nodeID, (new XYChart.Data(info.cost, info.param1)));
+            this.allNodesChartDatas.put(nodeID, (new XYChart.Data(info.param1, info.cost)));
         }
         return r;
     }
