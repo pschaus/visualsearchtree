@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableView?>
+<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
-      <Menu onShowing="#alignMenuItemText" text="Node">
+      <Menu text="Node">
          <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />
          <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />
          <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />
+         <MenuItem fx:id="manageBookMarksItem" onAction="#manageBookMarks" text="Add/Remove BookMarks" />
+         <MenuItem fx:id="showBookMarksItem" onAction="#showBookMarks" text="Show BookMarks" />
          <MenuItem disable="true" onAction="#saveTree" text="Save File" />
          <SeparatorMenuItem />
          <MenuItem fx:id="closeMenu" onAction="#closeWindow" text="Exit" />
@@ -25,34 +42,98 @@
    <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
       <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400.0" />
    </ScrollPane>
-   <Slider fx:id="zoomSlider"  min="-100" />
+   <Slider fx:id="zoomSlider" min="-100" />
    <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
-      <tabs>
-         <Tab fx:id="graph" text="Optimization Graph">
-            <AnchorPane id="Content">
-               <VBox>
-                     <fx:define>
-                        <ToggleGroup  fx:id="graphType" />
-                     </fx:define>
-                     <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
-                        <children>
-                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
-                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
-                        </children>
-                     </HBox>
+      <Tab fx:id="graph" text="Optimization Graph">
+         <AnchorPane id="Content">
+            <VBox>
+               <fx:define>
+                  <ToggleGroup fx:id="graphType" />
+               </fx:define>
+               <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
+                  <children>
+                     <RadioButton fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
+                     <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
+                  </children>
+               </HBox>
 
-                     <HBox>
-                        <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair" />
-                     </HBox>
-               </VBox>
-            </AnchorPane>
-         </Tab>
-         <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
-            <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
-            </TableView>
-         </Tab>
-      </tabs>
+               <HBox>
+                  <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair" />
+               </HBox>
+            </VBox>
+         </AnchorPane>
+      </Tab>
+      <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
+         <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+         </TableView>
+      </Tab>
+      <Tab fx:id="bookMarksTab" onSelectionChanged="#showBookMarks" text="BookMarks">
+         <HBox fx:id="tableHbox" alignment="CENTER">
+            <!-- Here will be displayed the TableView for BookMarks -->
+         </HBox>
+      </Tab>
    </TabPane>
 
 </VBox>
+
+
+<!--        <?xml version="1.0" encoding="UTF-8"?>-->
+
+<!--<?import javafx.scene.control.*?>-->
+<!--<?import javafx.scene.layout.*?>-->
+
+<!--<?import javafx.scene.control.cell.PropertyValueFactory?>-->
+<!--<VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">-->
+
+<!--   <MenuBar fx:id="menuBar">-->
+<!--      <Menu onShowing="#alignMenuItemText" text="Node">-->
+<!--         <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />-->
+<!--         <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />-->
+<!--         <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />-->
+<!--         <MenuItem disable="true" onAction="#saveTree" text="Save File" />-->
+<!--         <SeparatorMenuItem />-->
+<!--         <MenuItem fx:id="closeMenu" onAction="#closeWindow" text="Exit" />-->
+<!--      </Menu>-->
+<!--      <Menu text="Help">-->
+<!--         <MenuItem disable="true" text="Search" />-->
+<!--         <MenuItem text="Help" visible="false" />-->
+<!--         <SeparatorMenuItem />-->
+<!--         <MenuItem fx:id="about" onAction="#aboutUs" text="About" />-->
+<!--      </Menu>-->
+<!--   </MenuBar>-->
+
+<!--   <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">-->
+<!--      <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400.0" />-->
+<!--   </ScrollPane>-->
+<!--   <Slider fx:id="zoomSlider"  min="-100" />-->
+<!--   <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />-->
+<!--   <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">-->
+<!--      <tabs>-->
+<!--         <Tab fx:id="graph" text="Optimization Graph">-->
+<!--            <AnchorPane id="Content">-->
+<!--               <VBox>-->
+<!--                     <fx:define>-->
+<!--                        <ToggleGroup  fx:id="graphType" />-->
+<!--                     </fx:define>-->
+<!--                     <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">-->
+<!--                        <children>-->
+<!--                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>-->
+<!--                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>-->
+<!--                        </children>-->
+<!--                     </HBox>-->
+
+<!--                     <HBox>-->
+<!--                        <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair" />-->
+<!--                     </HBox>-->
+<!--               </VBox>-->
+<!--            </AnchorPane>-->
+<!--         </Tab>-->
+<!--         <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">-->
+<!--            <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">-->
+<!--            </TableView>-->
+<!--         </Tab>-->
+<!--      </tabs>-->
+<!--   </TabPane>-->
+
+<!--</VBox>-->
