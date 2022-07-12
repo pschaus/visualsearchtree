@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 public class VisualTree {
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
-        final double SCALE_DELTA = 1.1;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -41,11 +40,8 @@ public class VisualTree {
                     outputStage.setScene(scene);
                     outputStage.show();
 
-                    //Slider sl =(Slider) scene.lookup("#zoomSlider");
-
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(treeGroup);
-                    //sp.translateYProperty().bind(sl.valueProperty());
 
                     AnimationFactory.zoomOnSCroll(sp);
 
@@ -53,13 +49,16 @@ public class VisualTree {
                     legendbox.getChildren().add(instance.generateLegendsStack());
                     treeController.init();
 
-                    /** GRAPH **/
+                    /** TEST GRAPH **/
+                    final NumberAxis xAxis = new NumberAxis();
+                    final NumberAxis yAxis = new NumberAxis();
+                    yAxis.setLabel("Node Cost");
+                    xAxis.setLabel("Number of Solution");
                     //creating the chart
-                    final LineChart<Number,Number> lineChart = instance.getTreeChart(true);
-                    VBox chart = (VBox) scene.lookup("#chartUI");
-                    chart.getChildren().add(lineChart);
+                    final LineChart<Number,Number> lineChart = TreeVisual.getTreeChart(node);
 
-                    instance.addEventOnChart();
+                    VBox chartbox = (VBox) scene.lookup("#chartUI");
+                    chartbox.getChildren().add(lineChart);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
