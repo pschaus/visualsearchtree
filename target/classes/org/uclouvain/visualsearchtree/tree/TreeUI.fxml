@@ -6,10 +6,12 @@
 <VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
-      <Menu onShowing="#alignMenuItemText" text="Node">
+      <Menu text="Node">
          <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />
          <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />
          <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />
+         <MenuItem fx:id="manageBookMarksItem" onAction="#manageBookMarks" text="Add/Remove BookMarks" />
+         <MenuItem fx:id="showBookMarksItem" onAction="#showBookMarks" text="Show BookMarks" />
          <MenuItem disable="true" onAction="#saveTree" text="Save File" />
          <SeparatorMenuItem />
          <MenuItem fx:id="closeMenu" onAction="#closeWindow" text="Exit" />
@@ -49,8 +51,13 @@
             </AnchorPane>
          </Tab>
          <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
-            <TableView fx:id="tableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
+            <TableView fx:id="infoTableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
             </TableView>
+         </Tab>
+         <Tab fx:id="bookMarksTab" onSelectionChanged="#showBookMarks" text="BookMarks">
+            <HBox fx:id="tableHbox" alignment="CENTER">
+               <!-- Here will be displayed the TableView for BookMarks -->
+            </HBox>
          </Tab>
       </tabs>
    </TabPane>

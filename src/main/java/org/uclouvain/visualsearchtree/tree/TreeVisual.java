@@ -32,6 +32,8 @@ public class TreeVisual {
     private List<Text> labels;
     private String info;
     private List focusedRect;
+    private final Map<String,String> boookMarks;
+
 
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
@@ -41,6 +43,7 @@ public class TreeVisual {
         this.node = node;
         this.labels = new ArrayList<>(){};
         this.info = "";
+        this.boookMarks = new HashMap<String,String>();
         this.focusedRect = new ArrayList<>(){{
             add(new Rectangle());
             add(" ");
@@ -86,6 +89,13 @@ public class TreeVisual {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public Map<String, String> getBoookMarks() {
+        return boookMarks;
+    }
+    public void setBoookMarks(String key, String value) {
+        this.boookMarks.put(key, value);
     }
 
     public void setFocusedRect(Rectangle r, String branch, Text label) {
