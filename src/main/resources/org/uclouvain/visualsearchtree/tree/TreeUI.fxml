@@ -55,7 +55,7 @@
             </TableView>
          </Tab>
          <Tab fx:id="bookMarksTab" onSelectionChanged="#showBookMarks" text="BookMarks">
-            <HBox fx:id="tableHbox" alignment="CENTER">
+            <HBox fx:id="tableHbox" maxHeight="Infinity" minWidth="500" prefHeight="150" prefWidth="300" alignment="CENTER">
                <!-- Here will be displayed the TableView for BookMarks -->
             </HBox>
          </Tab>

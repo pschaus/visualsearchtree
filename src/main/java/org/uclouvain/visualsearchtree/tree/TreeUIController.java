@@ -120,8 +120,11 @@ public class TreeUIController {
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
         allBookMarks = new TableView<>(items);
-        allBookMarks.setMaxWidth(400);
-        allBookMarks.setPrefHeight(200);
+        allBookMarks.setMinHeight(150);
+        allBookMarks.setMinWidth(500);
+        allBookMarks.setPrefHeight(150);
+        allBookMarks.setPrefWidth(300);
+        allBookMarks.setMaxHeight(Double.MAX_VALUE);
 
         allBookMarks.getColumns().setAll(idColumn, valueColumn);
         tableHbox.getChildren().add(allBookMarks);
