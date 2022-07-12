@@ -25,9 +25,7 @@ public class Tree {
     }
 
     public void createNode(int id,int pId, NodeType type, NodeAction onClick) {
-        System.out.println("get pId "+pId);
         Node n = nodeMap.get(pId).addChild("child",type,"branch",onClick);
-        System.out.println("put id "+id);
         nodeMap.put(id,n);
     }
 

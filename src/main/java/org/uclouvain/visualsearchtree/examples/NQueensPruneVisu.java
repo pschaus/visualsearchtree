@@ -17,10 +17,9 @@ package org.uclouvain.visualsearchtree.examples;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.uclouvain.visualsearchtree.tree.NodeAction;
-import org.uclouvain.visualsearchtree.tree.Tree2;
-import org.uclouvain.visualsearchtree.tree.TreePane2;
+import org.uclouvain.visualsearchtree.tree.*;
 
 /**
  * Example that illustrates how to solve the NQueens
@@ -38,36 +37,40 @@ public class NQueensPruneVisu extends Application {
     public void start(Stage primaryStage) {
 
 
-        NQueensPrune nqueens = new NQueensPrune(10);
-        Tree2 t = new Tree2(-1);
+        NQueensPrune nqueens = new NQueensPrune(4);
+        Tree t = new Tree(-1);
 
         nqueens.dfs(new DFSListener() {
             @Override
-            public void solution(int pId, int id) {
-                t.createNode(pId,id, Tree2.NodeType.SOLUTION,() -> {});
-                DFSListener.super.solution(pId, id);
+            public void solution(int id, int pId) {
+                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {});
             }
 
             @Override
-            public void fail(int pId, int id) {
-                t.createNode(pId,id, Tree2.NodeType.FAIL,() -> {});
-                DFSListener.super.fail(pId, id);
+            public void fail(int id, int pId) {
+                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {});
             }
 
             @Override
-            public void branch(int pId, int id, int nChilds) {
-                t.createNode(pId,id, Tree2.NodeType.INNER,() -> {});
-                DFSListener.super.branch(pId, id, nChilds);
+            public void branch(int id, int pId, int nChilds) {
+                t.createNode(id,pId, Tree.NodeType.INNER,() -> {});
             }
 
         });
 
 
+        Tree.Node n = t.root();
 
-        Tree2.Node n = t.root();
 
 
-        Scene scene = new Scene(new TreePane2(n), 500, 600);
+        StackPane p = new StackPane();
+        AnimationFactory.zoomOnSCroll(p);
+
+        TreeVisual tv = new TreeVisual(t.root());
+        p.getChildren().add(tv.getGroup());
+
+
+        Scene scene = new Scene(p, 500, 600);
         primaryStage.setScene(scene);
 
 

@@ -46,22 +46,21 @@ public class NQueensPrune {
         }
     }
 
-
     private void dfs(int idx, DFSListener listener, int pId) {
         nRecur++;
         int id = ++nodeId;
         if (idx == n) {
-            listener.solution(pId, id);
-            throw new RuntimeException("solution found");
+            listener.solution(id, pId);
+            // throw new RuntimeException("solution found");
         } else {
-            listener.branch(pId,id,n);
+            listener.branch(id, pId, n);
             for (int i = 0; i < n; i++) {
                 q[idx] = i;
                 if (constraintsSatisfied(idx)) {
                     dfs(idx + 1, listener, id);
                 } else {
                     nodeId++;
-                    listener.fail(pId, nodeId);
+                    listener.fail(nodeId, pId);
                 }
             }
         }

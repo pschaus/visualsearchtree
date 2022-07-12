@@ -1,7 +1,7 @@
 package org.uclouvain.visualsearchtree.examples;
 
 public interface DFSListener {
-    default  void solution(int pId, int id) {};
-    default void fail(int pId, int id) {};
-    default void branch(int pId, int id,int nChilds) {};
+    default  void solution(int id, int pId) {};
+    default void fail(int id, int pId) {};
+    default void branch(int id, int pId, int nChilds) {};
 }
