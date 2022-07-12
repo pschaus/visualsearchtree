@@ -62,7 +62,6 @@ public class NQueensPruneVisu extends Application {
         Tree.Node n = t.root();
 
 
-
         StackPane p = new StackPane();
         AnimationFactory.zoomOnSCroll(p);
 

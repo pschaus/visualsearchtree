@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.event.EventListenerList;
 
 public class ProfilingData {
+
     private List<String> profilingNameList;
     private List<Tree.Node<String>> profilingNodesList;
 
