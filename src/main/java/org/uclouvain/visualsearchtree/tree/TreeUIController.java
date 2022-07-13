@@ -16,13 +16,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -31,6 +27,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static org.uclouvain.visualsearchtree.util.Constant.*;
 
 public class TreeUIController {
     public TabPane tabPane;
@@ -47,24 +45,21 @@ public class TreeUIController {
     public MenuItem showBookMarksItem;
     public MenuItem closeMenu;
     public MenuItem showLabels;
-    public MenuItem showGaph;
+    public MenuItem showGraph;
     public MenuItem showInfos;
     public MenuItem about;
     public HBox tableHbox;
     public Tab bookMarksTab;
-    public TableView<Map.Entry<String,String>> allBookMarks;
+    public TableView<Map.Entry<String,String>> bookMarksTableView;
 
     @FXML
     public ToggleGroup graphType;
     @FXML
     public RadioButton radioOnlySol;
     @FXML
-    public RadioButton radioAllNods;
+    public RadioButton radioAllNodes;
     @FXML
     public VBox chartUI;
-
-    final double ZOOM_COEFFICIENT = 1.5;
-    final double SCALE_COEFFICIENT = 0.01;
 
     public void setInstance(TreeVisual instance) {
         this.instance = instance;
@@ -83,7 +78,7 @@ public class TreeUIController {
                 RadioButton tmp = (RadioButton)newValue;
 
                 chartUI.getChildren().remove(0);
-                if (tmp.getText() == radioAllNods.getText()) {
+                if (tmp.getText() == radioAllNodes.getText()) {
                     chartUI.getChildren().add(instance.getTreeChart(true));
                     instance.addEventOnChart();
                 }else {
@@ -119,15 +114,14 @@ public class TreeUIController {
         valueColumn.setMinWidth(300);
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
-        allBookMarks = new TableView<>(items);
-        allBookMarks.setMinHeight(150);
-        allBookMarks.setMinWidth(500);
-        allBookMarks.setPrefHeight(150);
-        allBookMarks.setPrefWidth(300);
-        allBookMarks.setMaxHeight(Double.MAX_VALUE);
+        bookMarksTableView = new TableView<>(items);
+        bookMarksTableView.setMinHeight(150);
+        bookMarksTableView.setPlaceholder(new Label("No bookmarks added. Please click CTRL+B to add a bookmark to a node"));
+        bookMarksTableView.prefWidthProperty().bind(tableHbox.widthProperty());
+        bookMarksTableView.setMaxHeight(Double.MAX_VALUE);
 
-        allBookMarks.getColumns().setAll(idColumn, valueColumn);
-        tableHbox.getChildren().add(allBookMarks);
+        bookMarksTableView.getColumns().setAll(idColumn, valueColumn);
+        tableHbox.getChildren().add(bookMarksTableView);
     }
 
     // Menu methods
@@ -167,7 +161,7 @@ public class TreeUIController {
         showInformationAlert("About MiniCP-Profiler", message);
     }
 
-    // Helper methodes
+    // Helper methods
     public  void showAllLabels(){
         int length = instance.getLabels().size();
         for (int i = 0; i < length; i++) {
@@ -192,9 +186,6 @@ public class TreeUIController {
             }
             if(ev.getCode()== KeyCode.O){
                 displayGraph();
-            }
-            if(ev.getCode()== KeyCode.Q || ev.getCode() == KeyCode.LEFT || ev.getCode() == KeyCode.RIGHT || ev.getCode() == KeyCode.UP || ev.getCode() == KeyCode.DOWN){
-                changeHighlightedNode(ev.getCode());
             }
             if(ev.getCode()== KeyCode.B){
                 if(ev.isControlDown()){
@@ -260,6 +251,7 @@ public class TreeUIController {
             }else{
                 displayBookMarkForm();
             }
+
         }else{
             showInformationAlert("BookMarks", "Please select a node first for adding a bookmark");
         }
@@ -282,9 +274,9 @@ public class TreeUIController {
         if(tabPane.getSelectionModel().getSelectedItem()!=bookMarksTab){
             tabPane.getSelectionModel().select(bookMarksTab);
         }
-        allBookMarks.getItems().clear();
+        bookMarksTableView.getItems().clear();
         for(Map.Entry<String, String> entry : instance.getBoookMarks().entrySet()){
-            allBookMarks.getItems().add(entry);
+            bookMarksTableView.getItems().add(entry);
         }
     }
     public void removeBookMarks(String key){
@@ -302,27 +294,8 @@ public class TreeUIController {
     public void alignMenuItemText() {
         showLabels.setText("Show Labels \t\t\t\t L");
         showInfos.setText("Show Infos \t\t\t\t I");
-        showGaph.setText("Show Graph \t\t\t\t O");
+        showGraph.setText("Show Graph \t\t\t\t O");
         showBookMarksItem.setText("Show BookMarks \t\t\t B");
         manageBookMarksItem.setText("Add/ Remove BookMarks \t Ctrl+B");
-    }
-    private void changeHighlightedNode(KeyCode code) {
-        switch (code) {
-            case LEFT -> {
-                System.out.println(KeyCode.LEFT);
-            }
-            case RIGHT -> {
-                System.out.println(KeyCode.RIGHT);
-            }
-            case UP -> {
-                System.out.println(KeyCode.UP);
-            }
-            case DOWN -> {
-                System.out.println(KeyCode.DOWN);
-            }
-            default -> {
-
-            }
-        }
     }
 }
