@@ -13,7 +13,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
@@ -25,6 +24,8 @@ import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.*;
+
+import static org.uclouvain.visualsearchtree.util.Constant.*;
 
 public class TreeVisual {
     private final Tree.Node<String> node;
@@ -230,7 +231,7 @@ public class TreeVisual {
             default -> {
             }
         }
-        rect.setCursor(Cursor.CROSSHAIR);
+        rect.setCursor(Cursor.HAND);
         return rect;
     }
 
@@ -265,24 +266,24 @@ public class TreeVisual {
         theLabel.setFont(Font.font("Roboto", 10));
         theLabel.setFill(Color.rgb(13, 15, 16));
         if (nChild == 0) {
-            theLabel.setX(400 + absolute * 40);
-            theLabel.setY(82 + depth * 50);
+            theLabel.setX(400 + absolute * LABEL_X_COEFFICIENT);
+            theLabel.setY(82 + depth * LABEL_Y_COEFFICIENT);
         } else {
             if (pos == 0.0) {
-                theLabel.setX(402 + absolute * 40);
-                theLabel.setY(45 + depth * 50);
+                theLabel.setX(402 + absolute * LABEL_X_COEFFICIENT);
+                theLabel.setY(45 + depth * LABEL_Y_COEFFICIENT);
             } else if (pos < 0) {
                 if(pos == -1){
-                    theLabel.setX(378 + absolute * 40);
-                    theLabel.setY(50 + depth * 50);
+                    theLabel.setX(378 + absolute * LABEL_X_COEFFICIENT);
+                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
                 }
                 else{
-                    theLabel.setX(420 + absolute * 40);
-                    theLabel.setY(50 + depth * 50);
+                    theLabel.setX(420 + absolute * LABEL_X_COEFFICIENT);
+                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
                 }
             } else {
-                theLabel.setX(422 + absolute * 40);
-                theLabel.setY(48 + depth * 50);
+                theLabel.setX(422 + absolute * LABEL_X_COEFFICIENT);
+                theLabel.setY(48 + depth * LABEL_Y_COEFFICIENT);
             }
         }
         theLabel.setOpacity(0);
