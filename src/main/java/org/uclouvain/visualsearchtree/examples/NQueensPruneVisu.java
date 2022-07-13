@@ -43,17 +43,17 @@ public class NQueensPruneVisu extends Application {
         nqueens.dfs(new DFSListener() {
             @Override
             public void solution(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {});
+                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "");
             }
 
             @Override
             public void fail(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {});
+                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "");
             }
 
             @Override
             public void branch(int id, int pId, int nChilds) {
-                t.createNode(id,pId, Tree.NodeType.INNER,() -> {});
+                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "");
             }
 
         });

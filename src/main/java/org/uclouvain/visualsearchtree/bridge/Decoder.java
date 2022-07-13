@@ -146,7 +146,7 @@ public class Decoder {
 
         for (DecodedMessage msg: decodedMessageList) {
             System.out.println("create node ==================>"+msg.nodeId);
-            tree.createNode(msg.nodeId, msg.nodePid,nodeType(msg.nodeStatus),() -> {});
+            tree.createNode(msg.nodeId, msg.nodePid,nodeType(msg.nodeStatus),() -> {}, msg.nodeInfo);
         }
 
         return tree;

@@ -25,20 +25,14 @@ public class Tree {
     }
 
 
-    public void createNode(int id,int pId, NodeType type, NodeAction onClick) {
-        Node n = nodeMap.get(pId).addChild("child",type,"branch",onClick);
+    public void createNode(int id,int pId, NodeType type, NodeAction onClick, String info) {
+        Node n = nodeMap.get(pId).addChild("child",type,"branch",onClick, info);
         nodeMap.put(id,n);
     }
 
     public Node root() {
         return nodeMap.get(rootId);
-
     }
-
-
-
-
-
 
 
     static record Pair<L, R>(L left, R right) {
@@ -56,7 +50,6 @@ public class Tree {
         public List<Node<T>> children;
         public List<T> edgeLabels;
         public NodeAction onClick;
-        public String branch;
 
         @Override
         public String toString() {
@@ -65,13 +58,16 @@ public class Tree {
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
                     ", onClick=" + onClick +
-                    ", branch=" + branch +
+                    ", type=" + type +
                     ']';
         }
 
 
         public Node(){
-
+            this.type = NodeType.INNER;
+            this.children = new LinkedList<>();
+            this.edgeLabels = new LinkedList<>();
+            this.onClick = () -> {};
         }
 
         public Node(T label) {
@@ -82,28 +78,35 @@ public class Tree {
             this.onClick = () -> {};
         }
 
-        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick ) {
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
-            this.branch = branch;
             this.info = info;
 
         }
+        public Node(T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
+            this.label = label;
+            this.type = type;
+            this.children = children;
+            this.edgeLabels = edgeLabels;
+            this.onClick = onClick;
+            this.info = info;
+        }
 
-//        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
-//            this.nodeId = nodeId;
-//            this.nodePid = nodePid;
-//            this.label = label;
-//            this.children = children;
-//            this.edgeLabels = edgeLabels;
-//            this.onClick = onClick;
-//            this.branch = branch;
-//        }
+        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, NodeType nodeType) {
+            this.nodeId = nodeId;
+            this.nodePid = nodePid;
+            this.label = label;
+            this.children = children;
+            this.edgeLabels = edgeLabels;
+            this.onClick = onClick;
+            this.type = nodeType;
+        }
 
-        public Node addChild(T nodeLabel, NodeType type, T branchLabel, NodeAction onClick) {
-            Node child = new Node(nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick);
+        public Node addChild(T nodeLabel, NodeType type, T branchLabel, NodeAction onClick, T info) {
+            Node child = new Node(nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick, info);
             children.add(child);
             edgeLabels.add(branchLabel);
             return child;
@@ -139,9 +142,8 @@ public class Tree {
 
             Extent resExtent = Extent.merge(extentsMoved);
             resExtent.addFirst(0, 0);
-
-//            PositionedNode<T> resTree = new PositionedNode<T>(label, subtreesMoved, edgeLabels, info, onClick, 0,branch);
-            PositionedNode<T> resTree = new PositionedNode<T>(label, type, subtreesMoved, edgeLabels, onClick, 0);
+            System.out.println("in it:->"+ info);
+            PositionedNode<T> resTree = new PositionedNode<T>(label, type, subtreesMoved, edgeLabels, onClick, 0, info);
             return new Pair(resTree, resExtent);
         }
 
@@ -161,8 +163,8 @@ public class Tree {
         public NodeAction getOnClick() {
             return onClick;
         }
-        public String getBranch() {
-            return branch;
+        public NodeType getType() {
+            return type;
         }
         public T getInfo() {
             return  info;
@@ -175,37 +177,27 @@ public class Tree {
         public double position;
         public T label;
         public NodeType type;
-        String branch;
         public List<PositionedNode<T>> children;
         public List<T> edgeLabels;
         public T info;
         public NodeAction onClick;
 
-        public PositionedNode(T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, org.uclouvain.visualsearchtree.tree.NodeAction onClick, double position) {
+        public PositionedNode(T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, org.uclouvain.visualsearchtree.tree.NodeAction onClick, double position, T info) {
             this.label = label;
             this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
             this.position = position;
+            this.info = info;
         }
 
-//        public PositionedNode(T label, List<PositionedNode<T>> children, List<T> edgeLabels, T info, NodeAction onClick, double position, String branch) {
-//            this.label = label;
-//            this.children = children;
-//            this.edgeLabels = edgeLabels;
-//            this.onClick = onClick;
-//            this.position = position;
-//            this.branch = branch;
-//            this.info = info;
-//
-//        }
 
-        //        public PositionedNode moveTree(double x) {
-//            return new PositionedNode(label, children, edgeLabels, info, onClick, position + x, branch);
+//        public PositionedNode moveTree(double x) {
+//            return new PositionedNode(label, children, edgeLabels, info, onClick, position + x, type);
 //        }
         public PositionedNode moveTree(double x) {
-            return new PositionedNode(label, type, children, edgeLabels, onClick, position + x);
+            return new PositionedNode(label, type, children, edgeLabels, onClick, position + x, info);
         }
 
         @Override
@@ -213,7 +205,7 @@ public class Tree {
             return "PositionedNode{" +
                     "position=" + position +
                     ", label=" + label +
-                    ", branch=" + branch +
+                    ", type=" + type +
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
                     ", info=" + info +
