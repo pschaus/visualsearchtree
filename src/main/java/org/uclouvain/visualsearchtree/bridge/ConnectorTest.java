@@ -18,7 +18,7 @@ public class ConnectorTest {
             connector.createNode(5, 3, 1, 0, Connector.NodeStatus.FAILED).setNodeLabel("n=3").setNodeInfo("{\"cost\": 6, \"param1\": 4, \"other\": \"Some info on node 4\"}").send();
             connector.createNode(6, 3, 1, 0, Connector.NodeStatus.FAILED).setNodeLabel("n=4").setNodeInfo("{\"cost\": 5, \"param1\": 5, \"other\": \"Some info on node 5\"}").send();
             connector.createNode(4, 2, 1, 2, Connector.NodeStatus.BRANCH).setNodeLabel("n=5").setNodeInfo("{\"cost\": 3, \"param1\": 6, \"other\": \"Some info on node 6\"}").send();
-            connector.createNode(7, 4, 1, 0, Connector.NodeStatus.FAILED).setNodeLabel("n=6").setNodeInfo("{\"cost\": 3, \"param1\": 7, \"other\": \"Some info on node 7\"}").send();
+            connector.createNode(7, 4, 1, 0, Connector.NodeStatus.SOLVED).setNodeLabel("n=6").setNodeInfo("{\"cost\": 3, \"param1\": 7, \"other\": \"Some info on node 7\"}").send();
             connector.createNode(8, 4, 1, 2, Connector.NodeStatus.BRANCH).setNodeLabel("n=7").setNodeInfo("{\"cost\": 2, \"param1\": 8, \"other\": \"Some info on node 8\"}").send();
             connector.createNode(9, 8, 1, 2, Connector.NodeStatus.FAILED).setNodeLabel("n=8").setNodeInfo("{\"cost\": 2, \"param1\": 9, \"other\": \"Some info on node 9\"}").send();
             connector.createNode(10, 8, 1, 2, Connector.NodeStatus.SOLVED).setNodeLabel("s=9").setNodeInfo("{\"cost\": 1, \"param1\": 10, \"other\": \"Some info on node 10\"}").send();

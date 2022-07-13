@@ -7,9 +7,9 @@ import java.util.*;
 
 public class Tree {
 
+
     HashMap<Integer,Node> nodeMap;
     int rootId;
-
     public enum NodeType {
         INNER,
         SKIP,
@@ -20,9 +20,10 @@ public class Tree {
     public Tree(int rootId) {
         nodeMap = new HashMap<>();
         this.rootId = rootId;
-        System.out.println("put root "+rootId);
+        System.out.println("put root " + rootId);
         nodeMap.put(rootId, new Node("root"));
     }
+
 
     public void createNode(int id,int pId, NodeType type, NodeAction onClick) {
         Node n = nodeMap.get(pId).addChild("child",type,"branch",onClick);
@@ -31,7 +32,14 @@ public class Tree {
 
     public Node root() {
         return nodeMap.get(rootId);
+
     }
+
+
+
+
+
+
 
     static record Pair<L, R>(L left, R right) {
 
@@ -40,12 +48,31 @@ public class Tree {
 
 
     public static class Node<T> {
-
-        T label;
+        public int nodeId;
+        public int nodePid;
+        public T info;
         NodeType type;
-        List<Node<T>> children;
-        List<T> edgeLabels;
-        NodeAction onClick;
+        public T label;
+        public List<Node<T>> children;
+        public List<T> edgeLabels;
+        public NodeAction onClick;
+        public String branch;
+
+        @Override
+        public String toString() {
+            return "Node [" +
+                    "label=" + label +
+                    ", children=" + children +
+                    ", edgeLabels=" + edgeLabels +
+                    ", onClick=" + onClick +
+                    ", branch=" + branch +
+                    ']';
+        }
+
+
+        public Node(){
+
+        }
 
         public Node(T label) {
             this.label = label;
@@ -55,13 +82,25 @@ public class Tree {
             this.onClick = () -> {};
         }
 
-        public Node(T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick) {
+        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
             this.label = label;
-            this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
+            this.branch = branch;
+            this.info = info;
+
         }
+
+//        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, String branch ) {
+//            this.nodeId = nodeId;
+//            this.nodePid = nodePid;
+//            this.label = label;
+//            this.children = children;
+//            this.edgeLabels = edgeLabels;
+//            this.onClick = onClick;
+//            this.branch = branch;
+//        }
 
         public Node addChild(T nodeLabel, NodeType type, T branchLabel, NodeAction onClick) {
             Node child = new Node(nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick);
@@ -69,7 +108,6 @@ public class Tree {
             edgeLabels.add(branchLabel);
             return child;
         }
-
         public PositionedNode<T> design() {
             Pair<PositionedNode<T>, Extent> res = design_();
             return res.left();
@@ -102,21 +140,48 @@ public class Tree {
             Extent resExtent = Extent.merge(extentsMoved);
             resExtent.addFirst(0, 0);
 
+//            PositionedNode<T> resTree = new PositionedNode<T>(label, subtreesMoved, edgeLabels, info, onClick, 0,branch);
             PositionedNode<T> resTree = new PositionedNode<T>(label, type, subtreesMoved, edgeLabels, onClick, 0);
             return new Pair(resTree, resExtent);
         }
+
+        public void addChildren(Node<T> newChild) {
+            children.add(newChild);
+        }
+
+        public T getLabel() {
+            return label;
+        }
+        public int getNodeId() {
+            return nodeId;
+        }
+        public int getNodePid() {
+            return nodePid;
+        }
+        public NodeAction getOnClick() {
+            return onClick;
+        }
+        public String getBranch() {
+            return branch;
+        }
+        public T getInfo() {
+            return  info;
+        }
     }
+
 
     public static class PositionedNode<T> {
 
         public double position;
         public T label;
         public NodeType type;
+        String branch;
         public List<PositionedNode<T>> children;
         public List<T> edgeLabels;
+        public T info;
         public NodeAction onClick;
 
-        public PositionedNode(T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, NodeAction onClick, double position) {
+        public PositionedNode(T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, org.uclouvain.visualsearchtree.tree.NodeAction onClick, double position) {
             this.label = label;
             this.type = type;
             this.children = children;
@@ -125,6 +190,20 @@ public class Tree {
             this.position = position;
         }
 
+//        public PositionedNode(T label, List<PositionedNode<T>> children, List<T> edgeLabels, T info, NodeAction onClick, double position, String branch) {
+//            this.label = label;
+//            this.children = children;
+//            this.edgeLabels = edgeLabels;
+//            this.onClick = onClick;
+//            this.position = position;
+//            this.branch = branch;
+//            this.info = info;
+//
+//        }
+
+        //        public PositionedNode moveTree(double x) {
+//            return new PositionedNode(label, children, edgeLabels, info, onClick, position + x, branch);
+//        }
         public PositionedNode moveTree(double x) {
             return new PositionedNode(label, type, children, edgeLabels, onClick, position + x);
         }
@@ -134,8 +213,10 @@ public class Tree {
             return "PositionedNode{" +
                     "position=" + position +
                     ", label=" + label +
+                    ", branch=" + branch +
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
+                    ", info=" + info +
                     ", onClick=" + onClick +
                     '}';
         }

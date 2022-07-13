@@ -2,6 +2,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -9,20 +10,21 @@ import javafx.scene.Group;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TreeVisual {
     private final Tree.Node<String> node;
@@ -30,11 +32,18 @@ public class TreeVisual {
     private List<Text> labels;
     private String info;
     private List focusedRect;
+    private final Map<String,String> boookMarks;
+
+
+    private Map<String, Rectangle> allNodesRects;
+    private Map<String, XYChart.Data> allNodesChartDatas;
+    private Map<String, Tree.PositionedNode<String>> allNodesPositions;
 
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
         this.labels = new ArrayList<>(){};
         this.info = "";
+        this.boookMarks = new HashMap<String,String>();
         this.focusedRect = new ArrayList<>(){{
             add(new Rectangle());
             add(" ");
@@ -46,6 +55,9 @@ public class TreeVisual {
             add(0);
             add(0);
         }};
+        this.allNodesRects = new Hashtable<>();
+        this.allNodesPositions = new Hashtable<>();
+        this.allNodesChartDatas = new Hashtable<>();
     }
 
     public Tree.Node<String> getNode() {
@@ -60,6 +72,9 @@ public class TreeVisual {
         return info;
     }
 
+    public List<Integer> getLegendStats() {
+        return legendStats;
+    }
     public List getFocusedRect() {
         return focusedRect;
     }
@@ -76,6 +91,18 @@ public class TreeVisual {
         this.info = info;
     }
 
+    public Map<String, String> getBoookMarks() {
+        return boookMarks;
+    }
+    public void setBoookMarks(String key, String value) {
+        this.boookMarks.put(key, value);
+    }
+    public void setFocusedRect(Rectangle r, String branch, Text label) {
+        this.focusedRect.set(0, r);
+        this.focusedRect.set(1, branch);
+        this.focusedRect.set(2, label);
+    }
+
     public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label) {
         this.focusedRect.set(0, r);
         this.focusedRect.set(1, type);
@@ -89,8 +116,55 @@ public class TreeVisual {
         Text nodeLabel = new Text();
         nodeLabel.setTextAlignment(TextAlignment.RIGHT);
         drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
-        return  root;
+        return root;
     }
+
+
+//    public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
+//        double absolute = center + root.position;
+//        Gson gz = new Gson();
+//        NodeInfoData info = null;
+//
+//        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.branch);
+//        styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
+//
+//        //Add Event to each rectangle
+//        r.setOnMouseClicked(e -> {
+//            //root.nodeAction();
+//            r.fireEvent(new BackToNormalEvent());
+//            r.setFill(Color.ORANGE);
+//            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
+//            nLabel.setText(root.label);
+//            this.setInfo(root.info);
+//            this.setFocusedRect(r, root.branch, nLabel);
+//        });
+//
+//        g.getChildren().add(r);
+//        g.getChildren().add(nLabel);
+//
+//        for (Tree.PositionedNode<String> child : root.children) {
+//            Rectangle childR = drawNodeRecur(g, child, absolute, depth + 1, new Text());
+//            Line line = connectRectangle(r, childR);
+//            g.getChildren().add(line);
+//
+//            //Make rectangle toFront
+//            r.toFront();
+//            childR.toFront();
+//        }
+//
+//        if (depth > this.legendStats.get(3)) {
+//            this.setLegendStats(3, depth);
+//        }
+//
+//        info = gz.fromJson(root.info, new TypeToken<NodeInfoData>(){}.getType());
+//        if (info != null) {
+//            String nodeID = UUID.randomUUID().toString();
+//            this.allNodesPositions.put(nodeID, root);
+//            this.allNodesRects.put(nodeID, r);
+//            this.allNodesChartDatas.put(nodeID, (new XYChart.Data(info.param1, info.cost)));
+//        }
+//        return r;
+//    }
 
     public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
         double absolute = center + root.position;
@@ -129,6 +203,41 @@ public class TreeVisual {
         return r;
     }
 
+    private Rectangle createRectangle(double x, double y, String branch) {
+        Rectangle rect = new Rectangle(x,y,20,20);
+        rect.setStrokeType(StrokeType.OUTSIDE);
+        rect.setStrokeWidth(1);
+        rect.setStroke(Color.BLACK);
+        rect.addEventHandler(CustomEvent.CUSTOM_EVENT_TYPE, new BackToNormalEventHandler() {
+            @Override
+            public void unClick() {
+                makeNotFocus();
+            }
+        });
+
+        switch (branch) {
+            case "BRANCH" -> {
+                rect.setArcHeight(40);
+                rect.setArcWidth(40);
+                rect.setFill(Color.CORNFLOWERBLUE);
+                this.setLegendStats(0,this.legendStats.get(0) +1);
+            }
+            case "FAILED" -> {
+                rect.setFill(Color.RED);
+                this.setLegendStats(1,this.legendStats.get(1) +1);
+            }
+            case "SOLVED" -> {
+                rect.setFill(Color.GREEN);
+                rect.setRotate(45);
+                this.setLegendStats(2,this.legendStats.get(2) +1);
+            }
+            default -> {
+            }
+        }
+        rect.setCursor(Cursor.CROSSHAIR);
+        return rect;
+    }
+
     private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
         Rectangle rect = new Rectangle(x,y,20,20);
         rect.setStrokeType(StrokeType.OUTSIDE);
@@ -164,6 +273,31 @@ public class TreeVisual {
         return rect;
     }
 
+    private Rectangle createRectangleForLegendBox(String branch) {
+        Rectangle rect = new Rectangle();
+        rect.setWidth(12);
+        rect.setHeight(12);
+        rect.setStrokeType(StrokeType.OUTSIDE);
+        rect.setStrokeWidth(1);
+        rect.setStroke(Color.BLACK);
+
+        switch (branch) {
+            case "BRANCH" -> {
+                rect.setArcHeight(24);
+                rect.setArcWidth(24);
+                rect.setFill(Color.CORNFLOWERBLUE);
+            }
+            case "FAILED" -> rect.setFill(Color.RED);
+            case "SOLVED" -> {
+                rect.setFill(Color.GREEN);
+                rect.setRotate(45);
+            }
+            default -> {
+            }
+        }
+        return rect;
+    }
+
     private Rectangle createRectangleForLegendBox(Tree.NodeType type) {
         Rectangle rect = new Rectangle();
         rect.setWidth(12);
@@ -194,15 +328,21 @@ public class TreeVisual {
         theLabel.setFont(Font.font("Roboto", 10));
         theLabel.setFill(Color.rgb(13, 15, 16));
         if (nChild == 0) {
-            theLabel.setX(392 + absolute * 40);
+            theLabel.setX(400 + absolute * 40);
             theLabel.setY(82 + depth * 50);
         } else {
             if (pos == 0.0) {
-                theLabel.setX(400 + absolute * 40);
+                theLabel.setX(402 + absolute * 40);
                 theLabel.setY(45 + depth * 50);
             } else if (pos < 0) {
-                theLabel.setX(355 + absolute * 40);
-                theLabel.setY(55 + depth * 50);
+                if(pos == -1){
+                    theLabel.setX(378 + absolute * 40);
+                    theLabel.setY(50 + depth * 50);
+                }
+                else{
+                    theLabel.setX(420 + absolute * 40);
+                    theLabel.setY(50 + depth * 50);
+                }
             } else {
                 theLabel.setX(422 + absolute * 40);
                 theLabel.setY(48 + depth * 50);
@@ -214,6 +354,7 @@ public class TreeVisual {
         this.setLabels(theLabel);
 
     }
+
     private Line connectRectangle(Rectangle r1, Rectangle r2) {
         Line line = new Line();
         line.setStartX(r1.getX()+r1.getWidth()/2);
@@ -227,6 +368,23 @@ public class TreeVisual {
         return line;
     }
 
+
+//    public HBox generateLegendsStack(){
+//        HBox hbox = new HBox();
+//        hbox.setPadding(new Insets(10));
+//        hbox.setAlignment(Pos.BASELINE_LEFT);
+//        Rectangle branchRect = createRectangleForLegendBox("BRANCH");
+//        Rectangle solvedRect = createRectangleForLegendBox("SOLVED");
+//        Rectangle failedRect = createRectangleForLegendBox("FAILED");
+//        FlowPane s1 = new FlowPane();
+//        FlowPane s2 = new FlowPane();
+//        FlowPane s3 = new FlowPane();
+//        s1.getChildren().addAll(branchRect, new Text("  ("+ this.legendStats.get(0)+")"));
+//        s2.getChildren().addAll(failedRect, new Text("  ("+ this.legendStats.get(1)+")"));
+//        s3.getChildren().addAll(solvedRect, new Text("  ("+ this.legendStats.get(2)+")"));
+//        hbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : ("+ this.legendStats.get(3)+")"));
+//        return hbox;
+//    }
 
     public HBox generateLegendsStack(){
         HBox hbox = new HBox();
@@ -246,7 +404,7 @@ public class TreeVisual {
     }
 
 
-    public void makeNotFocus() {
+    public void makeNotFocus(){
         var r = (Rectangle) this.focusedRect.get(0);
         var branch = (String) this.focusedRect.get(1);
         var label = (Text) this.focusedRect.get(2);
@@ -260,26 +418,44 @@ public class TreeVisual {
                 }
             }
         }
+
     }
 
     /**
-     * Create optimization graph
-     *
-     * @param  rootNode   the root node of the tree.
-     * @return         line chart representing the graph
+     * Create the optimization chart
+     * @param all_sol
+     * @return
      */
-    public static LineChart<Number, Number> getTreeChart(Tree.Node<String> rootNode){
+    public LineChart<Number, Number> getTreeChart(boolean all_sol){
+        // variables
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Node Cost");
-        xAxis.setLabel("Number of Solution");
-        //creating the chart
-        final LineChart<Number,Number> lineChart = new LineChart<Number,Number>(xAxis,yAxis);
-//        lineChart.setTitle("Optimization Graph");
-
-        //defining a series
         XYChart.Series series = new XYChart.Series();
-        //getchildRecursvly(series, rootNode);
+        String x_label = "Number of Solution";
+        yAxis.setLabel("Node Cost");
+        if (!all_sol){
+            x_label = "Number of Nodes";
+        }
+        xAxis.setLabel(x_label);
+        //creating the chart
+        final LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
+        if (all_sol)
+        {
+            for (String key: this.allNodesPositions.keySet())
+            {
+                System.out.println(this.allNodesChartDatas.get(key));
+                series.getData().add(this.allNodesChartDatas.get(key));
+            }
+        }
+        else
+        {
+            for (String key: this.allNodesPositions.keySet())
+            {
+                if (this.allNodesPositions.get(key).branch == "SOLVED")
+                    series.getData().add(this.allNodesChartDatas.get(key));
+            }
+        }
+
         lineChart.getData().add(series);
         return  lineChart;
     }
@@ -309,4 +485,40 @@ public class TreeVisual {
             }
         }
     }*/
+    /**
+     * Use function to add event on chart
+     */
+    public void addEventOnChart()
+    {
+        for (String key: this.allNodesPositions.keySet())
+        {
+            if (this.allNodesChartDatas.get(key) != null)
+            {
+                //variables
+                Data tmp_data = (Data)this.allNodesChartDatas.get(key);
+                Rectangle tmp_rect = this.allNodesRects.get(key);
+
+                tmp_data.getNode().setCursor(Cursor.HAND);
+                Color old_col = (Color) tmp_rect.getFill();
+                tmp_data.getNode().setOnMouseClicked(event -> {
+                    //Make focus and animate to ease visibility
+
+                    //Animate
+                    ScaleTransition st = new ScaleTransition(Duration.millis(200), tmp_rect);
+                    st.setByX(0.5f);
+                    st.setByY(0.5f);
+                    st.setCycleCount(4);
+                    st.setAutoReverse(true);
+                    st.play();
+
+                    //focus
+                    tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
+                    tmp_rect.setFill(Color.ORANGE);
+                });
+                tmp_data.getNode().setOnMouseExited(event -> {
+                    this.allNodesRects.get(key).setFill(old_col);
+                });
+            }
+        }
+    }
 }

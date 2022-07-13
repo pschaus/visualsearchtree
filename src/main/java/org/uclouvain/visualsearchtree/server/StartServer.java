@@ -55,7 +55,7 @@ public class StartServer extends Application {
 
             //server ui position
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            primaryStage.setAlwaysOnTop(true);
+            primaryStage.setAlwaysOnTop(false);
             primaryStage.setX(screenSize.getWidth()- scene.getWidth()-30);
             primaryStage.setY((screenSize.getHeight()/2)-(scene.getHeight()/2));
 
@@ -88,11 +88,8 @@ public class StartServer extends Application {
 
     @Override
     public void stop(){
-        // TODO: [ToBeFixed] We have serious problem here.
-        //  We can't stop multithread server when we close server ui
-        //  Not Yet
         System.out.println("Stage is closing");
-        serverThread.interrupt();
+        System.exit(0);
     }
 
     public static void main(String[] args) {
