@@ -55,7 +55,7 @@ public class StartServer extends Application {
 
             //server ui position
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            primaryStage.setAlwaysOnTop(false);
+            primaryStage.setAlwaysOnTop(true);
             primaryStage.setX(screenSize.getWidth()- scene.getWidth()-30);
             primaryStage.setY((screenSize.getHeight()/2)-(scene.getHeight()/2));
 

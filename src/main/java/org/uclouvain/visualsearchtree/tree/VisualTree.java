@@ -33,6 +33,7 @@ public class VisualTree {
                     treeController.setInstance(instance);
 
                     Group treeGroup = instance.getGroup();
+                    primaryStage.setAlwaysOnTop(true);
                     Scene scene = new Scene(root, 500, 700);
 
                     Stage outputStage = new Stage();
