@@ -42,7 +42,6 @@ class ServerClientThread extends VisualTree implements Runnable {
 
     public void run(){
         try {
-
             System.out.println(" start server ..................");
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 

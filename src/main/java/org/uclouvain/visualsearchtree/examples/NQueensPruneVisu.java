@@ -21,6 +21,8 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.uclouvain.visualsearchtree.tree.*;
 
+import java.util.Random;
+
 /**
  * Example that illustrates how to solve the NQueens
  * problem with a chronological backtracking algorithm
@@ -35,45 +37,43 @@ public class NQueensPruneVisu extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
-
         NQueensPrune nqueens = new NQueensPrune(4);
         Tree t = new Tree(-1);
+
+        // TEST: TO SIMULATE OPTIMIZATION GRAPH
+        Random rand = new Random();
 
         nqueens.dfs(new DFSListener() {
             @Override
             public void solution(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "");
+                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+rand.nextInt(40)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
 
             @Override
             public void fail(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "");
+                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+rand.nextInt(60)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
 
             @Override
             public void branch(int id, int pId, int nChilds) {
-                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "");
+                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+rand.nextInt(30)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
-
         });
 
 
         Tree.Node n = t.root();
 
+        // Let use visualTree screen to visualize both
+        // tree, optimization graph, node info and bookmarks
+        VisualTree.treeProfilerLauncher(n, primaryStage);
 
-        StackPane p = new StackPane();
-        AnimationFactory.zoomOnSCroll(p);
-
-        TreeVisual tv = new TreeVisual(t.root());
-        p.getChildren().add(tv.getGroup());
-
-
-        Scene scene = new Scene(p, 500, 600);
-        primaryStage.setScene(scene);
-
-
-        primaryStage.show();
+        // StackPane p = new StackPane();
+        // AnimationFactory.zoomOnSCroll(p);
+        // TreeVisual tv = new TreeVisual(t.root());
+        // p.getChildren().add(tv.getGroup());
+        // Scene scene = new Scene(p, 500, 600);
+        // primaryStage.setScene(scene);
+        // primaryStage.show();
 
     }
 }
