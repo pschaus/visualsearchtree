@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 public class VisualTree {
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
-        final double SCALE_DELTA = 1.1;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -41,11 +40,9 @@ public class VisualTree {
                     outputStage.setScene(scene);
                     outputStage.show();
 
-                    //Slider sl =(Slider) scene.lookup("#zoomSlider");
 
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(treeGroup);
-                    //sp.translateYProperty().bind(sl.valueProperty());
 
                     AnimationFactory.zoomOnSCroll(sp);
 
