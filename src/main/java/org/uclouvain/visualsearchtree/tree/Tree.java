@@ -84,7 +84,6 @@ public class Tree {
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
             this.info = info;
-
         }
         public Node(T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
             this.label = label;
@@ -103,6 +102,17 @@ public class Tree {
             this.edgeLabels = edgeLabels;
             this.onClick = onClick;
             this.type = nodeType;
+        }
+
+        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeType nodeType, T info) {
+            this.nodeId = nodeId;
+            this.nodePid = nodePid;
+            this.label = label;
+            this.children = children;
+            this.edgeLabels = edgeLabels;
+            this.onClick = () -> {};
+            this.type = nodeType;
+            this.info = info;
         }
 
         public Node addChild(T nodeLabel, NodeType type, T branchLabel, NodeAction onClick, T info) {

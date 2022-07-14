@@ -1,23 +1,22 @@
 package org.uclouvain.visualsearchtree.server;
 
-import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.reflect.TypeToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.uclouvain.visualsearchtree.tree.NodeDeserializer;
 import org.uclouvain.visualsearchtree.tree.Tree;
 import javax.swing.*;
 import com.google.gson.Gson;
@@ -29,8 +28,6 @@ public  class ServerUIController {
     private ProfilingData pData;
     private List<Tree.Node> treeListCurrentlyDraw = new ArrayList<>();
     private Stage primaryStage;
-    @FXML
-    private Label portLabel;
 
     
     @FXML
@@ -88,10 +85,7 @@ public  class ServerUIController {
             } catch (FileNotFoundException ev) {
                 ev.printStackTrace();
             }
-            System.out.println(profilingNode.toString());
-            // TODO : SAVE DATA ON CORRECT FORMAT HERE - DONE(✅️)
             outFile.println(new Gson().toJson(profilingNode,  new TypeToken<Tree.Node<String>>(){}.getType()));
-            // ---------------------------------------
             outFile.close();
         }
     }
@@ -100,8 +94,6 @@ public  class ServerUIController {
         if(!threelistView.getSelectionModel().isEmpty()) {
             int nodeKey = threelistView.getSelectionModel().getSelectedIndex();
             Tree.Node<String> profilingNode = pData.getProfilingNodesList().get(nodeKey);
-            System.out.println(profilingNode.toString());
-
             // SAVE FILE
             fileSaver(profilingNode);
         }
@@ -111,6 +103,11 @@ public  class ServerUIController {
     * Load an old file
     * */
     private void fileLoader() {
+        // register the custom deserializer
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        JsonDeserializer<Tree.Node> deserializer = new NodeDeserializer();
+        gsonBuilder.registerTypeAdapter(Tree.Node.class, deserializer);
+
         // TODO : DECODE FILE HERE AND CONVERT TO TREE.NODE - DONE(✅️)
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select minicp profiling backup file");
@@ -122,14 +119,15 @@ public  class ServerUIController {
 
             try {
                 Reader reader = Files.newBufferedReader(Paths.get(fileToRead.getAbsolutePath()));
-                Gson gson = new Gson();
-                Tree.Node<String> nodeFromFile = gson.fromJson(reader, new TypeToken<Tree.Node<String>>(){}.getType());
+                Gson gson = gsonBuilder.create();
 
-                //pData.addToProfilingNameList("<old> " + nodeFromFile.getLabel());
+                Tree.Node<String> nodeFromFile = gson.fromJson(reader, new TypeToken<Tree.Node<String>>(){}.getType());
+                if (nodeFromFile != null) {
+                    pData.addToProfilingNameList("<old> " + nodeFromFile.getLabel());
+                }
                 if(!pData.getProfilingNodesList().contains(nodeFromFile)) {
                     pData.addSilentlyToProfilingNodesList(nodeFromFile);
                 }
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
