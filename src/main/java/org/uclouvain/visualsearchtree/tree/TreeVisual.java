@@ -49,6 +49,7 @@ public class TreeVisual {
             add(new Rectangle());
             add(Tree.NodeType.INNER);
             add(new Text(" "));
+            add(0);
         }};
         this.legendStats = new ArrayList<>(){{
             add(0);
@@ -99,10 +100,11 @@ public class TreeVisual {
         this.boookMarks.put(key, value);
     }
 
-    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label) {
+    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label, int nodeId) {
         this.focusedRect.set(0, r);
         this.focusedRect.set(1, type);
         this.focusedRect.set(2, label);
+        this.focusedRect.set(3, nodeId);
     }
 
     public Group getGroup() {
@@ -128,12 +130,13 @@ public class TreeVisual {
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
             //root.nodeAction();
+            System.out.println(root.nodeId);
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
             this.setInfo(root.info);
-            this.setFocusedRect(r, root.type, nLabel);
+            this.setFocusedRect(r, root.type, nLabel, root.nodeId);
         });
 
         g.getChildren().add(r);
@@ -235,7 +238,6 @@ public class TreeVisual {
         return rect;
     }
 
-
     private Rectangle createRectangleForLegendBox(Tree.NodeType type) {
         Rectangle rect = new Rectangle();
         rect.setWidth(12);
@@ -305,8 +307,6 @@ public class TreeVisual {
 
         return line;
     }
-
-
 
     public HBox generateLegendsStack(){
         HBox hbox = new HBox();
