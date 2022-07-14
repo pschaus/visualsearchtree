@@ -45,7 +45,7 @@ public class Tree {
         public int nodeId;
         public int nodePid;
         public T info;
-        NodeType type;
+        public NodeType type;
         public T label;
         public List<Node<T>> children;
         public List<T> edgeLabels;
