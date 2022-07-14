@@ -19,6 +19,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -97,8 +98,9 @@ public class TreeUIController {
 
         TableColumn<Map, String> valueColumn = new TableColumn<>("Value");
         valueColumn.setCellValueFactory(new MapValueFactory<>("Value"));
-        valueColumn.setMinWidth(150);
+        valueColumn.setMinWidth(350);
 
+        valueColumn.prefWidthProperty().bind(infoTableView.widthProperty().add(-keyColumn.getWidth()));
         infoTableView.getColumns().add(keyColumn);
         infoTableView.getColumns().add(valueColumn);
     }
@@ -111,7 +113,6 @@ public class TreeUIController {
 
         TableColumn<Map.Entry<String, String>, String> valueColumn = new TableColumn<>("BookMarks");
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-        valueColumn.setMinWidth(300);
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
         bookMarksTableView = new TableView<>(items);
@@ -120,11 +121,12 @@ public class TreeUIController {
         bookMarksTableView.prefWidthProperty().bind(tableHbox.widthProperty());
         bookMarksTableView.setMaxHeight(Double.MAX_VALUE);
 
+        valueColumn.prefWidthProperty().bind(bookMarksTableView.widthProperty().add(-idColumn.getWidth()));
         bookMarksTableView.getColumns().setAll(idColumn, valueColumn);
         tableHbox.getChildren().add(bookMarksTableView);
     }
 
-    // Menu methods
+    // Menu onClick methods
     public void showNodeLabels(ActionEvent actionEvent) {
         showAllLabels();
     }
@@ -240,14 +242,20 @@ public class TreeUIController {
         }
     }
     public void addOrRemoveBookMarks() throws IOException {
-        Text focusedNodeLabel = (Text) instance.getFocusedRect().get(2);
-        var allBookMarks = instance.getBoookMarks();
 
-        if(!Objects.equals(focusedNodeLabel.getText(), " ")){
-            if(allBookMarks.containsKey(focusedNodeLabel.getText())){
-                removeBookMarks(focusedNodeLabel.getText());
+        var allBookMarks = instance.getBoookMarks();
+        var focusedNode = instance.getFocusedRect();
+        String focusedNodeLabel = ( (Text) focusedNode.get(2) ).getText();
+
+        //key is made by concatening "node", nodeId and nodeLabel
+        String key = "node"+focusedNode.get(3)+" "+focusedNodeLabel;
+
+        if(!Objects.equals(focusedNodeLabel, " ")){
+            if(allBookMarks.containsKey(key)){
+                removeBookMarks(key);
                 Rectangle r = (Rectangle) instance.getFocusedRect().get(0);
                 r.setStrokeWidth(1);
+                displayBookMarks();
             }else{
                 displayBookMarkForm();
             }
@@ -281,7 +289,6 @@ public class TreeUIController {
     }
     public void removeBookMarks(String key){
         instance.getBoookMarks().remove(key);
-        //Delete mark point on the node after here
     }
     public void showInformationAlert(String headerText, String contentText){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
