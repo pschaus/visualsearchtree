@@ -193,9 +193,9 @@ public class TreeUIController {
             }
         });
 
-        zoomSlider.valueChangingProperty().addListener((observableValue, aBoolean, t1) -> {
+        zoomSlider.setOnMouseClicked(e ->{
             treeroot.setMinHeight(treeroot.getMinHeight()+zoomSlider.getValue());
-            treeroot.setMinWidth(treeroot.getPrefWidth()+zoomSlider.getValue()*ZOOM_COEFFICIENT*3);
+            treeroot.setMinWidth(treeroot.getMinWidth()+zoomSlider.getValue()*ZOOM_COEFFICIENT*6);
             treeroot.setScaleX(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
             treeroot.setScaleY(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
         });
