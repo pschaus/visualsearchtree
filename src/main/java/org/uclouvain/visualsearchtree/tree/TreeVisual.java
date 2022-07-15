@@ -204,7 +204,7 @@ public class TreeVisual {
 //    }
 
     private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
-        Rectangle rect = new Rectangle(x,y,20,20);
+        Rectangle rect = new Rectangle(x,y,NODE_SHAPE_SIZE,NODE_SHAPE_SIZE);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
@@ -217,8 +217,8 @@ public class TreeVisual {
 
         switch (type) {
             case INNER -> {
-                rect.setArcHeight(40);
-                rect.setArcWidth(40);
+                rect.setArcHeight(NODE_SHAPE_ARC_VALUE);
+                rect.setArcWidth(NODE_SHAPE_ARC_VALUE);
                 rect.setFill(Color.CORNFLOWERBLUE);
                 this.setLegendStats(0,this.legendStats.get(0) +1);
             }
@@ -240,16 +240,16 @@ public class TreeVisual {
 
     private Rectangle createRectangleForLegendBox(Tree.NodeType type) {
         Rectangle rect = new Rectangle();
-        rect.setWidth(12);
-        rect.setHeight(12);
+        rect.setWidth(LEGEND_SHAPE_SIZE);
+        rect.setHeight(LEGEND_SHAPE_SIZE);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
 
         switch (type) {
             case INNER -> {
-                rect.setArcHeight(24);
-                rect.setArcWidth(24);
+                rect.setArcHeight(LEGEND_SHAPE_ARC_VALUE);
+                rect.setArcWidth(LEGEND_SHAPE_ARC_VALUE);
                 rect.setFill(Color.CORNFLOWERBLUE);
             }
             case FAIL -> rect.setFill(Color.RED);
