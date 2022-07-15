@@ -39,8 +39,8 @@
                      </fx:define>
                      <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
                         <children>
-                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
-                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
+                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">per solutions</RadioButton>
+                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">per choices</RadioButton>
                         </children>
                      </HBox>
 
