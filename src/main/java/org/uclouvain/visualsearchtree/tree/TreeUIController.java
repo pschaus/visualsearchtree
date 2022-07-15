@@ -19,7 +19,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -68,26 +67,8 @@ public class TreeUIController {
 
     // Init methods
     public  void init(){
-        resize();
         alignMenuItemText();
         attachEvent();
-
-        // Check if radio btn changed
-        graphType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                RadioButton tmp = (RadioButton)newValue;
-
-                chartUI.getChildren().remove(0);
-                if (tmp.getText() == radioAllNodes.getText()) {
-                    chartUI.getChildren().add(instance.getTreeChart(true));
-                    instance.addEventOnChart();
-                }else {
-                    chartUI.getChildren().add(instance.getTreeChart(false));
-                    instance.addEventOnChart();
-                }
-            }
-        });
         initTableInfo();
         initBookMarksTable();
     }
@@ -109,7 +90,7 @@ public class TreeUIController {
 
         TableColumn<Map.Entry<String, String>, String> idColumn = new TableColumn<>("Node Id");
         idColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-        idColumn.setMinWidth(100);
+        idColumn.setMinWidth(150);
 
         TableColumn<Map.Entry<String, String>, String> valueColumn = new TableColumn<>("BookMarks");
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
@@ -117,7 +98,7 @@ public class TreeUIController {
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
         bookMarksTableView = new TableView<>(items);
         bookMarksTableView.setMinHeight(150);
-        bookMarksTableView.setPlaceholder(new Label("No bookmarks added. Please click CTRL+B to add a bookmark to a node"));
+        bookMarksTableView.setPlaceholder(new Label("No bookmarks added. Please press CTRL+B to add a bookmark to a node"));
         bookMarksTableView.prefWidthProperty().bind(tableHbox.widthProperty());
         bookMarksTableView.setMaxHeight(Double.MAX_VALUE);
 
@@ -171,13 +152,6 @@ public class TreeUIController {
             element.setOpacity(element.getOpacity()==1? 0:1);
         }
     }
-    public void resize(){
-        int depth = instance.getLegendStats().get(3);
-        if(depth>4){
-            treeroot.setMinHeight(depth*60);
-            treeroot.setMinWidth(depth*130);
-        }
-    }
     public void attachEvent(){
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
@@ -202,9 +176,26 @@ public class TreeUIController {
             }
         });
 
+        // Check if radio btn changed
+        graphType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                RadioButton tmp = (RadioButton)newValue;
+
+                chartUI.getChildren().remove(0);
+                if (tmp.getText() == radioAllNodes.getText()) {
+                    chartUI.getChildren().add(instance.getTreeChart(true));
+                    instance.addEventOnChart();
+                }else {
+                    chartUI.getChildren().add(instance.getTreeChart(false));
+                    instance.addEventOnChart();
+                }
+            }
+        });
+
         zoomSlider.valueChangingProperty().addListener((observableValue, aBoolean, t1) -> {
-            treeroot.setMinHeight(treeroot.getMinHeight()+zoomSlider.getValue()*ZOOM_COEFFICIENT);
-            treeroot.setMinWidth(treeroot.getMinWidth()+zoomSlider.getValue()*ZOOM_COEFFICIENT*3);
+            treeroot.setMinHeight(treeroot.getMinHeight()+zoomSlider.getValue());
+            treeroot.setMinWidth(treeroot.getPrefWidth()+zoomSlider.getValue()*ZOOM_COEFFICIENT*3);
             treeroot.setScaleX(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
             treeroot.setScaleY(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
         });
