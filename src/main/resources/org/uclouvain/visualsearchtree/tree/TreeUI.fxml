@@ -53,7 +53,7 @@
                      <HBox alignment="TOP_CENTER" prefWidth="500" spacing="10">
                         <children>
                            <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">per solutions</RadioButton>
-                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">per choices</RadioButton>
+                           <RadioButton  fx:id="radioAllNodes" toggleGroup="$graphType" selected="true">per choices</RadioButton>
                         </children>
                      </HBox>
 
