@@ -166,42 +166,6 @@ public class TreeVisual {
         return r;
     }
 
-//    public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
-//        double absolute = center + root.position;
-//
-//        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.type);
-//        styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
-//
-//        //Add Event to each rectangle
-//        r.setOnMouseClicked(e -> {
-//            //root.nodeAction();
-//            r.fireEvent(new BackToNormalEvent());
-//            r.setFill(Color.ORANGE);
-//            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
-//            nLabel.setText(root.label);
-//            this.setInfo(root.label);
-//            this.setFocusedRect(r, root.type, nLabel);
-//        });
-//
-//        g.getChildren().add(r);
-//        g.getChildren().add(nLabel);
-//
-//        for (Tree.PositionedNode<String> child : root.children) {
-//            Rectangle childR = drawNodeRecur(g, child, absolute, depth + 1, new Text());
-//            Line line = connectRectangle(r, childR);
-//            g.getChildren().add(line);
-//
-//            //Make rectangle toFront
-//            r.toFront();
-//            childR.toFront();
-//        }
-//
-//        if (depth > this.legendStats.get(3)) {
-//            this.setLegendStats(3, depth);
-//        }
-//
-//        return r;
-//    }
 
     private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
         Rectangle rect = new Rectangle(x,y,NODE_SHAPE_SIZE,NODE_SHAPE_SIZE);
@@ -352,29 +316,50 @@ public class TreeVisual {
         // variables
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
+        this.allNodesChartDatas = new HashMap<>();
         XYChart.Series series = new XYChart.Series();
-        String x_label = "Number of Solution";
-        yAxis.setLabel("Node Cost");
-        if (!all_sol){
-            x_label = "Number of Nodes";
-        }
-        xAxis.setLabel(x_label);
+        Gson gz = new Gson();
+        NodeInfoData _info = null;
+        yAxis.setLabel("Cost");
+        xAxis.setLabel("Number of Choices");
+
         //creating the chart
         final LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
         if (all_sol)
         {
             for (String key: this.allNodesPositions.keySet())
             {
-                System.out.println(this.allNodesChartDatas.get(key));
-                series.getData().add(this.allNodesChartDatas.get(key));
+                if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
+                    _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
+                    if (_info != null)
+                    {
+                        this.allNodesChartDatas.put(key, (new XYChart.Data(_info.param1, _info.cost)));
+                        series.getData().add(this.allNodesChartDatas.get(key));
+                    }
             }
         }
         else
         {
+            xAxis.setLabel("Number of Solutions");
+            Map<String, Float> only_sol = new HashMap<>();
             for (String key: this.allNodesPositions.keySet())
             {
                 if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
-                    series.getData().add(this.allNodesChartDatas.get(key));
+                {
+                    _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
+                    if (_info != null) {
+                        only_sol.put(key, (float) _info.param1);
+                    }
+                }
+            }
+            // sort by value
+            List<Map.Entry<String, Float>> list = new ArrayList<>(only_sol.entrySet());
+            list.sort(Map.Entry.comparingByValue());
+            for (int i = 0; i < list.size(); i++) {
+                String _key = list.get(i).getKey();
+                _info = gz.fromJson(this.allNodesPositions.get(_key).info, new TypeToken<NodeInfoData>(){}.getType());
+                this.allNodesChartDatas.put(_key, (new XYChart.Data(i+1, _info.cost)));
+                series.getData().add(this.allNodesChartDatas.get(_key));
             }
         }
 
