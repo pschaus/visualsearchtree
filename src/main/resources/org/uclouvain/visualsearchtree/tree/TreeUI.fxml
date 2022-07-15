@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
 <VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
       <Menu text="Node">
          <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />
          <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />
-         <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />
+         <MenuItem fx:id="showGraph" onAction="#showGraph" text="Show graph" />
          <MenuItem fx:id="manageBookMarksItem" onAction="#manageBookMarks" text="Add/Remove BookMarks" />
          <MenuItem fx:id="showBookMarksItem" onAction="#showBookMarks" text="Show BookMarks" />
          <MenuItem disable="true" onAction="#saveTree" text="Save File" />
@@ -25,9 +38,9 @@
    </MenuBar>
 
    <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
-      <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400" prefHeight="400" prefWidth="400.0" />
+      <StackPane fx:id="treeroot" minHeight="400" minWidth="400" maxHeight="Infinity" maxWidth="Infinity" />
    </ScrollPane>
-   <Slider fx:id="zoomSlider"  min="-100" />
+   <Slider fx:id="zoomSlider" min="-50" max="50" />
    <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <tabs>
@@ -35,9 +48,9 @@
             <AnchorPane id="Content">
                <VBox>
                      <fx:define>
-                        <ToggleGroup  fx:id="graphType" />
+                        <ToggleGroup fx:id="graphType" />
                      </fx:define>
-                     <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
+                     <HBox alignment="TOP_CENTER" prefWidth="500" spacing="10">
                         <children>
                            <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">per solutions</RadioButton>
                            <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">per choices</RadioButton>
@@ -55,7 +68,7 @@
             </TableView>
          </Tab>
          <Tab fx:id="bookMarksTab" onSelectionChanged="#showBookMarks" text="BookMarks">
-            <HBox fx:id="tableHbox" maxHeight="Infinity" minWidth="500" prefHeight="150" prefWidth="300" alignment="CENTER">
+            <HBox fx:id="tableHbox" alignment="CENTER" maxHeight="Infinity" minWidth="500" prefHeight="150" prefWidth="300">
                <!-- Here will be displayed the TableView for BookMarks -->
             </HBox>
          </Tab>

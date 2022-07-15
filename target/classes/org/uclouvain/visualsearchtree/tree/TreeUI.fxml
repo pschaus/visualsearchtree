@@ -2,14 +2,13 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <VBox id="vbox" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uclouvain.visualsearchtree.tree.TreeUIController">
 
    <MenuBar fx:id="menuBar">
       <Menu text="Node">
          <MenuItem fx:id="showLabels" onAction="#showNodeLabels" text="Show Labels" />
          <MenuItem fx:id="showInfos" onAction="#showNodeInfos" text="Show Infos" />
-         <MenuItem fx:id="showGaph" onAction="#showGraph" text="Show graph" />
+         <MenuItem fx:id="showGraph" onAction="#showGraph" text="Show graph" />
          <MenuItem fx:id="manageBookMarksItem" onAction="#manageBookMarks" text="Add/Remove BookMarks" />
          <MenuItem fx:id="showBookMarksItem" onAction="#showBookMarks" text="Show BookMarks" />
          <MenuItem disable="true" onAction="#saveTree" text="Save File" />
@@ -40,7 +39,7 @@
                      <HBox spacing="10" prefWidth="500" alignment="TOP_CENTER">
                         <children>
                            <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">Only solutions</RadioButton>
-                           <RadioButton  fx:id="radioAllNods" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
+                           <RadioButton fx:id="radioAllNodes" toggleGroup="$graphType" selected="true">All nodes</RadioButton>
                         </children>
                      </HBox>
 

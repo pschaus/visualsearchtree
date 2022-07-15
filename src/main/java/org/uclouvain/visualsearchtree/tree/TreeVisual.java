@@ -13,7 +13,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
@@ -25,6 +24,8 @@ import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.*;
+
+import static org.uclouvain.visualsearchtree.util.Constant.*;
 
 public class TreeVisual {
     private final Tree.Node<String> node;
@@ -48,6 +49,7 @@ public class TreeVisual {
             add(new Rectangle());
             add(Tree.NodeType.INNER);
             add(new Text(" "));
+            add(0);
         }};
         this.legendStats = new ArrayList<>(){{
             add(0);
@@ -98,10 +100,11 @@ public class TreeVisual {
         this.boookMarks.put(key, value);
     }
 
-    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label) {
+    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label, int nodeId) {
         this.focusedRect.set(0, r);
         this.focusedRect.set(1, type);
         this.focusedRect.set(2, label);
+        this.focusedRect.set(3, nodeId);
     }
 
     public Group getGroup() {
@@ -127,12 +130,13 @@ public class TreeVisual {
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
             //root.nodeAction();
+            System.out.println(root.nodeId);
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
             nLabel.setText(root.label);
             this.setInfo(root.info);
-            this.setFocusedRect(r, root.type, nLabel);
+            this.setFocusedRect(r, root.type, nLabel, root.nodeId);
         });
 
         g.getChildren().add(r);
@@ -164,7 +168,7 @@ public class TreeVisual {
 
 
     private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
-        Rectangle rect = new Rectangle(x,y,20,20);
+        Rectangle rect = new Rectangle(x,y,NODE_SHAPE_SIZE,NODE_SHAPE_SIZE);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
@@ -177,8 +181,8 @@ public class TreeVisual {
 
         switch (type) {
             case INNER -> {
-                rect.setArcHeight(40);
-                rect.setArcWidth(40);
+                rect.setArcHeight(NODE_SHAPE_ARC_VALUE);
+                rect.setArcWidth(NODE_SHAPE_ARC_VALUE);
                 rect.setFill(Color.CORNFLOWERBLUE);
                 this.setLegendStats(0,this.legendStats.get(0) +1);
             }
@@ -194,23 +198,22 @@ public class TreeVisual {
             default -> {
             }
         }
-        rect.setCursor(Cursor.CROSSHAIR);
+        rect.setCursor(Cursor.HAND);
         return rect;
     }
 
-
     private Rectangle createRectangleForLegendBox(Tree.NodeType type) {
         Rectangle rect = new Rectangle();
-        rect.setWidth(12);
-        rect.setHeight(12);
+        rect.setWidth(LEGEND_SHAPE_SIZE);
+        rect.setHeight(LEGEND_SHAPE_SIZE);
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
 
         switch (type) {
             case INNER -> {
-                rect.setArcHeight(24);
-                rect.setArcWidth(24);
+                rect.setArcHeight(LEGEND_SHAPE_ARC_VALUE);
+                rect.setArcWidth(LEGEND_SHAPE_ARC_VALUE);
                 rect.setFill(Color.CORNFLOWERBLUE);
             }
             case FAIL -> rect.setFill(Color.RED);
@@ -229,24 +232,24 @@ public class TreeVisual {
         theLabel.setFont(Font.font("Roboto", 10));
         theLabel.setFill(Color.rgb(13, 15, 16));
         if (nChild == 0) {
-            theLabel.setX(400 + absolute * 40);
-            theLabel.setY(82 + depth * 50);
+            theLabel.setX(400 + absolute * LABEL_X_COEFFICIENT);
+            theLabel.setY(82 + depth * LABEL_Y_COEFFICIENT);
         } else {
             if (pos == 0.0) {
-                theLabel.setX(402 + absolute * 40);
-                theLabel.setY(45 + depth * 50);
+                theLabel.setX(402 + absolute * LABEL_X_COEFFICIENT);
+                theLabel.setY(45 + depth * LABEL_Y_COEFFICIENT);
             } else if (pos < 0) {
                 if(pos == -1){
-                    theLabel.setX(378 + absolute * 40);
-                    theLabel.setY(50 + depth * 50);
+                    theLabel.setX(378 + absolute * LABEL_X_COEFFICIENT);
+                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
                 }
                 else{
-                    theLabel.setX(420 + absolute * 40);
-                    theLabel.setY(50 + depth * 50);
+                    theLabel.setX(420 + absolute * LABEL_X_COEFFICIENT);
+                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
                 }
             } else {
-                theLabel.setX(422 + absolute * 40);
-                theLabel.setY(48 + depth * 50);
+                theLabel.setX(422 + absolute * LABEL_X_COEFFICIENT);
+                theLabel.setY(48 + depth * LABEL_Y_COEFFICIENT);
             }
         }
         theLabel.setOpacity(0);
@@ -268,8 +271,6 @@ public class TreeVisual {
 
         return line;
     }
-
-
 
     public HBox generateLegendsStack(){
         HBox hbox = new HBox();

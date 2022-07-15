@@ -46,17 +46,17 @@ public class NQueensPruneVisu extends Application {
         nqueens.dfs(new DFSListener() {
             @Override
             public void solution(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+rand.nextInt(40)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
 
             @Override
             public void fail(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+rand.nextInt(60)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
 
             @Override
             public void branch(int id, int pId, int nChilds) {
-                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+rand.nextInt(30)+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
             }
         });
 
