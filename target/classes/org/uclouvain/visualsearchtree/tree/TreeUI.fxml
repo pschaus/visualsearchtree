@@ -40,7 +40,7 @@
    <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
       <StackPane fx:id="treeroot" minHeight="400" minWidth="400" maxHeight="Infinity" maxWidth="Infinity" />
    </ScrollPane>
-   <Slider fx:id="zoomSlider" min="-50" max="50" />
+   <Slider fx:id="zoomSlider" value="25" max="50" />
    <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <tabs>
@@ -52,11 +52,8 @@
                      </fx:define>
                      <HBox alignment="TOP_CENTER" prefWidth="500" spacing="10">
                         <children>
-                           <RadioButton fx:id="radioOnlySol">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="graphType" />
-                           </toggleGroup></RadioButton>
-                           <RadioButton fx:id="radioAllNodes" selected="true" toggleGroup="$graphType">All nodes</RadioButton>
+                           <RadioButton  fx:id="radioOnlySol" toggleGroup="$graphType">per solutions</RadioButton>
+                           <RadioButton  fx:id="radioAllNodes" toggleGroup="$graphType" selected="true">per choices</RadioButton>
                         </children>
                      </HBox>
 
