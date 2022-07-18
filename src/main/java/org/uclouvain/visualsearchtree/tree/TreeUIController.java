@@ -287,7 +287,7 @@ public class TreeUIController {
                 removeBookMarks(key);
                 Rectangle r = (Rectangle) instance.getFocusedRect().get(0);
                 r.setStrokeWidth(1);
-                displayBookMarks();
+                showBookMarksItem.fire();
             }else{
                 displayBookMarkForm();
             }
@@ -310,7 +310,7 @@ public class TreeUIController {
         bookMarkStage.toFront();
         bookMarkStage.show();
     }
-    private void displayBookMarks() {
+    public void displayBookMarks() {
         if(tabPane.getSelectionModel().getSelectedItem()!=bookMarksTab){
             tabPane.getSelectionModel().select(bookMarksTab);
         }
