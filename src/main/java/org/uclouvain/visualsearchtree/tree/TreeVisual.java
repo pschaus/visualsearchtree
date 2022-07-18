@@ -161,7 +161,6 @@ public class TreeVisual {
             String nodeID = UUID.randomUUID().toString();
             this.allNodesPositions.put(nodeID, root);
             this.allNodesRects.put(nodeID, r);
-            this.allNodesChartDatas.put(nodeID, (new XYChart.Data(info.param1, info.cost)));
         }
         return r;
     }
@@ -330,12 +329,15 @@ public class TreeVisual {
             for (String key: this.allNodesPositions.keySet())
             {
                 if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
+                {
                     _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
+                    System.out.println(_info);
                     if (_info != null)
                     {
                         this.allNodesChartDatas.put(key, (new XYChart.Data(_info.param1, _info.cost)));
                         series.getData().add(this.allNodesChartDatas.get(key));
                     }
+                }
             }
         }
         else
@@ -379,19 +381,18 @@ public class TreeVisual {
      */
     public void addEventOnChart()
     {
-        for (String key: this.allNodesPositions.keySet())
+        for (String key: this.allNodesChartDatas.keySet())
         {
             if (this.allNodesChartDatas.get(key) != null)
             {
                 //variables
                 Data tmp_data = (Data)this.allNodesChartDatas.get(key);
                 Rectangle tmp_rect = this.allNodesRects.get(key);
-
                 tmp_data.getNode().setCursor(Cursor.HAND);
                 Color old_col = (Color) tmp_rect.getFill();
-                tmp_data.getNode().setOnMouseClicked(event -> {
-                    //Make focus and animate to ease visibility
 
+                tmp_data.getNode().setOnMousePressed(event -> {
+                    //Make focus and animate to ease visibility
                     //Animate
                     ScaleTransition st = new ScaleTransition(Duration.millis(200), tmp_rect);
                     st.setByX(0.5f);
