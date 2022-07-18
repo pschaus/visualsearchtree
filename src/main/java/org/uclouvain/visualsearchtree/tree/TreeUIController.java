@@ -38,6 +38,8 @@ public class TreeUIController {
     public Slider zoomSlider;
     public TableView infoTableView;
     private TreeVisual instance;
+    private final double stackPaneMinWidth = 400;
+    private double stackPaneMinHeight = 400;
 
     //Menu items variables
     public MenuBar menuBar;
@@ -67,11 +69,20 @@ public class TreeUIController {
 
     // Init methods
     public  void init(){
+        resize();
         alignMenuItemText();
         attachEvent();
         initTableInfo();
         initBookMarksTable();
     }
+    public void resize(){
+        int depth = instance.getLegendStats().get(3);
+        if(depth>5){
+            treeroot.setMinHeight(depth*60);
+            stackPaneMinHeight = treeroot.getMinHeight();
+        }
+    }
+
     private void initTableInfo () {
         TableColumn<Map, String> keyColumn = new TableColumn<>("Key");
         keyColumn.setCellValueFactory(new MapValueFactory<>("Key"));
@@ -194,11 +205,41 @@ public class TreeUIController {
         });
 
         zoomSlider.setOnMouseClicked(e ->{
-            treeroot.setMinHeight(treeroot.getMinHeight()+zoomSlider.getValue());
-            treeroot.setMinWidth(treeroot.getMinWidth()+zoomSlider.getValue()*ZOOM_COEFFICIENT*6);
-            treeroot.setScaleX(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
-            treeroot.setScaleY(1 + zoomSlider.getValue()*SCALE_COEFFICIENT);
+            double zoomValue = zoomSlider.getValue();
+            if (zoomValue == DEFAULT_SLIDER_VALUE) {
+                treeroot.setMinHeight(stackPaneMinHeight);
+                treeroot.setMinWidth(stackPaneMinWidth);
+                treeroot.setScaleY(1);
+                treeroot.setScaleY(1);
+            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
+                zoomOut(zoomValue);
+            }else {
+                zoomIn(zoomValue);
+            }
         });
+    }
+    public void zoomIn(double value){
+        treeroot.setScaleX(1 + value*SCALE_COEFFICIENT);
+        treeroot.setScaleY(1 + value*SCALE_COEFFICIENT);
+        if(value<=DEFAULT_SLIDER_VALUE+7){
+            treeroot.setMinHeight(stackPaneMinHeight * (value/ZOOM_Y_COEFFICIENT));
+            treeroot.setMinWidth(stackPaneMinWidth * (value/ZOOM_X_COEFFICIENT));
+        }else if(value<=DEFAULT_SLIDER_VALUE+15){
+            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+1)));
+        }else if(value<=DEFAULT_SLIDER_VALUE+20){
+            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+2)));
+        }else{
+            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+3)));
+        }
+    }
+    public void zoomOut(double value){
+        treeroot.setMinHeight(stackPaneMinHeight);
+        treeroot.setMinWidth(stackPaneMinWidth);
+        treeroot.setScaleX(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
+        treeroot.setScaleY(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
     }
     public void displayNodeInfos(){
         if(tabPane.getSelectionModel().getSelectedItem() != infoTab){
