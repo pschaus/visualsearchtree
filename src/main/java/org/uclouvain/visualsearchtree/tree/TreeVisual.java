@@ -3,6 +3,7 @@ package org.uclouvain.visualsearchtree.tree;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javafx.animation.ScaleTransition;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -13,6 +14,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
@@ -28,17 +30,28 @@ import java.util.*;
 import static org.uclouvain.visualsearchtree.util.Constant.*;
 
 public class TreeVisual {
-    private final Tree.Node<String> node;
+    private Tree.Node<String> node;
     private List<Integer> legendStats;
     private List<Text> labels;
     private String info;
     private List focusedRect;
-    private final Map<String,String> boookMarks;
+    private  StackPane treeStackPane;
+
+    private Map<String,String> boookMarks;
 
 
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
+    private List<Tree.Node> tempList;
+    private  Tree tree;
+    ///
+    NumberAxis xAxis = new NumberAxis();
+    NumberAxis yAxis = new NumberAxis();
+
+    private LineChart lineChart;
+    private XYChart.Series series;
+    private HBox legendhbox;
 
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
@@ -62,6 +75,49 @@ public class TreeVisual {
         this.allNodesChartDatas = new Hashtable<>();
     }
 
+
+    /**
+     * Realtime constructor
+     */
+    public  TreeVisual(){
+        this.treeStackPane = new StackPane();
+        this.boookMarks = new HashMap<String,String>();
+        tree = new Tree(-1);
+        this.node = tree.root();
+        this.legendhbox = new HBox();
+
+        this.xAxis = new NumberAxis();
+        this.yAxis = new NumberAxis();
+        lineChart = new LineChart<>(xAxis, yAxis);
+        tempList = new ArrayList<>();
+        this.labels = new ArrayList<>(){};
+        this.info = "";
+        this.focusedRect = new ArrayList<>(){{
+            add(new Rectangle());
+            add(Tree.NodeType.INNER);
+            add(new Text(" "));
+            add(0);
+        }};
+
+        this.legendStats = new ArrayList<>(){{
+            add(0);
+            add(0);
+            add(0);
+            add(0);
+        }};
+        //
+        this.allNodesRects = new Hashtable<>();
+        this.allNodesPositions = new Hashtable<>();
+        this.allNodesChartDatas = new Hashtable<>();
+        this.series =  new XYChart.Series();
+        lineChart.getData().add(series);
+        PeriodicDrawer();
+    }
+
+    public StackPane getTreeStackPane()
+    {
+        return this.treeStackPane;
+    }
     public Tree.Node<String> getNode() {
         return node;
     }
@@ -113,8 +169,9 @@ public class TreeVisual {
         Tree.PositionedNode<String> pnode = this.getNode().design();
         Text nodeLabel = new Text();
         nodeLabel.setTextAlignment(TextAlignment.RIGHT);
-        System.out.println(pnode.info);
         drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
+        getTreeChart(true);
+        generateLegendsStack();
         return root;
     }
 
@@ -130,7 +187,6 @@ public class TreeVisual {
         //Add Event to each rectangle
         r.setOnMouseClicked(e -> {
             //root.nodeAction();
-            System.out.println(root.nodeId);
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
             nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
@@ -272,9 +328,8 @@ public class TreeVisual {
     }
 
     public HBox generateLegendsStack(){
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(10));
-        hbox.setAlignment(Pos.BASELINE_LEFT);
+        legendhbox.setPadding(new Insets(10));
+        legendhbox.setAlignment(Pos.BASELINE_LEFT);
         Rectangle branchRect = createRectangleForLegendBox(Tree.NodeType.INNER);
         Rectangle solvedRect = createRectangleForLegendBox(Tree.NodeType.SOLUTION);
         Rectangle failedRect = createRectangleForLegendBox(Tree.NodeType.FAIL);
@@ -284,8 +339,8 @@ public class TreeVisual {
         s1.getChildren().addAll(branchRect, new Text("  ("+ this.legendStats.get(0)+")"));
         s2.getChildren().addAll(failedRect, new Text("  ("+ this.legendStats.get(1)+")"));
         s3.getChildren().addAll(solvedRect, new Text("  ("+ this.legendStats.get(2)+")"));
-        hbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : ("+ this.legendStats.get(3)+")"));
-        return hbox;
+        legendhbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : ("+ this.legendStats.get(3)+")"));
+        return legendhbox;
     }
 
 
@@ -313,17 +368,12 @@ public class TreeVisual {
      */
     public LineChart<Number, Number> getTreeChart(boolean all_sol){
         // variables
-        final NumberAxis xAxis = new NumberAxis();
-        final NumberAxis yAxis = new NumberAxis();
         this.allNodesChartDatas = new HashMap<>();
-        XYChart.Series series = new XYChart.Series();
         Gson gz = new Gson();
         NodeInfoData _info = null;
         yAxis.setLabel("Cost");
         xAxis.setLabel("Number of Choices");
-
         //creating the chart
-        final LineChart<Number,Number> lineChart = new LineChart<>(xAxis, yAxis);
         if (all_sol)
         {
             for (String key: this.allNodesPositions.keySet())
@@ -331,7 +381,6 @@ public class TreeVisual {
                 if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
                 {
                     _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
-                    System.out.println(_info);
                     if (_info != null)
                     {
                         this.allNodesChartDatas.put(key, (new XYChart.Data(_info.param1, _info.cost)));
@@ -364,9 +413,6 @@ public class TreeVisual {
                 series.getData().add(this.allNodesChartDatas.get(_key));
             }
         }
-
-        lineChart.getData().add(series);
-        System.out.println(series);
         return  lineChart;
     }
 
@@ -410,5 +456,74 @@ public class TreeVisual {
                 });
             }
         }
+    }
+
+
+    public void PeriodicDrawer(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            int intv = 0;
+            @Override
+            public void run() {
+                boolean check = false;
+                for ( int i = 0; i < 5; i++) {
+                    if (i < tempList.size() )
+                    {
+                        if (tempList.get(i) != null) {
+                            tree.attachToParent(tempList.get(i).nodePid, tree.nodeMap.get(tempList.get(i).nodeId));
+                            check = true;
+                        }
+                        tempList.remove(i);
+                    }
+                }
+                if ( (intv > 0) && (!check))
+                {
+                    refresh(true, timer);
+                }else {
+                    refresh(false, timer);
+                }
+                intv ++;
+            }
+        }, 0, 500);
+    }
+
+    public void refresh(Boolean exit, Timer time){
+        if (exit)
+            time.cancel();
+        Platform.runLater(()->{
+            if (treeStackPane.getChildren().size() >  0)
+            {
+                treeStackPane.getChildren().remove(0);
+            }
+            this.resetAllBeforeRedraw();
+            treeStackPane.getChildren().add(getGroup());
+        });
+    }
+
+    public void createNode(int id, int pId, Tree.NodeType type, NodeAction onClick, String info){
+        tree.crateIndNode(id, pId, type, onClick, info);
+        this.tempList.add(new Tree.Node(id,pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
+    }
+
+    /**
+     * Used to reset all parameters
+     */
+    public void resetAllBeforeRedraw(){
+        // Reset all saved nodes data
+        this.allNodesRects = new Hashtable<>();
+        this.allNodesPositions = new Hashtable<>();
+        this.allNodesChartDatas = new Hashtable<>();
+
+        //Empty legendBox
+        if (legendhbox.getChildren().size() >  0)
+        {
+            legendhbox.getChildren().remove(0, legendhbox.getChildren().size());
+        }
+        this.legendStats = new ArrayList<>(){{
+            add(0);
+            add(0);
+            add(0);
+            add(0);
+        }};
     }
 }

@@ -37,35 +37,43 @@ public class NQueensPruneVisu extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        NQueensPrune nqueens = new NQueensPrune(4);
+        NQueensPrune nqueens = new NQueensPrune(10);
         Tree t = new Tree(-1);
-
+        TreeVisual tv = new TreeVisual();
         // TEST: TO SIMULATE OPTIMIZATION GRAPH
-        Random rand = new Random();
+        VisualTree.treeProfilerLaucher(tv);
 
-        nqueens.dfs(new DFSListener() {
+        Thread t2 = new Thread(new Runnable() {
             @Override
-            public void solution(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
-            }
+            public void run() {
+                nqueens.dfs(new DFSListener() {
+                    @Override
+                    public void solution(int id, int pId) {
+                        System.out.println("solution");
+                        tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                    }
 
-            @Override
-            public void fail(int id, int pId) {
-                t.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
-            }
+                    @Override
+                    public void fail(int id, int pId) {
+                        System.out.println("fail");
+                        tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                    }
 
-            @Override
-            public void branch(int id, int pId, int nChilds) {
-                t.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                    @Override
+                    public void branch(int id, int pId, int nChilds) {
+                        System.out.println("branch");
+                        tv.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                    }
+                });
             }
         });
+        t2.start();
 
-
-        Tree.Node n = t.root();
+        //Tree.Node n = t.root();
 
         // Let use visualTree screen to visualize both
         // tree, optimization graph, node info and bookmarks
-        VisualTree.treeProfilerLauncher(n, primaryStage);
+        //VisualTree.treeProfilerLauncher(n, primaryStage);
 
         // StackPane p = new StackPane();
         // AnimationFactory.zoomOnSCroll(p);

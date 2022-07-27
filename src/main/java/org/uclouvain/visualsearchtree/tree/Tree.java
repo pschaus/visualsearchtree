@@ -30,6 +30,30 @@ public class Tree {
         nodeMap.put(id,n);
     }
 
+    /**
+     *
+     * @param pId
+     * @param n
+     */
+    public void attachToParent(int pId, Node n)
+    {
+        if (nodeMap.get(pId) != null) {
+            nodeMap.get(pId).children.add(nodeMap.get(n.nodeId));
+        }
+    }
+
+    /**
+     *  Add new node to nodemap without linked it to its parent
+     * @param id
+     * @param pId
+     * @param type
+     * @param onClick
+     * @param info
+     */
+    public void crateIndNode(int id,int pId, NodeType type, NodeAction onClick, String info){
+        nodeMap.put(id, new Tree.Node(id, pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
+    }
+
     public Node root() {
         return nodeMap.get(rootId);
     }
@@ -116,6 +140,28 @@ public class Tree {
             this.info = info;
         }
 
+        /**
+         *
+         * @param nodeId
+         * @param nodePid
+         * @param label
+         * @param type
+         * @param children
+         * @param edgeLabels
+         * @param onClick
+         * @param info
+         */
+        public Node(int nodeId, int nodePid, T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
+            this.nodeId = nodeId;
+            this.nodePid = nodePid;
+            this.label = label;
+            this.type = type;
+            this.children = children;
+            this.edgeLabels = edgeLabels;
+            this.onClick = onClick;
+            this.info = info;
+        }
+
         public Node addChild(int nodeId,T nodeLabel, NodeType type, T branchLabel, NodeAction onClick, T info) {
             Node child = new Node(nodeId,nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick, info);
             children.add(child);
@@ -153,7 +199,6 @@ public class Tree {
 
             Extent resExtent = Extent.merge(extentsMoved);
             resExtent.addFirst(0, 0);
-            System.out.println("in it:->"+ info);
             PositionedNode<T> resTree = new PositionedNode<T>(nodeId,label, type, subtreesMoved, edgeLabels, onClick, 0, info);
             return new Pair(resTree, resExtent);
         }
