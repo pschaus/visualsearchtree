@@ -50,8 +50,8 @@ public class Decoder {
         readBuffer(msgBody, buffer, msgSize);
 
         // msg type
-        switch ((int) msgBody[0] & 0xFF){
-            case NODE:
+        switch ((int) msgBody[0] & 0xFF) {
+            case NODE -> {
                 formatData.msgTypeName = "NODE";
                 formatData.msgType = NODE;
                 formatData.nodeId = byteArrayToInt(readBytes(msgBody, 1, 4), "BIG_ENDIAN");
@@ -60,45 +60,42 @@ public class Decoder {
                 formatData.nodeChildren = byteArrayToInt(readBytes(msgBody, 29, 32), "BIG_ENDIAN");
                 formatData.nodeStatus = (int) msgBody[33] & 0xFF;
                 //decode optional data
-                if(msgBody.length > 34) {
+                if (msgBody.length > 34) {
                     int i = 34;
-                    do{
+                    do {
                         int opt_type = (int) msgBody[i] & 0xFF;
-                        int opt_size = byteArrayToInt(readBytes(msgBody, i+1, i+5), "BIG_ENDIAN");
-                        String opt_msg = new String(readBytes(msgBody, i+5, i+6+opt_size-2), StandardCharsets.US_ASCII);
-                        i = i+6+opt_size-1;
-                        if(opt_type == 0) {
+                        int opt_size = byteArrayToInt(readBytes(msgBody, i + 1, i + 5), "BIG_ENDIAN");
+                        String opt_msg = new String(readBytes(msgBody, i + 5, i + 6 + opt_size - 2), StandardCharsets.US_ASCII);
+                        i = i + 6 + opt_size - 1;
+                        if (opt_type == 0) {
                             formatData.nodeLabel = opt_msg.trim();
-                        }
-                        else if(opt_type == 1) {
+                        } else if (opt_type == 1) {
                             formatData.nodeNoGood = opt_msg.trim();
-                        }
-                        else{
+                        } else {
                             formatData.nodeInfo = opt_msg.trim();
                         }
-                    } while(msgBody.length > i);
+                    } while (msgBody.length > i);
                 }
-                break;
-            case DONE:
+            }
+            case DONE -> {
                 formatData.msgTypeName = "DONE";
                 formatData.msgType = DONE;
-                break;
-            case START:
+            }
+            case START -> {
                 formatData.msgTypeName = "START";
                 formatData.msgType = START;
-                if(msgBody.length > 1) {
+                if (msgBody.length > 1) {
                     int opt_type = (int) msgBody[1] & 0xFF;
                     int opt_size = byteArrayToInt(readBytes(msgBody, 2, 5), "BIG_ENDIAN");
-                    String opt_msg = new String(readBytes(msgBody, 6, 6+opt_size-1), StandardCharsets.UTF_8);
+                    String opt_msg = new String(readBytes(msgBody, 6, 6 + opt_size - 1), StandardCharsets.UTF_8);
                     formatData.nodeInfo = opt_msg.trim();
                 }
-                break;
-            case RESTART:
+            }
+            case RESTART -> {
                 formatData.msgTypeName = "RESTART";
                 formatData.msgType = RESTART;
-                break;
-            default:
-                System.out.println("ERROR: Invalid Message type");
+            }
+            default -> System.out.println("ERROR: Invalid Message type");
         }
         return formatData;
     };

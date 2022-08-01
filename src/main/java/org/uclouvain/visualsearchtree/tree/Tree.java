@@ -32,8 +32,8 @@ public class Tree {
 
     /**
      *
-     * @param pId
-     * @param n
+     * @param pId parent Id
+     * @param n number of children
      */
     public void attachToParent(int pId, Node n)
     {
@@ -44,11 +44,11 @@ public class Tree {
 
     /**
      *  Add new node to nodemap without linked it to its parent
-     * @param id
-     * @param pId
-     * @param type
-     * @param onClick
-     * @param info
+     * @param id node Id
+     * @param pId parent Id
+     * @param type node Type
+     * @param onClick node action
+     * @param info node info
      */
     public void crateIndNode(int id,int pId, NodeType type, NodeAction onClick, String info){
         nodeMap.put(id, new Tree.Node(id, pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
@@ -142,14 +142,14 @@ public class Tree {
 
         /**
          *
-         * @param nodeId
-         * @param nodePid
-         * @param label
-         * @param type
-         * @param children
-         * @param edgeLabels
-         * @param onClick
-         * @param info
+         * @param nodeId Node Id
+         * @param nodePid node Parent Id
+         * @param label Node label
+         * @param type Node Type
+         * @param children Node children
+         * @param edgeLabels Node Edge Labels
+         * @param onClick Node action
+         * @param info Node info
          */
         public Node(int nodeId, int nodePid, T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
             this.nodeId = nodeId;
@@ -394,7 +394,6 @@ public class Tree {
             }
             return res;
         }
-
     }
 }
 

@@ -1,19 +1,11 @@
 package org.uclouvain.visualsearchtree.tree;
 
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.*;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -43,7 +35,6 @@ public class VisualTree {
                     outputStage.initOwner(primaryStage);
                     outputStage.setScene(scene);
                     outputStage.show();
-
 
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(treeGroup);

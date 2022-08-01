@@ -36,10 +36,7 @@ public class TreeVisual {
     private String info;
     private List focusedRect;
     private  StackPane treeStackPane;
-
     private Map<String,String> boookMarks;
-
-
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
@@ -74,7 +71,6 @@ public class TreeVisual {
         this.allNodesPositions = new Hashtable<>();
         this.allNodesChartDatas = new Hashtable<>();
     }
-
 
     /**
      * Realtime constructor
@@ -111,7 +107,7 @@ public class TreeVisual {
         this.allNodesChartDatas = new Hashtable<>();
         this.series =  new XYChart.Series();
         lineChart.getData().add(series);
-        PeriodicDrawer();
+        periodicDrawer();
     }
 
     public StackPane getTreeStackPane()
@@ -458,8 +454,7 @@ public class TreeVisual {
         }
     }
 
-
-    public void PeriodicDrawer(){
+    public void periodicDrawer(){
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             int intv = 0;

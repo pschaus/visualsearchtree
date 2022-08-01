@@ -1,7 +1,6 @@
 package org.uclouvain.visualsearchtree.server;
 
 import java.net.*;
-import java.io.*;
 
 public class MultiThreadServer {
     public MultiThreadServer(int port, ProfilingData profilingData) {

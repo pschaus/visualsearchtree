@@ -5,7 +5,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -35,7 +34,7 @@ public class AddBookMarksUI {
             Rectangle r = (Rectangle) focusedNode.get(0);
             r.setStrokeWidth(3);
             closeWindow();
-            // Update the bookmarks tableview by simulating pressing the B key --- ONly for Windows and Linux
+            // Update the bookmarks tableview by simulating pressing the B key --- Only for Windows and Linux
             if(!System.getProperty("os.name").contains("MAC")){
                 Robot robot = new Robot();
                 robot.keyPress(KeyCode.B);
