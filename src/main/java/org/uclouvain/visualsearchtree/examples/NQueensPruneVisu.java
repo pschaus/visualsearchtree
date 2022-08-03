@@ -37,7 +37,7 @@ public class NQueensPruneVisu extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        NQueensPrune nqueens = new NQueensPrune(10);
+        NQueensPrune nqueens = new NQueensPrune(4);
         Tree t = new Tree(-1);
         TreeVisual tv = new TreeVisual();
         // TEST: TO SIMULATE OPTIMIZATION GRAPH
@@ -50,19 +50,17 @@ public class NQueensPruneVisu extends Application {
                     @Override
                     public void solution(int id, int pId) {
                         System.out.println("solution");
-                        tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                        tv.createNode(id,pId, Tree.NodeType.SOLUTION,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
                     }
-
                     @Override
                     public void fail(int id, int pId) {
                         System.out.println("fail");
-                        tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                        tv.createNode(id,pId, Tree.NodeType.FAIL,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
                     }
-
                     @Override
                     public void branch(int id, int pId, int nChilds) {
                         System.out.println("branch");
-                        tv.createNode(id,pId, Tree.NodeType.INNER,() -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
+                        tv.createNode(id,pId, Tree.NodeType.INNER,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \"Some info on node\"}");
                     }
                 });
             }

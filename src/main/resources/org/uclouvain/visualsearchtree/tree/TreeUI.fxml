@@ -25,7 +25,6 @@
          <MenuItem fx:id="showGraph" onAction="#showGraph" text="Show graph" />
          <MenuItem fx:id="manageBookMarksItem" onAction="#manageBookMarks" text="Add/Remove BookMarks" />
          <MenuItem fx:id="showBookMarksItem" onAction="#showBookMarks" text="Show BookMarks" />
-         <MenuItem disable="true" onAction="#saveTree" text="Save File" />
          <SeparatorMenuItem />
          <MenuItem fx:id="closeMenu" onAction="#closeWindow" text="Exit" />
       </Menu>

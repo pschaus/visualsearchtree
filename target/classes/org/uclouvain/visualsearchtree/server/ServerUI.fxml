@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -12,16 +9,16 @@
     >
 
     <VBox fx:id="listViewcontainer" alignment="TOP_CENTER" prefHeight="380" prefWidth="290" spacing="8">
-           <children>
-
-                <GridPane xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER" prefHeight="260" prefWidth="290">
-                    <ListView  prefHeight="250" prefWidth="280" fx:id="threelistView" />
-                </GridPane>
-                <Button onAction="#showTree" text="Show Tree" prefWidth="280" prefHeight="35" fx:id="showtree" style= "-fx-color: rgb(247,247,247);" />
-                <Button onAction="#saveTree" text="Save Tree" prefWidth="280" prefHeight="35" fx:id="savetree" style= "-fx-color: rgb(247,247,247);" />
-                <Button onAction="#loadTree" text="Load Tree" prefWidth="280" prefHeight="35" fx:id="loadtree" style= "-fx-color: rgb(247,247,247);" />
-                <Label fx:id="portLabel" text="CONNECTION PORT: " style= "-fx-textFill: rgb(255, 0, 0);" />
-            </children>
+        <GridPane xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER" prefHeight="260" prefWidth="290">
+            <ListView prefHeight="250" prefWidth="280" fx:id="threelistView"/>
+        </GridPane>
+        <Button onAction="#showTree" text="Show Tree" prefWidth="280" prefHeight="35" fx:id="showtree"
+                style="-fx-color: rgb(247,247,247);"/>
+        <Button onAction="#saveTree" text="Save Tree" prefWidth="280" prefHeight="35" fx:id="savetree"
+                style="-fx-color: rgb(247,247,247);"/>
+        <Button onAction="#loadTree" text="Load Tree" prefWidth="280" prefHeight="35" fx:id="loadtree"
+                style="-fx-color: rgb(247,247,247);"/>
+        <Label fx:id="portLabel" text="CONNECTION PORT: " style="-fx-textFill: rgb(255, 0, 0);"/>
     </VBox>
 
 </VBox>
