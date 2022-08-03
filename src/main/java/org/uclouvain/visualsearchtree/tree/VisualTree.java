@@ -14,8 +14,11 @@ import java.io.IOException;
 
 
 public class VisualTree {
+    static Stage pStage;
+
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
+        pStage = primaryStage;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -31,7 +34,6 @@ public class VisualTree {
                     Scene scene = new Scene(root, 500, 700);
 
                     Stage outputStage = new Stage();
-
                     outputStage.initOwner(primaryStage);
                     outputStage.setScene(scene);
                     outputStage.show();
@@ -63,7 +65,7 @@ public class VisualTree {
 
     /**
      *
-     * @param instance
+     * @param instance TreeVisual instance
      */
     public static void treeProfilerLaucher(TreeVisual instance)
     {
@@ -88,7 +90,6 @@ public class VisualTree {
 
                     outputStage.setScene(scene);
                     outputStage.show();
-
 
                     StackPane sp = (StackPane) scene.lookup("#treeroot");
                     sp.getChildren().add(p);
