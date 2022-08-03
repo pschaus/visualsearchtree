@@ -16,11 +16,18 @@ public class AddBookMarksUI {
 
     public Button cancelButton;
 
-
+    /**
+     * For having an instance of TreeVisual in this class in order to exploit some of its properties
+     * @param instance Tree Visual instance
+     */
     public void setInstance(TreeVisual instance) {
         this.instance = instance;
     }
 
+    /**
+     * Add BookMark to the list of all bookmark and change the node style
+     * @param actionEvent event on Add button clicked
+     */
     public void addBookMarksToNode(ActionEvent actionEvent){
         String bookMark = nodeBookmark.getText();
         var focusedNode = instance.getFocusedRect();
@@ -42,6 +49,10 @@ public class AddBookMarksUI {
         }
     }
 
+    /**
+     * Close the form window one time Cancel Button been clicked
+     * @param actionEvent event on Close Button clicked
+     */
     public void closeFormWindow(ActionEvent actionEvent) {
         closeWindow();
     }
@@ -51,6 +62,10 @@ public class AddBookMarksUI {
         stage.close();
     }
 
+    /**
+     * Display Error relative to this functionality
+     * @param message Error message
+     */
     public void displayAlertError(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("MiniCP-Profiler");

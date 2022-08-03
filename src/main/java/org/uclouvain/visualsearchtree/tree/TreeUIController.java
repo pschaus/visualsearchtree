@@ -63,6 +63,9 @@ public class TreeUIController {
     @FXML
     public VBox chartUI;
 
+    /**
+     * @param instance TreeVisual instance
+     */
     public void setInstance(TreeVisual instance) {
         this.instance = instance;
     }
@@ -118,7 +121,7 @@ public class TreeUIController {
         tableHbox.getChildren().add(bookMarksTableView);
     }
 
-    // Menu onClick methods
+    // Menu nodeAction methods
     public void showNodeLabels(ActionEvent actionEvent) {
         showAllLabels();
     }
@@ -131,9 +134,6 @@ public class TreeUIController {
     public void closeWindow(ActionEvent actionEvent) {
         Stage st = (Stage) menuBar.getScene().getWindow();
         st.close();
-    }
-    public void saveTree(ActionEvent actionEvent) {
-        //
     }
     public void manageBookMarks(Event actionEvent) throws IOException {
         addOrRemoveBookMarks();
@@ -156,6 +156,10 @@ public class TreeUIController {
     }
 
     // Helper methods
+
+    /**
+     * Display all node's Label
+     */
     public  void showAllLabels(){
         int length = instance.getLabels().size();
         for (int i = 0; i < length; i++) {
@@ -163,6 +167,10 @@ public class TreeUIController {
             element.setOpacity(element.getOpacity()==1? 0:1);
         }
     }
+
+    /**
+     * Attach keyEvent on the scene
+     */
     public void attachEvent(){
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
@@ -218,6 +226,11 @@ public class TreeUIController {
             }
         });
     }
+
+    /**
+     * Zoom In StackPane containing the tree
+     * @param value slider current value
+     */
     public void zoomIn(double value){
         treeroot.setScaleX(1 + value*SCALE_COEFFICIENT);
         treeroot.setScaleY(1 + value*SCALE_COEFFICIENT);
@@ -235,12 +248,21 @@ public class TreeUIController {
             treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+3)));
         }
     }
+
+    /**
+     * Zoom Out StackPane containing the tree
+     * @param value slider current value
+     */
     public void zoomOut(double value){
         treeroot.setMinHeight(stackPaneMinHeight);
         treeroot.setMinWidth(stackPaneMinWidth);
         treeroot.setScaleX(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
         treeroot.setScaleY(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
     }
+
+    /**
+     * Switch Tab pane and display the current Node selected infos
+     */
     public void displayNodeInfos(){
         if(tabPane.getSelectionModel().getSelectedItem() != infoTab){
             tabPane.getSelectionModel().select(infoTab);
@@ -268,11 +290,19 @@ public class TreeUIController {
             infoTableView.setPlaceholder(new Label("Select one Node and press 'I' to display this Node infos."));
         }
     }
+
+    /**
+     * Switch Tab pane and display the optimization graph
+     */
     public void displayGraph() {
         if(tabPane.getSelectionModel().getSelectedItem()!=graph){
             tabPane.getSelectionModel().select(graph);
         }
     }
+
+    /**
+     * Display window to add a bookmark if the seleted node has not yet, otherwise remove it
+     */
     public void addOrRemoveBookMarks() throws IOException {
 
         var allBookMarks = instance.getBoookMarks();
@@ -296,6 +326,10 @@ public class TreeUIController {
             showInformationAlert("BookMarks", "Please select a node first for adding a bookmark");
         }
     }
+
+    /**
+     * Display form to add a bookMark
+     */
     public void displayBookMarkForm() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AddBookMarksUI.fxml"));
         Parent formRoot = fxmlLoader.load();
@@ -310,6 +344,10 @@ public class TreeUIController {
         bookMarkStage.toFront();
         bookMarkStage.show();
     }
+
+    /**
+     * Switch Tab pane and display the current Node selected bookmark
+     */
     public void displayBookMarks() {
         if(tabPane.getSelectionModel().getSelectedItem()!=bookMarksTab){
             tabPane.getSelectionModel().select(bookMarksTab);
@@ -319,9 +357,19 @@ public class TreeUIController {
             bookMarksTableView.getItems().add(entry);
         }
     }
+
+    /**
+     * Remove a node bookMark
+     */
     public void removeBookMarks(String key){
         instance.getBoookMarks().remove(key);
     }
+
+    /**
+     * General method for showing Alert Information
+     * @param headerText Title text
+     * @param contentText message to display
+     */
     public void showInformationAlert(String headerText, String contentText){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("MiniCP-Profiler");
@@ -330,6 +378,10 @@ public class TreeUIController {
         alert.initOwner(menuBar.getScene().getWindow());
         alert.showAndWait();
     }
+
+    /**
+     * Modify menu text for add the shortcut key
+     */
     public void alignMenuItemText() {
         showLabels.setText("Show Labels \t\t\t\t L");
         showInfos.setText("Show Infos \t\t\t\t I");
