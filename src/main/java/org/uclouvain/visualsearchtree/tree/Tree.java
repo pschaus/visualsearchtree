@@ -4,9 +4,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import java.util.*;
 
-
 public class Tree {
-
 
     HashMap<Integer,Node> nodeMap;
     int rootId;
@@ -24,19 +22,16 @@ public class Tree {
         nodeMap.put(rootId, new Node("root"));
     }
 
-
-    public void createNode(int id,int pId, NodeType type, NodeAction onClick, String info) {
-        Node n = nodeMap.get(pId).addChild(id,"child",type,"branch",onClick, info);
+    public void createNode(int id, int pId, NodeType type, NodeAction nodeAction, String info) {
+        Node n = nodeMap.get(pId).addChild(id,"child",type,"branch", nodeAction, info);
         nodeMap.put(id,n);
     }
 
     /**
-     *
      * @param pId parent Id
-     * @param n number of children
+     * @param n node to attach
      */
-    public void attachToParent(int pId, Node n)
-    {
+    public void attachToParent(int pId, Node n) {
         if (nodeMap.get(pId) != null) {
             nodeMap.get(pId).children.add(nodeMap.get(n.nodeId));
         }
@@ -47,11 +42,11 @@ public class Tree {
      * @param id node Id
      * @param pId parent Id
      * @param type node Type
-     * @param onClick node action
+     * @param nodeAction node action
      * @param info node info
      */
-    public void crateIndNode(int id,int pId, NodeType type, NodeAction onClick, String info){
-        nodeMap.put(id, new Tree.Node(id, pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
+    public void crateIndNode(int id, int pId, NodeType type, NodeAction nodeAction, String info){
+        nodeMap.put(id, new Tree.Node(id, pId,"child", type, new LinkedList<>(), new LinkedList(), nodeAction, info));
     }
 
     public Node root() {
@@ -64,7 +59,6 @@ public class Tree {
     }
 
 
-
     public static class Node<T> {
         public int nodeId;
         public int nodePid;
@@ -73,7 +67,7 @@ public class Tree {
         public T label;
         public List<Node<T>> children;
         public List<T> edgeLabels;
-        public NodeAction onClick;
+        public NodeAction nodeAction;
 
         @Override
         public String toString() {
@@ -81,17 +75,16 @@ public class Tree {
                     "label=" + label +
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
-                    ", onClick=" + onClick +
+                    ", nodeAction=" + nodeAction +
                     ", type=" + type +
                     ']';
         }
-
 
         public Node(){
             this.type = NodeType.INNER;
             this.children = new LinkedList<>();
             this.edgeLabels = new LinkedList<>();
-            this.onClick = () -> {};
+            this.nodeAction = (nodeInfoData) -> {};
         }
 
         public Node(T label) {
@@ -99,33 +92,33 @@ public class Tree {
             this.type = NodeType.INNER;
             this.children = new LinkedList<>();
             this.edgeLabels = new LinkedList<>();
-            this.onClick = () -> {};
+            this.nodeAction = (nodeInfoData) -> {};
         }
 
-        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick ) {
+        public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction nodeAction) {
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
+            this.nodeAction = nodeAction;
             this.info = info;
         }
-        public Node(int nodeId,T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
+        public Node(int nodeId, T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction nodeAction, T info) {
             this.nodeId = nodeId;
             this.label = label;
             this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
+            this.nodeAction = nodeAction;
             this.info = info;
         }
 
-        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, NodeType nodeType) {
+        public Node(int nodeId, int nodePid, T label, List<Node<T>> children, List<T> edgeLabels, NodeAction nodeAction, NodeType nodeType) {
             this.nodeId = nodeId;
             this.nodePid = nodePid;
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
+            this.nodeAction = nodeAction;
             this.type = nodeType;
         }
 
@@ -135,7 +128,7 @@ public class Tree {
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = () -> {};
+            this.nodeAction = (nodeInfoData) -> {};
             this.type = nodeType;
             this.info = info;
         }
@@ -148,22 +141,22 @@ public class Tree {
          * @param type Node Type
          * @param children Node children
          * @param edgeLabels Node Edge Labels
-         * @param onClick Node action
+         * @param nodeAction Node action
          * @param info Node info
          */
-        public Node(int nodeId, int nodePid, T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction onClick, T info) {
+        public Node(int nodeId, int nodePid, T label, NodeType type, List<Node<T>> children, List<T> edgeLabels, NodeAction nodeAction, T info) {
             this.nodeId = nodeId;
             this.nodePid = nodePid;
             this.label = label;
             this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
+            this.nodeAction = nodeAction;
             this.info = info;
         }
 
-        public Node addChild(int nodeId,T nodeLabel, NodeType type, T branchLabel, NodeAction onClick, T info) {
-            Node child = new Node(nodeId,nodeLabel, type, new LinkedList<>(), new LinkedList(), onClick, info);
+        public Node addChild(int nodeId, T nodeLabel, NodeType type, T branchLabel, NodeAction nodeAction, T info) {
+            Node child = new Node(nodeId,nodeLabel, type, new LinkedList<>(), new LinkedList(), nodeAction, info);
             children.add(child);
             edgeLabels.add(branchLabel);
             return child;
@@ -199,7 +192,7 @@ public class Tree {
 
             Extent resExtent = Extent.merge(extentsMoved);
             resExtent.addFirst(0, 0);
-            PositionedNode<T> resTree = new PositionedNode<T>(nodeId,label, type, subtreesMoved, edgeLabels, onClick, 0, info);
+            PositionedNode<T> resTree = new PositionedNode<T>(nodeId,label, type, subtreesMoved, edgeLabels, nodeAction, 0, info);
             return new Pair(resTree, resExtent);
         }
 
@@ -216,8 +209,8 @@ public class Tree {
         public int getNodePid() {
             return nodePid;
         }
-        public NodeAction getOnClick() {
-            return onClick;
+        public NodeAction getNodeAction() {
+            return nodeAction;
         }
         public NodeType getType() {
             return type;
@@ -237,25 +230,24 @@ public class Tree {
         public List<PositionedNode<T>> children;
         public List<T> edgeLabels;
         public T info;
-        public NodeAction onClick;
+        public NodeAction nodeAction;
 
-        public PositionedNode(int id,T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, org.uclouvain.visualsearchtree.tree.NodeAction onClick, double position, T info) {
+        public PositionedNode(int id, T label, NodeType type, List<PositionedNode<T>> children, List<T> edgeLabels, org.uclouvain.visualsearchtree.tree.NodeAction nodeAction, double position, T info) {
             this.nodeId=id;
             this.label = label;
             this.type = type;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.onClick = onClick;
+            this.nodeAction = nodeAction;
             this.position = position;
             this.info = info;
         }
 
-
 //        public PositionedNode moveTree(double x) {
-//            return new PositionedNode(label, children, edgeLabels, info, onClick, position + x, type);
+//            return new PositionedNode(label, children, edgeLabels, info, nodeAction, position + x, type);
 //        }
         public PositionedNode moveTree(double x) {
-            return new PositionedNode(nodeId,label, type, children, edgeLabels, onClick, position + x, info);
+            return new PositionedNode(nodeId,label, type, children, edgeLabels, nodeAction, position + x, info);
         }
 
         @Override
@@ -268,9 +260,10 @@ public class Tree {
                     ", children=" + children +
                     ", edgeLabels=" + edgeLabels +
                     ", info=" + info +
-                    ", onClick=" + onClick +
+                    ", nodeAction=" + nodeAction +
                     '}';
         }
+
     }
 
     static class Extent {
