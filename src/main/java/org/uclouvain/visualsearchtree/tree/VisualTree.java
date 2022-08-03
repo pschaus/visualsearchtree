@@ -14,7 +14,7 @@ import java.io.IOException;
 
 
 public class VisualTree {
-    static Stage pStage;
+    static Stage pStage = new Stage();
 
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
