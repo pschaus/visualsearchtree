@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import org.uclouvain.visualsearchtree.tree.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Example that illustrates how to solve the NQueens
@@ -37,9 +38,12 @@ public class NQueensPruneVisu extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        NQueensPrune nqueens = new NQueensPrune(4);
+        NQueensPrune nqueens = new NQueensPrune(10);
         Tree t = new Tree(-1);
         TreeVisual tv = new TreeVisual();
+
+        tv.setRealtimeItv(100);
+        tv.setRealtimeNbNodeDrawer(700);
         // TEST: TO SIMULATE OPTIMIZATION GRAPH
         VisualTree.treeProfilerLaucher(tv);
 

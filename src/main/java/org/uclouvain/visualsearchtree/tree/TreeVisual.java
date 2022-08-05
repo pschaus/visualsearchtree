@@ -55,6 +55,20 @@ public class TreeVisual {
     private XYChart.Series series;
     private HBox legendbox;
 
+    private long realtimeItv;
+
+
+    public void setRealtimeItv(long realtimeItv) {
+        this.realtimeItv = realtimeItv;
+    }
+
+
+    public void setRealtimeNbNodeDrawer(long realtimeNbNodeDrawer) {
+        this.realtimeNbNodeDrawer = realtimeNbNodeDrawer;
+    }
+
+    private long realtimeNbNodeDrawer;
+
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
         this.labels = new ArrayList<>(){};
@@ -112,6 +126,8 @@ public class TreeVisual {
         this.allNodesChartDatas = new Hashtable<>();
         this.series =  new XYChart.Series();
         lineChart.getData().add(series);
+        this.realtimeItv = 1000;
+        this.realtimeNbNodeDrawer = 5;
         periodicDrawer();
     }
 
@@ -551,7 +567,7 @@ public class TreeVisual {
             @Override
             public void run() {
                 boolean check = false;
-                for ( int i = 0; i < 5; i++) {
+                for ( int i = 0; i < realtimeNbNodeDrawer; i++) {
                     if (i < tempList.size() )
                     {
                         if (tempList.get(i) != null) {
@@ -569,7 +585,7 @@ public class TreeVisual {
                 }
                 intv ++;
             }
-        }, 0, 500);
+        }, 0, this.realtimeItv);
     }
 
     public void refresh(Boolean exit, Timer time){
