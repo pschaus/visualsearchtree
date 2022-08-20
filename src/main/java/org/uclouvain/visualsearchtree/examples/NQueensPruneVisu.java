@@ -15,13 +15,22 @@
 
 package org.uclouvain.visualsearchtree.examples;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.uclouvain.visualsearchtree.tree.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +45,7 @@ public class NQueensPruneVisu {
     public static void main(String[] args) {
 
         Platform.startup(() -> {
-            NQueensPrune nqueens = new NQueensPrune(7);
+            NQueensPrune nqueens = new NQueensPrune(4);
             Tree t = new Tree(-1);
             TreeVisual tv = new TreeVisual();
 
@@ -49,17 +58,17 @@ public class NQueensPruneVisu {
                 @Override
                 public void solution(int id, int pId) {
                     System.out.println("solution");
-                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
                 }
                 @Override
                 public void fail(int id, int pId) {
                     System.out.println("fail");
-                    tv.createNode(id,pId, Tree.NodeType.FAIL,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    tv.createNode(id,pId, Tree.NodeType.FAIL,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
                 }
                 @Override
                 public void branch(int id, int pId, int nChilds) {
                     System.out.println("branch");
-                    tv.createNode(id,pId, Tree.NodeType.INNER,(nodeInfoData) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    tv.createNode(id,pId, Tree.NodeType.INNER,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
                 }
             }));
             t2.start();
@@ -81,5 +90,55 @@ public class NQueensPruneVisu {
         }
         value.append("}");
         return value.toString();
+    }
+
+    /**
+     * Draw Rectangle for Chess Visualisation for Nqueens problem
+     * @param isFixed boolean which indicate if a variable has its value fixed
+     * @return Rectangle which represent a case
+     */
+    private static Rectangle createRectangleForBoard(boolean isFixed, Tree.NodeType type){
+        Rectangle r = new Rectangle(50,50);
+        Color c = (type == Tree.NodeType.FAIL)? Color.RED : (type == Tree.NodeType.SOLUTION)? Color.GREEN : Color.CORNFLOWERBLUE;
+        r.setFill(isFixed ? c : Color.WHITE);
+        r.setStrokeType(StrokeType.OUTSIDE);
+        r.setStrokeWidth(0.4);
+        r.setStroke(Color.BLACK);
+        return r;
+    }
+
+    /**
+     * Draw a visualisation : Here a chess with fixed value of node is drawn
+     * @param nodeInfoData info parse to gson object of the concerned node
+     */
+    public static void drawNewVisualisation(TreeVisual.NodeInfoData nodeInfoData, Tree.NodeType type) {
+        int n = NQueensPrune.nVisu;
+        Gson g = new Gson();
+        Map<Integer, Integer> coordinates = new Gson().fromJson(nodeInfoData.other, new TypeToken<HashMap<Integer, Integer>>() {}.getType());
+        GridPane chess = new GridPane();
+//        chess.setHgap(2);
+//        chess.setVgap(2);
+        Scene chessScene = new Scene(chess, n*50 +n, n*50 +n);
+        Stage chessWindow = new Stage();
+
+        chessWindow.setTitle("Nqueens Visualisation Board");
+        chessWindow.setScene(chessScene);
+
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(coordinates.get(i) == j){
+                    chess.add(createRectangleForBoard(true, type), j, i);
+                }else{
+                    chess.add(createRectangleForBoard(false,type), j, i);
+                }
+            }
+        }
+        chessWindow.initModality(Modality.WINDOW_MODAL);
+        chessWindow.initOwner(VisualTree.pStage);
+        chessWindow.setX(VisualTree.pStage.getX());
+        chessWindow.setY(VisualTree.pStage.getY());
+
+        chessWindow.show();
+        System.out.println(nodeInfoData);
     }
 }

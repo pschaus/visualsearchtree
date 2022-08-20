@@ -26,6 +26,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.uclouvain.visualsearchtree.examples.NQueensPruneVisu;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
@@ -210,11 +211,11 @@ public class TreeVisual {
         styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
 
         //Add Event to each rectangle
-        root.nodeAction = (nodeInfoData) -> drawNewVisualisation(nodeInfoData);
+        root.nodeAction = NQueensPruneVisu::drawNewVisualisation;
         r.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 || e.getButton()== MouseButton.SECONDARY) {
                 NodeInfoData infoData = gson.fromJson(root.info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                root.nodeAction.nodeAction(infoData);
+                root.nodeAction.nodeAction(infoData, root.type);
             }
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
@@ -247,39 +248,6 @@ public class TreeVisual {
             this.allNodesRects.put(nodeID, r);
         }
         return r;
-    }
-
-    /**
-     * Draw a visualisation : Here a chess with fixed value of node is drawn
-     * @param nodeInfoData info parse to gson object of the concerned node
-     */
-    private void drawNewVisualisation(NodeInfoData nodeInfoData) {
-        int nRow = 4, nCol=4;
-        GridPane chess = new GridPane();
-        chess.setHgap(2);
-        chess.setVgap(2);
-        Scene chessScene = new Scene(chess, nRow*50, nCol*50);
-        Stage chessWindow = new Stage();
-
-        chessWindow.setTitle("Nqueens Visualisation Board");
-        chessWindow.setScene(chessScene);
-
-        for(int i=0;i<nRow;i++){
-            for(int j=0;j<nCol;j++){
-                if((i==0 && j==1) || (i==1 && j==3) || (i==2 && j==0) || (i==3 && j==2)){
-                    chess.add(createRectangleForBoard(true), j, i);
-                }else{
-                    chess.add(createRectangleForBoard(false), j, i);
-                }
-            }
-        }
-        chessWindow.initModality(Modality.WINDOW_MODAL);
-        chessWindow.initOwner(VisualTree.pStage);
-        chessWindow.setX(VisualTree.pStage.getX());
-        chessWindow.setY(VisualTree.pStage.getY());
-
-        chessWindow.show();
-        System.out.println(nodeInfoData);
     }
 
     /**
@@ -351,17 +319,6 @@ public class TreeVisual {
             }
         }
         return rect;
-    }
-
-    /**
-     * Draw Rectangle for Chess Visualisation for Nqueens problem
-     * @param isFixed boolean which indicate if a variable has its value fixed
-     * @return Rectangle which represent a case
-     */
-    private Rectangle createRectangleForBoard(boolean isFixed){
-        Rectangle r = new Rectangle(50,50);
-        r.setFill(isFixed ? Color.BLACK : Color.WHITE);
-        return r;
     }
 
     /**

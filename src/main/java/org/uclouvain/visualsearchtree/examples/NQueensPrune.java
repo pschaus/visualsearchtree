@@ -27,11 +27,12 @@ public class NQueensPrune {
 
     int [] q;
     int n = 0;
-
+    static  int nVisu = 0;
     static int nRecur = 0;
 
     public NQueensPrune(int n) {
         this.n = n;
+        nVisu = n;
         q = new int[n];
     }
 
