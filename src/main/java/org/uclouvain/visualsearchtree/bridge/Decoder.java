@@ -7,6 +7,10 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * <b>Note: </b>THis class help to decode all data that we receive through socket
+ * in order to draw our tree node on screen
+ */
 public class Decoder {
     private static final int NODE = 0;
     private static final int DONE = 1;
@@ -37,12 +41,25 @@ public class Decoder {
 
     }
 
+    /**
+     * <b>Note: </b>This method retrieve incoming data and insert it to server
+     * buffer based on our server-socket protocol. This help to draw node on Tree
+     * as data come
+     * @param buffer
+     * @param incomingBytes
+     */
     public static void addToBuffer(List<Byte> buffer, byte[] incomingBytes) {
         for (byte byteData: incomingBytes) {
             buffer.add(byteData);
         }
     }
 
+    /**
+     * <b>Note: </b>Convert socket plain data to byte to {@link org.uclouvain.visualsearchtree.bridge.Decoder.DecodedMessage DecodedMessage}
+     * @param buffer
+     * @param msgSize
+     * @return
+     */
     public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) {
         DecodedMessage formatData = new DecodedMessage();
         byte[] msgBody = new byte[msgSize];
@@ -100,6 +117,13 @@ public class Decoder {
         return formatData;
     };
 
+    /**
+     * <b>Note: </b>Read data in server buffer
+     * @param b
+     * @param buffer
+     * @param len
+     * @return
+     */
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
         if (len <= 0 && buffer.size() == 0)
             return false;
@@ -109,6 +133,13 @@ public class Decoder {
         return true;
     }
 
+    /**
+     * <b>Note: </b>Help function
+     * @param bytes
+     * @param off
+     * @param len
+     * @return
+     */
     private static byte[] readBytes(byte[] bytes, int off, int len) {
         byte[] b = new byte[len];
         int j = 0;
@@ -123,6 +154,13 @@ public class Decoder {
         }
     }
 
+    /**
+     * <b>Note: </b>Help function. Convert byte Array ti Int.
+     * It helps to encode minicp-socket communication protocol
+     * @param bytes
+     * @param endian
+     * @return
+     */
     public static int byteArrayToInt(byte[] bytes, String endian) {
         final ByteBuffer bb = ByteBuffer.wrap(bytes);
         if(endian == "BIG_ENDIAN")
@@ -132,6 +170,11 @@ public class Decoder {
         return bb.getInt();
     }
 
+    /**
+     * <b>Note: </b>build tree from decoded messages
+     * @param decodedMessageList
+     * @return
+     */
     public static Tree treeBuilder(List<Decoder.DecodedMessage> decodedMessageList) {
         Map<Integer, DecodedMessage> preFormat = new HashMap<Integer, DecodedMessage>();
         for (DecodedMessage msg: decodedMessageList) {
@@ -149,6 +192,11 @@ public class Decoder {
         return tree;
     }
 
+    /**
+     * <b>Note: </b>Nodes types
+     * @param type
+     * @return
+     */
     private static Tree.NodeType nodeType(int type) {
         switch (type) {
             case 0:

@@ -6,8 +6,12 @@ import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * <b>Note: </b> It help us make Node conversion to object to json and vice-versa
+ */
 public class NodeDeserializer implements JsonDeserializer<Tree.Node> {
     /**
+     * <b>Notes: </b> Convert GSON to TreeNode
      * @param json    The Json data being deserialized
      * @param typeOfT The type of the Object to deserialize to
      * @param context

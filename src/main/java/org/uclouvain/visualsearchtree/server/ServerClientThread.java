@@ -10,6 +10,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <b>Note: </b> A server thread class. So we can create multiple server by the same
+ * type.
+ */
 class ServerClientThread extends VisualTree implements Runnable {
     // initialize socket and input stream
     private Socket socket = null;

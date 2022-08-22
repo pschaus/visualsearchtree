@@ -17,7 +17,7 @@ public class AddBookMarksUI {
     public Button cancelButton;
 
     /**
-     * For having an instance of TreeVisual in this class in order to exploit some of its properties
+     * <b>Note: </b>For having an instance of TreeVisual in this class in order to exploit some of its properties
      * @param instance Tree Visual instance
      */
     public void setInstance(TreeVisual instance) {
@@ -25,7 +25,7 @@ public class AddBookMarksUI {
     }
 
     /**
-     * Add BookMark to the list of all bookmark and change the node style
+     * <b>Note: </b>Add BookMark to the list of all bookmark and change the node style
      * @param actionEvent event on Add button clicked
      */
     public void addBookMarksToNode(ActionEvent actionEvent){
@@ -37,7 +37,7 @@ public class AddBookMarksUI {
         }else{
             //key is made by concatening "node", nodeId and nodeLabel
             String key = "node"+focusedNode.get(3)+" "+nodeLabel;
-            instance.setBoookMarks(key,bookMark);
+            instance.setBookMarks(key,bookMark);
             Rectangle r = (Rectangle) focusedNode.get(0);
             r.setStrokeWidth(3);
             closeWindow();
@@ -50,7 +50,7 @@ public class AddBookMarksUI {
     }
 
     /**
-     * Close the form window one time Cancel Button been clicked
+     * <b>Note: </b>Close the form window one time Cancel Button been clicked
      * @param actionEvent event on Close Button clicked
      */
     public void closeFormWindow(ActionEvent actionEvent) {
@@ -63,7 +63,7 @@ public class AddBookMarksUI {
     }
 
     /**
-     * Display Error relative to this functionality
+     * <b>Note: </b>Display Error relative to this functionality
      * @param message Error message
      */
     public void displayAlertError(String message){

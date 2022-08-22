@@ -3,6 +3,12 @@ package org.uclouvain.visualsearchtree.server;
 import java.net.*;
 
 public class MultiThreadServer {
+    /**
+     * <b>Note: </b> Multi Thead server used to process many profiling data by
+     * the same time by launching  {@link org.uclouvain.visualsearchtree.server.ServerClientThread ServerClientThread}
+     * @param port
+     * @param profilingData
+     */
     public MultiThreadServer(int port, ProfilingData profilingData) {
         try {
             ServerSocket server = new ServerSocket(port);
@@ -20,8 +26,4 @@ public class MultiThreadServer {
             System.out.println(e);
         }
     }
-
-//    public static void main(String args[]) {
-//        MultiThreadServer server = new MultiThreadServer(6666);
-//    }
 }

@@ -8,14 +8,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,8 +21,6 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.examples.NQueensPruneVisu;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
@@ -35,6 +31,18 @@ import java.util.*;
 
 import static org.uclouvain.visualsearchtree.util.Constant.*;
 
+/**
+ * <p><b>TreeVisual</b>: This Class instance return very basic profiling screen</p>
+ * <p>This screen contain: </p>
+ * <ul>
+ *   <li>
+ *       The <b>Search Tree</b>: [{@link org.uclouvain.visualsearchtree.tree.Tree Tree}]
+ *   </li>
+ *   <li>
+ *       The layout oft his screen is TreePane Object [{@link org.uclouvain.visualsearchtree.tree.TreePane TreePane}]
+ *   </li>
+ * </ul>
+ */
 public class TreeVisual {
     private Tree.Node<String> node;
     private List<Integer> legendStats;
@@ -55,21 +63,33 @@ public class TreeVisual {
     private LineChart lineChart;
     private XYChart.Series series;
     private HBox legendbox;
-
     private long realtimeItv;
+    private long realtimeNbNodeDrawer;
 
 
+    /**
+     * <b>Note: </b> Defines the time interval after which the tree must be refreshed
+     * to draw new nodes during a real-time search.
+     * @param realtimeItv
+     */
     public void setRealtimeItv(long realtimeItv) {
         this.realtimeItv = realtimeItv;
     }
 
-
+    /**
+     * <b>Note: </b> Defines the maximum number of nodes to add to the existing tree
+     * during a realtime search at each refresh interval.
+     * @param realtimeNbNodeDrawer
+     */
     public void setRealtimeNbNodeDrawer(long realtimeNbNodeDrawer) {
         this.realtimeNbNodeDrawer = realtimeNbNodeDrawer;
     }
 
-    private long realtimeNbNodeDrawer;
 
+    /**
+     * <b>Note: </b> Create an instance of the search tree from a {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} object.
+     * @param node
+     */
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
         this.labels = new ArrayList<>(){};
@@ -93,9 +113,13 @@ public class TreeVisual {
     }
 
     /**
-     * Realtime constructor
+     * Create an instance of the search without {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} object pass argument.
+     * <br/><br/>
+     * <p>
+     *     <b>Use case: </b> Used for  Realtime constructor
+     * </p>
      */
-    public  TreeVisual(){
+    public TreeVisual(){
         this.treeStackPane = new StackPane();
         this.boookMarks = new HashMap<String,String>();
         tree = new Tree(-1);
@@ -132,48 +156,97 @@ public class TreeVisual {
         periodicDrawer();
     }
 
+    /**
+     * <b>Note: </b> Return the stack Pane that contain visualization search Tree
+     * @return {@link javafx.scene.layout.StackPane}
+     */
     public StackPane getTreeStackPane()
     {
         return this.treeStackPane;
     }
+
+
+    /**
+     * <b>Note: </b> Return the root node used to draw search tree
+     * @return {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
+     */
     public Tree.Node<String> getNode() {
         return node;
     }
 
+    /**
+     * <b>Notes: </b> Get the list of label defined on each {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} of Search {@link org.uclouvain.visualsearchtree.tree.Tree}
+     * @return {@link java.util.List}
+     */
     public List<Text> getLabels() {
         return labels;
     }
 
+    // TODO: DO NOT UNDERSTAND
     public String getInfo() {
         return info;
     }
 
+    // TODO: DO NOT UNDERSTAND
     public List<Integer> getLegendStats() {
         return legendStats;
     }
+
+    /**
+     * <b>Note: </b>Get Tree Node on which user click.
+     * @return {@link java.util.List}
+     */
     public List getFocusedRect() {
         return focusedRect;
     }
 
+    // TODO: DO NOT UNDERSTAND
     public void setLegendStats(int i, int value) {
         this.legendStats.set(i, value);
     }
 
+    /**
+     * <b>Note: </b> Add label
+     * @param label
+     */
     public void setLabels(Text label) {
         this.labels.add(label);
     }
 
+    /**
+     * <b>Note: </b> Add info
+     * @param info
+     */
     public void setInfo(String info) {
         this.info = info;
     }
 
-    public Map<String, String> getBoookMarks() {
+
+    /**
+     * <b>Note: </b> Get bookMarks from Tree
+     * @return
+     */
+    public Map<String, String> getBookMarks() {
         return boookMarks;
     }
-    public void setBoookMarks(String key, String value) {
+
+
+    /**
+     * <b>Note: </b> Define nookmark on specific {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
+     * @param key
+     * @param value
+     */
+    public void setBookMarks(String key, String value) {
         this.boookMarks.put(key, value);
     }
 
+    /**
+     * <b>Note: </b> Focus on a Tree {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
+     * @param r
+     * @param type
+     * @param label
+     * @param nodeId
+     */
     public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label, int nodeId) {
         this.focusedRect.set(0, r);
         this.focusedRect.set(1, type);
@@ -181,9 +254,12 @@ public class TreeVisual {
         this.focusedRect.set(3, nodeId);
     }
 
+    /**
+     * <b>Note: </b> Use {@link org.uclouvain.visualsearchtree.tree.Tree.PositionedNode PositionedNode} to build tree and return it as {@link javafx.scene.Group Group}
+     * @return {@link javafx.scene.Group}
+     */
     public Group getGroup() {
         Group root = new Group();
-
         Tree.PositionedNode<String> pnode = this.getNode().design();
         Text nodeLabel = new Text();
         nodeLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -194,7 +270,7 @@ public class TreeVisual {
     }
 
     /**
-     * Draw Node recursively
+     * <b>Note: </b>Draw Node recursively
      * @param g group to add node
      * @param root root node
      * @param center double value for centering the tree
@@ -251,6 +327,7 @@ public class TreeVisual {
     }
 
     /**
+     <b>Note: </b>This Method is used to create Tre Nodes objects.
      * @param x width of the rectangle
      * @param y height of the rectangle
      * @param type Node Type
@@ -292,7 +369,7 @@ public class TreeVisual {
     }
 
     /**
-     * Draw Rectangle for Legend HBox
+     * <b>Note: </b>Draw Rectangle for Legend HBox
      * @param type Node Type
      * @return Rectangle representing a type of node
      */
@@ -322,7 +399,7 @@ public class TreeVisual {
     }
 
     /**
-     * Style Each node Label by setting its content and positioning it to a suitable position on the scene
+     * <b>Note: </b>Style Each node Label by setting its content and positioning it to a suitable position on the scene
      * @param theLabel Text Widget
      * @param absolute absolute position value
      * @param depth tree depth
@@ -363,7 +440,7 @@ public class TreeVisual {
     }
 
     /**
-     * Create a line for connecting two Nodes represented by a rectangle
+     * <b>Note: </b>Create a line for connecting two Nodes represented by a rectangle
      * @param r1 first rectangle
      * @param r2 second rectangle
      * @return Line for connecting rectangles
@@ -382,7 +459,7 @@ public class TreeVisual {
     }
 
     /**
-     * Generate Legend Box for specify number of each type of nodes
+     * <b>Note: </b>Generate Legend Box for specify number of each type of nodes
      * @return HBox
      */
     public HBox generateLegendsStack(){
@@ -402,7 +479,7 @@ public class TreeVisual {
     }
 
     /**
-     * Make the previous node selected to it initial state : No more focus color...
+     * <b>Note: </b>Make the previous node selected to it initial state : No more focus color...
      */
     public void makeNotFocus(){
         var r = (Rectangle) this.focusedRect.get(0);
@@ -422,7 +499,7 @@ public class TreeVisual {
     }
 
     /**
-     * Create the optimization chart
+     * <b>Note: </b>Create the optimization chart
      * @param all_sol boolean
      * @return LineChart
      */
@@ -476,6 +553,9 @@ public class TreeVisual {
         return  lineChart;
     }
 
+    /**
+     * <b>Note: </b> Node Info Data
+     */
     public static class NodeInfoData {
         public int cost = 0;
         public int param1 = 0;
@@ -483,7 +563,7 @@ public class TreeVisual {
     }
 
     /**
-     * Use function to add event on chart
+     * <b>Note: </b>Use function to add event on chart
      */
     public void addEventOnChart() {
         for (String key: this.allNodesChartDatas.keySet())
@@ -517,6 +597,9 @@ public class TreeVisual {
         }
     }
 
+    /**
+     * <b>Note: </b>Periodic Drawer
+     */
     public void periodicDrawer(){
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -545,6 +628,11 @@ public class TreeVisual {
         }, 0, this.realtimeItv);
     }
 
+    /**
+     * <b>Note: </b> Used to refresh screen in order to draw another  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} on screen during search
+     * @param exit
+     * @param time
+     */
     public void refresh(Boolean exit, Timer time){
         if (exit)
             time.cancel();
@@ -558,13 +646,21 @@ public class TreeVisual {
         });
     }
 
+    /**
+     * <b>Note: </b>Used to create a new  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
+     * @param id
+     * @param pId
+     * @param type
+     * @param onClick
+     * @param info
+     */
     public void createNode(int id, int pId, Tree.NodeType type, NodeAction onClick, String info){
         tree.crateIndNode(id, pId, type, onClick, info);
         this.tempList.add(new Tree.Node(id,pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
     }
 
     /**
-     * Used to reset all parameters
+     * <b>Note: </b>Used to reset all parameters
      */
     public void resetAllBeforeRedraw(){
         // Reset all saved nodes data
