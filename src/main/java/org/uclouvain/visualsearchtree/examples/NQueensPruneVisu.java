@@ -109,7 +109,7 @@ public class NQueensPruneVisu {
         Color c = (type == Tree.NodeType.FAIL)? Color.RED : (type == Tree.NodeType.SOLUTION)? Color.GREEN : Color.CORNFLOWERBLUE;
         r.setFill(isFixed ? c : Color.WHITE);
         r.setStrokeType(StrokeType.OUTSIDE);
-        r.setStrokeWidth(0.4);
+        r.setStrokeWidth(.4);
         r.setStroke(Color.BLACK);
         return r;
     }
