@@ -17,11 +17,9 @@ package org.uclouvain.visualsearchtree.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
@@ -31,8 +29,6 @@ import org.uclouvain.visualsearchtree.tree.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Example that illustrates how to solve the NQueens
@@ -53,7 +49,7 @@ public class NQueensPruneVisu {
             tv.setRealtimeItv(1000);
             tv.setRealtimeNbNodeDrawer(5);
             // TEST: TO SIMULATE OPTIMIZATION GRAPH
-            VisualTree.treeProfilerLaucher(tv);
+            VisualTree.treeProfilerLauncher(tv);
 
             Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
                 @Override

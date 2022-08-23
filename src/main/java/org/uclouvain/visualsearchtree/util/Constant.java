@@ -1,5 +1,10 @@
 package org.uclouvain.visualsearchtree.util;
 
+/**
+ * <h1>Visualization screen constant</h1>
+ * <p>This class describe all constant used in {@link org.uclouvain.visualsearchtree.tree.VisualTree Visualization Object}
+ * screen such as NODE_SHAPE_SIZE, LEGEND_SIZE, ...</p>
+ */
 public class Constant {
     public static final double ZOOM_X_COEFFICIENT = 8;
     public static final double ZOOM_Y_COEFFICIENT = 25;

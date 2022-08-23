@@ -5,7 +5,6 @@ package org.uclouvain.visualsearchtree.tree;
 import java.util.*;
 
 public class Tree {
-
     HashMap<Integer,Node> nodeMap;
     int rootId;
     public enum NodeType {
@@ -15,6 +14,10 @@ public class Tree {
         SOLUTION
     }
 
+    /**
+     * <b>Note: </b> Create Tree from  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} id
+     * @param rootId
+     */
     public Tree(int rootId) {
         nodeMap = new HashMap<>();
         this.rootId = rootId;
@@ -22,12 +25,21 @@ public class Tree {
         nodeMap.put(rootId, new Node("root"));
     }
 
+    /**
+     * <b>Note: </b> Create new Npde
+     * @param id
+     * @param pId
+     * @param type
+     * @param nodeAction
+     * @param info
+     */
     public void createNode(int id, int pId, NodeType type, NodeAction nodeAction, String info) {
         Node n = nodeMap.get(pId).addChild(id,"child",type,"branch", nodeAction, info);
         nodeMap.put(id,n);
     }
 
     /**
+     * <b>Note: </b>Assign new  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} to it Parent in order to build tree hierarchy
      * @param pId parent Id
      * @param n node to attach
      */
@@ -38,7 +50,7 @@ public class Tree {
     }
 
     /**
-     *  Add new node to nodemap without linked it to its parent
+     * <b>Note: </b> Add new node to nodemap without linked it to its parent
      * @param id node Id
      * @param pId parent Id
      * @param type node Type
@@ -59,6 +71,10 @@ public class Tree {
     }
 
 
+    /**
+     * <b>Note: </b> Used to create Tree
+     * @param <T>
+     */
     public static class Node<T> {
         public int nodeId;
         public int nodePid;

@@ -14,6 +14,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * <b>Note: This method starts a tcp server which waits to receive data to
+ * launch the visualization for the search algorithm.</b>
+ *
+ * <p>The default port will be 6666. But if it is not available another one
+ * will be choose automatically and this port number will be display at
+ * the bottom of server screen</p>
+ */
 public class StartServer extends Application {
     private int currentAvailablePort = 6666;
     private MultiThreadServer server;

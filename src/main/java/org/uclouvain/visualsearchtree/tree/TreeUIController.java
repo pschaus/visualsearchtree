@@ -100,7 +100,7 @@ public class TreeUIController {
         infoTableView.getColumns().add(valueColumn);
     }
     public void initBookMarksTable(){
-        Map<String, String> bookMarksMap = instance.getBoookMarks();
+        Map<String, String> bookMarksMap = instance.getBookMarks();
 
         TableColumn<Map.Entry<String, String>, String> idColumn = new TableColumn<>("Node Id");
         idColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
@@ -305,7 +305,7 @@ public class TreeUIController {
      */
     public void addOrRemoveBookMarks() throws IOException {
 
-        var allBookMarks = instance.getBoookMarks();
+        var allBookMarks = instance.getBookMarks();
         var focusedNode = instance.getFocusedRect();
         String focusedNodeLabel = ( (Text) focusedNode.get(2) ).getText();
 
@@ -353,7 +353,7 @@ public class TreeUIController {
             tabPane.getSelectionModel().select(bookMarksTab);
         }
         bookMarksTableView.getItems().clear();
-        for(Map.Entry<String, String> entry : instance.getBoookMarks().entrySet()){
+        for(Map.Entry<String, String> entry : instance.getBookMarks().entrySet()){
             bookMarksTableView.getItems().add(entry);
         }
     }
@@ -362,7 +362,7 @@ public class TreeUIController {
      * Remove a node bookMark
      */
     public void removeBookMarks(String key){
-        instance.getBoookMarks().remove(key);
+        instance.getBookMarks().remove(key);
     }
 
     /**

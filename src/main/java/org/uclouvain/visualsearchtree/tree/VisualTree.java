@@ -9,13 +9,42 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
-
+/**
+ * <h1>Complete Visualization Object Class</h1>
+ * <p>
+ *     VisualTree is a Graphic Component that hel the user to visualize the look of it search Algorithm
+ *     and interact with it of need. It allow the user to perfrom the following action:
+ * </p>
+ * <ul>
+ *     <li>
+ *         <b>Show Tree</b>: [{@link org.uclouvain.visualsearchtree.tree.VisualTree:treeProfilerLaucher() treeProfilerLaucher}] Show the research tree, in real time or not, it can be display lonely
+ *         or with all other features.
+ *     </li>
+ *     <li>
+ *         <b>Show optimization graph</b>: Display the optimization graph is the research Algorithm is about optimization.
+ *         , it can aolso bedisplay with other features.
+ *     </li>
+ *     <li>
+ *         <b>Show Legend</b>: display the number of solution or fail of all Nodes after the research.
+ *     </li>
+ *     <li>
+ *         <b>Add bookMark</b>: to set a reference point in search tree node for after.
+ *     </li>
+ * </ul>
+ */
 public class VisualTree {
     public static Stage pStage = new Stage();
 
+    /**
+     * <p>
+     *     It render new screen instance of {@link org.uclouvain.visualsearchtree.tree.VisualTree VisualTree}
+     * </p>
+     * @param node
+     * @param primaryStage
+     * @see #treeProfilerLauncher(TreeVisual)
+     */
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
         pStage = primaryStage;
@@ -64,16 +93,14 @@ public class VisualTree {
     }
 
     /**
-     *
+     * <p>
+     *     It render new screen instance of {@link org.uclouvain.visualsearchtree.tree.VisualTree VisualTree}
+     * </p>
      * @param instance TreeVisual instance
      */
-    public static void treeProfilerLaucher(TreeVisual instance)
+    public static void treeProfilerLauncher(TreeVisual instance)
     {
-        //TreeVisual instance = new TreeVisual();
         Platform.runLater(new Runnable() {
-            /**
-             *
-             */
             @Override
             public void run() {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("TreeUI.fxml"));
