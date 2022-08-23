@@ -40,18 +40,14 @@ public class NQueensPruneVisu {
 
     public static void main(String[] args) {
 
-        Platform.startup(() -> {
-            NQueensPrune nqueens = new NQueensPrune(4);
-            Tree t = new Tree(-1);
+            NQueensPrune nqueens = new NQueensPrune(5);
             TreeVisual tv = new TreeVisual();
             Gson gson = new Gson();
 
+            tv.setRealtimeNbNodeDrawer(50);
             tv.setRealtimeItv(1000);
-            tv.setRealtimeNbNodeDrawer(5);
-            // TEST: TO SIMULATE OPTIMIZATION GRAPH
-            VisualTree.treeProfilerLauncher(tv);
-
-            Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
+            Visualizer.show(tv);
+        Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
                 @Override
                 public void solution(int id, int pId) {
                     System.out.println("solution");
@@ -75,7 +71,6 @@ public class NQueensPruneVisu {
                 }
             }));
             t2.start();
-        });
     }
 
     /**

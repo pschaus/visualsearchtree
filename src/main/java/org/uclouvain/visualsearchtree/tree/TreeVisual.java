@@ -45,19 +45,19 @@ import static org.uclouvain.visualsearchtree.util.Constant.*;
 public class TreeVisual {
     private Tree.Node<String> node;
     private List<Integer> legendStats;
-    private final List<Text> labels;
+    private List<Text> labels;
     private String info;
-    private final List focusedRect;
+    private List focusedRect;
     private  StackPane treeStackPane;
-    private final Map<String,String> boookMarks;
+    private Map<String,String> boookMarks;
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
     private List<Tree.Node> tempList;
     private  Tree tree;
 
-    NumberAxis xAxis = new NumberAxis();
-    NumberAxis yAxis = new NumberAxis();
+    NumberAxis xAxis;
+    NumberAxis yAxis;
 
     private LineChart lineChart;
     private XYChart.Series series;
@@ -69,10 +69,12 @@ public class TreeVisual {
     /**
      * <b>Note: </b> Defines the time interval after which the tree must be refreshed
      * to draw new nodes during a real-time search.
-     * @param realtimeItv
+     * @param _realtimeItv
      */
-    public void setRealtimeItv(long realtimeItv) {
-        this.realtimeItv = realtimeItv;
+    public void setRealtimeItv(long _realtimeItv) {
+        Platform.runLater(()->{
+            this.realtimeItv = _realtimeItv;
+        });
     }
 
     /**
@@ -81,7 +83,9 @@ public class TreeVisual {
      * @param realtimeNbNodeDrawer
      */
     public void setRealtimeNbNodeDrawer(long realtimeNbNodeDrawer) {
-        this.realtimeNbNodeDrawer = realtimeNbNodeDrawer;
+        Platform.runLater(()->{
+            this.realtimeNbNodeDrawer = realtimeNbNodeDrawer;
+        });
     }
 
 
@@ -97,7 +101,8 @@ public class TreeVisual {
         this.focusedRect = new ArrayList<>(){{
             add(new Rectangle());
             add(Tree.NodeType.INNER);
-            add(new Text(" "));
+            Text  t = new Text(" ");
+            add(t);
             add(0);
         }};
         this.legendStats = new ArrayList<>(){{
@@ -119,6 +124,20 @@ public class TreeVisual {
      * </p>
      */
     public TreeVisual(){
+        if (Platform.isFxApplicationThread())
+        {
+            initTreeVisual();
+        }
+        else
+        {
+            Platform.startup(()->{
+                initTreeVisual();
+            });
+        }
+    }
+
+    public void initTreeVisual()
+    {
         this.treeStackPane = new StackPane();
         this.boookMarks = new HashMap<String,String>();
         tree = new Tree(-1);
@@ -134,7 +153,8 @@ public class TreeVisual {
         this.focusedRect = new ArrayList<>(){{
             add(new Rectangle());
             add(Tree.NodeType.INNER);
-            add(new Text(" "));
+            Text  t = new Text(" ");
+            add(t);
             add(0);
         }};
 
@@ -150,7 +170,7 @@ public class TreeVisual {
         this.allNodesChartDatas = new Hashtable<>();
         this.series =  new XYChart.Series();
         lineChart.getData().add(series);
-        this.realtimeItv = 1000;
+        this.realtimeItv = 100;
         this.realtimeNbNodeDrawer = 5;
         periodicDrawer();
     }
@@ -320,6 +340,8 @@ public class TreeVisual {
             this.allNodesPositions.put(nodeID, root);
             this.allNodesRects.put(nodeID, r);
         }
+        info = null;
+        gson = null;
         return r;
     }
 
@@ -468,10 +490,14 @@ public class TreeVisual {
         FlowPane s1 = new FlowPane();
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
-        s1.getChildren().addAll(branchRect, new Text("  ("+ this.legendStats.get(0)+")"));
-        s2.getChildren().addAll(failedRect, new Text("  ("+ this.legendStats.get(1)+")"));
-        s3.getChildren().addAll(solvedRect, new Text("  ("+ this.legendStats.get(2)+")"));
-        legendbox.getChildren().addAll(s1,s2,s3,new  Text("DEPTH : ("+ this.legendStats.get(3)+")"));
+        Text  t1 = new Text("  ("+ this.legendStats.get(0)+")");
+        Text  t2 = new Text("  ("+ this.legendStats.get(1)+")");
+        Text  t3 = new Text("  ("+ this.legendStats.get(2)+")");
+        Text  t4 = new  Text("DEPTH : ("+ this.legendStats.get(3)+")");
+        s1.getChildren().addAll(branchRect, t1);
+        s2.getChildren().addAll(failedRect, t2);
+        s3.getChildren().addAll(solvedRect, t3);
+        legendbox.getChildren().addAll(s1,s2,s3,t4);
         return legendbox;
     }
 
@@ -546,7 +572,9 @@ public class TreeVisual {
                 this.allNodesChartDatas.put(_key, (new XYChart.Data(i+1, _info.cost)));
                 series.getData().add(this.allNodesChartDatas.get(_key));
             }
+            list = null;
         }
+        gz = null;
         return  lineChart;
     }
 
@@ -621,8 +649,13 @@ public class TreeVisual {
                     refresh(false, timer);
                 }
                 intv ++;
+                try {
+                    Thread.sleep(realtimeItv);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
-        }, 0, this.realtimeItv);
+        },0, 100);
     }
 
     /**
@@ -638,6 +671,7 @@ public class TreeVisual {
             {
                 treeStackPane.getChildren().remove(0);
             }
+            //System.gc();
             this.resetAllBeforeRedraw();
             treeStackPane.getChildren().add(getGroup());
         });
@@ -652,8 +686,11 @@ public class TreeVisual {
      * @param info
      */
     public void createNode(int id, int pId, Tree.NodeType type, NodeAction onClick, String info){
-        tree.crateIndNode(id, pId, type, onClick, info);
-        this.tempList.add(new Tree.Node(id,pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info));
+        Platform.runLater(()->{
+            tree.crateIndNode(id, pId, type, onClick, info);
+            Tree.Node tn = new Tree.Node(id,pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info);
+            this.tempList.add(tn);
+        });
     }
 
     /**
@@ -664,6 +701,7 @@ public class TreeVisual {
         this.allNodesRects = new Hashtable<>();
         this.allNodesPositions = new Hashtable<>();
         this.allNodesChartDatas = new Hashtable<>();
+        this.labels = new ArrayList<>(){};
 
         //Empty legendBox
         if (legendbox.getChildren().size() >  0)
