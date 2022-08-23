@@ -144,31 +144,4 @@ public class NQueensPruneVisu {
 
         chessWindow.show();
     }
-    public static void drawNewVisualisation(TreeVisual.NodeInfoData nodeInfoData, Tree.NodeType type) {
-        int n = NQueensPrune.nVisu;
-        Gson g = new Gson();
-        Map<Integer, Integer> coordinates = new Gson().fromJson(nodeInfoData.other, new TypeToken<HashMap<Integer, Integer>>() {}.getType());
-        GridPane chess = new GridPane();
-        Scene chessScene = new Scene(chess, n*50 +n, n*50 +n);
-        Stage chessWindow = new Stage();
-
-        chessWindow.setTitle("Nqueens Visualisation Board");
-        chessWindow.setScene(chessScene);
-
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                if(coordinates.get(i) == j){
-                    chess.add(createRectangleForVisualisation(true, type), j, i);
-                }else{
-                    chess.add(createRectangleForVisualisation(false,type), j, i);
-                }
-            }
-        }
-        chessWindow.initModality(Modality.WINDOW_MODAL);
-        chessWindow.initOwner(VisualTree.pStage);
-        chessWindow.setX(VisualTree.pStage.getX());
-        chessWindow.setY(VisualTree.pStage.getY());
-
-        chessWindow.show();
-    }
 }
