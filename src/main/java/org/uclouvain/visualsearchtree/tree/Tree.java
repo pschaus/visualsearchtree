@@ -84,7 +84,7 @@ public class Tree {
             this.type = NodeType.INNER;
             this.children = new LinkedList<>();
             this.edgeLabels = new LinkedList<>();
-            this.nodeAction = (nodeInfoData, type) -> {};
+            this.nodeAction = () -> {};
         }
 
         public Node(T label) {
@@ -92,7 +92,7 @@ public class Tree {
             this.type = NodeType.INNER;
             this.children = new LinkedList<>();
             this.edgeLabels = new LinkedList<>();
-            this.nodeAction = (nodeInfoData, type) -> {};
+            this.nodeAction = () -> {};
         }
 
         public Node(T label, T info, List<Node<T>> children, List<T> edgeLabels, NodeAction nodeAction) {
@@ -128,7 +128,7 @@ public class Tree {
             this.label = label;
             this.children = children;
             this.edgeLabels = edgeLabels;
-            this.nodeAction = (nodeInfoData, type) -> {};
+            this.nodeAction = () -> {};
             this.type = nodeType;
             this.info = info;
         }

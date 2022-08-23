@@ -48,6 +48,7 @@ public class NQueensPruneVisu {
             NQueensPrune nqueens = new NQueensPrune(4);
             Tree t = new Tree(-1);
             TreeVisual tv = new TreeVisual();
+            Gson gson = new Gson();
 
             tv.setRealtimeItv(1000);
             tv.setRealtimeNbNodeDrawer(5);
@@ -58,17 +59,23 @@ public class NQueensPruneVisu {
                 @Override
                 public void solution(int id, int pId) {
                     System.out.println("solution");
-                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {drawNewVisualisation(infoData,Tree.NodeType.SOLUTION);}, info);
                 }
                 @Override
                 public void fail(int id, int pId) {
                     System.out.println("fail");
-                    tv.createNode(id,pId, Tree.NodeType.FAIL,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                    tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {drawNewVisualisation(infoData,Tree.NodeType.FAIL);}, info);
                 }
                 @Override
                 public void branch(int id, int pId, int nChilds) {
                     System.out.println("branch");
-                    tv.createNode(id,pId, Tree.NodeType.INNER,(nodeInfoData, nodeType) -> {}, "{\"cost\": "+id+", \"param1\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}");
+                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                    tv.createNode(id,pId, Tree.NodeType.INNER,() -> {drawNewVisualisation(infoData, Tree.NodeType.INNER);}, info);
                 }
             }));
             t2.start();
@@ -116,8 +123,6 @@ public class NQueensPruneVisu {
         Gson g = new Gson();
         Map<Integer, Integer> coordinates = new Gson().fromJson(nodeInfoData.other, new TypeToken<HashMap<Integer, Integer>>() {}.getType());
         GridPane chess = new GridPane();
-//        chess.setHgap(2);
-//        chess.setVgap(2);
         Scene chessScene = new Scene(chess, n*50 +n, n*50 +n);
         Stage chessWindow = new Stage();
 
@@ -139,6 +144,5 @@ public class NQueensPruneVisu {
         chessWindow.setY(VisualTree.pStage.getY());
 
         chessWindow.show();
-        System.out.println(nodeInfoData);
     }
 }

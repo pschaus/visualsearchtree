@@ -8,14 +8,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,10 +21,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.uclouvain.visualsearchtree.examples.NQueensPruneVisu;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
@@ -211,11 +206,9 @@ public class TreeVisual {
         styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
 
         //Add Event to each rectangle
-        root.nodeAction = NQueensPruneVisu::drawNewVisualisation;
         r.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 || e.getButton()== MouseButton.SECONDARY) {
-                NodeInfoData infoData = gson.fromJson(root.info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                root.nodeAction.nodeAction(infoData, root.type);
+                root.nodeAction.nodeAction();
             }
             r.fireEvent(new BackToNormalEvent());
             r.setFill(Color.ORANGE);
@@ -443,7 +436,7 @@ public class TreeVisual {
                     _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
                     if (_info != null)
                     {
-                        this.allNodesChartDatas.put(key, (new XYChart.Data(_info.param1, _info.cost)));
+                        this.allNodesChartDatas.put(key, (new XYChart.Data(_info.domain, _info.cost)));
                         series.getData().add(this.allNodesChartDatas.get(key));
                     }
                 }
@@ -459,7 +452,7 @@ public class TreeVisual {
                 {
                     _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
                     if (_info != null) {
-                        only_sol.put(key, (float) _info.param1);
+                        only_sol.put(key, (float) _info.domain);
                     }
                 }
             }
@@ -478,7 +471,7 @@ public class TreeVisual {
 
     public static class NodeInfoData {
         public int cost = 0;
-        public int param1 = 0;
+        public int domain = 0;
         public String other = "";
     }
 
