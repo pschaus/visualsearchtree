@@ -528,6 +528,7 @@ public class TreeVisual {
      */
     public LineChart<Number, Number> getTreeChart(boolean all_sol){
         // variables
+        series.getData().clear();
         this.allNodesChartDatas = new HashMap<>();
         Gson gz = new Gson();
         NodeInfoData _info = null;
@@ -572,9 +573,7 @@ public class TreeVisual {
                 this.allNodesChartDatas.put(_key, (new XYChart.Data(i+1, _info.cost)));
                 series.getData().add(this.allNodesChartDatas.get(_key));
             }
-            list = null;
         }
-        gz = null;
         return  lineChart;
     }
 
@@ -612,7 +611,9 @@ public class TreeVisual {
                     st.play();
 
                     //focus
-                    tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
+                    //tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
+                    tmp_rect.getParent().setTranslateX(tmp_rect.getParent().getLayoutX() -  tmp_rect.getX());
+                    tmp_rect.getParent().setTranslateY(tmp_rect.getParent().getLayoutY() -  tmp_rect.getY());
                     tmp_rect.setFill(Color.ORANGE);
                 });
                 tmp_data.getNode().setOnMouseExited(event -> {

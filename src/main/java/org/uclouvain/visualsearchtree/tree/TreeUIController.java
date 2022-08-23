@@ -2,6 +2,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -201,13 +202,13 @@ public class TreeUIController {
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 RadioButton tmp = (RadioButton)newValue;
 
-                chartUI.getChildren().remove(0);
+                //chartUI.getChildren().remove(0);
                 if (tmp.getText() == radioAllNodes.getText()) {
-                    chartUI.getChildren().add(instance.getTreeChart(true));
-                    instance.addEventOnChart();
+                        instance.getTreeChart(true);
+                        instance.addEventOnChart();
                 }else {
-                    chartUI.getChildren().add(instance.getTreeChart(false));
-                    instance.addEventOnChart();
+                        instance.getTreeChart(false);
+                        instance.addEventOnChart();
                 }
             }
         });

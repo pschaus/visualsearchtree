@@ -40,12 +40,12 @@ public class NQueensPruneVisu {
 
     public static void main(String[] args) {
 
-            NQueensPrune nqueens = new NQueensPrune(5);
+            NQueensPrune nqueens = new NQueensPrune(7);
             TreeVisual tv = new TreeVisual();
             Gson gson = new Gson();
 
             tv.setRealtimeNbNodeDrawer(50);
-            tv.setRealtimeItv(1000);
+            tv.setRealtimeItv(300);
             Visualizer.show(tv);
         Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
                 @Override
