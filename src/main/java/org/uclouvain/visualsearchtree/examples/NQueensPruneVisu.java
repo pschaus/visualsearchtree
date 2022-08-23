@@ -104,6 +104,15 @@ public class NQueensPruneVisu {
      * @param isFixed boolean which indicate if a variable has its value fixed
      * @return Rectangle which represent a case
      */
+    private static Rectangle createRectangleForVisualisation(boolean isFixed, Tree.NodeType type){
+        Rectangle r = new Rectangle(50,50);
+        Color c = (type == Tree.NodeType.FAIL)? Color.RED : (type == Tree.NodeType.SOLUTION)? Color.GREEN : Color.CORNFLOWERBLUE;
+        r.setFill(isFixed ? c : Color.WHITE);
+        r.setStrokeType(StrokeType.OUTSIDE);
+        r.setStrokeWidth(.4);
+        r.setStroke(Color.BLACK);
+        return r;
+    }
     private static Rectangle createRectangleForBoard(boolean isFixed, Tree.NodeType type){
         Rectangle r = new Rectangle(50,50);
         Color c = (type == Tree.NodeType.FAIL)? Color.RED : (type == Tree.NodeType.SOLUTION)? Color.GREEN : Color.CORNFLOWERBLUE;
@@ -132,9 +141,9 @@ public class NQueensPruneVisu {
         for(int i=0;i<n;i++){
             for(int j=0;j<n;j++){
                 if(coordinates.get(i) == j){
-                    chess.add(createRectangleForBoard(true, type), j, i);
+                    chess.add(createRectangleForVisualisation(true, type), j, i);
                 }else{
-                    chess.add(createRectangleForBoard(false,type), j, i);
+                    chess.add(createRectangleForVisualisation(false,type), j, i);
                 }
             }
         }
