@@ -277,8 +277,8 @@ public class TreeUIController {
             item1.put("Value" , info.cost);
             items.add(item1);
             Map<String, Object> item2 = new HashMap<>();
-            item2.put("Key", "param1");
-            item2.put("Value"  , info.param1);
+            item2.put("Key", "domain");
+            item2.put("Value"  , info.domain);
             items.add(item2);
             Map<String, Object> item3 = new HashMap<>();
             item3.put("Key", "other");
