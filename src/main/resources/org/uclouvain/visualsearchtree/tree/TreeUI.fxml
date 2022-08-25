@@ -36,11 +36,11 @@
       </Menu>
    </MenuBar>
 
-   <ScrollPane fx:id="sasd" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
+   <ScrollPane fx:id="treeScrollPane" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
       <StackPane fx:id="treeroot" minHeight="400" minWidth="400" maxHeight="Infinity" maxWidth="Infinity" />
    </ScrollPane>
    <Slider fx:id="zoomSlider" value="25" max="50" />
-   <VBox fx:id="legendbox" maxHeight="50" maxWidth="290" minHeight="50" prefHeight="50" prefWidth="500" />
+   <VBox fx:id="legendbox" maxHeight="50" maxWidth="300" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="graph" text="Optimization Graph">
          <AnchorPane id="Content">
