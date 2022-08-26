@@ -27,6 +27,7 @@ import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.uclouvain.visualsearchtree.util.Constant.*;
 
@@ -53,7 +54,7 @@ public class TreeVisual {
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
-    private List<Tree.Node> tempList;
+    private ConcurrentHashMap<Integer, Integer> tempList;
     private  Tree tree;
 
     NumberAxis xAxis;
@@ -147,7 +148,7 @@ public class TreeVisual {
         this.xAxis = new NumberAxis();
         this.yAxis = new NumberAxis();
         lineChart = new LineChart<>(xAxis, yAxis);
-        tempList = new ArrayList<>();
+        tempList = new ConcurrentHashMap<>();
         this.labels = new ArrayList<>(){};
         this.info = "";
         this.focusedRect = new ArrayList<>(){{
@@ -157,6 +158,7 @@ public class TreeVisual {
             add(t);
             add(0);
         }};
+
 
         this.legendStats = new ArrayList<>(){{
             add(0);
@@ -632,18 +634,18 @@ public class TreeVisual {
             int intv = 0;
             @Override
             public void run() {
-                boolean check = false;
-                for ( int i = 0; i < realtimeNbNodeDrawer; i++) {
-                    if (i < tempList.size() )
-                    {
-                        if (tempList.get(i) != null) {
-                            tree.attachToParent(tempList.get(i).nodePid, tree.nodeMap.get(tempList.get(i).nodeId));
-                            check = true;
-                        }
-                        tempList.remove(i);
-                    }
+                boolean check;
+                int nbNodes = 0;
+                Iterator<Map.Entry<Integer, Integer>> it = tempList.entrySet().iterator();
+                while (it.hasNext() && (nbNodes < realtimeNbNodeDrawer))
+                {
+                    // Get the entry at this iteration
+                    Map.Entry<Integer, Integer> entry = it.next();
+                    tree.attachToParent(entry.getValue(), tree.nodeMap.get(entry.getKey()));
+                    it.remove();
+                    nbNodes++;
                 }
-                if ( (intv > 0) && (!check))
+                if ( (intv > 3) && (tempList.size() == 0))
                 {
                     refresh(true, timer);
                 }else {
@@ -665,8 +667,9 @@ public class TreeVisual {
      * @param time
      */
     public void refresh(Boolean exit, Timer time){
-        if (exit)
+        if (exit){
             time.cancel();
+        }
         Platform.runLater(()->{
             if (treeStackPane.getChildren().size() >  0)
             {
@@ -689,8 +692,7 @@ public class TreeVisual {
     public void createNode(int id, int pId, Tree.NodeType type, NodeAction onClick, String info){
         Platform.runLater(()->{
             tree.crateIndNode(id, pId, type, onClick, info);
-            Tree.Node tn = new Tree.Node(id,pId,"child", type, new LinkedList<>(), new LinkedList(), onClick, info);
-            this.tempList.add(tn);
+            this.tempList.put(id,pId);
         });
     }
 
