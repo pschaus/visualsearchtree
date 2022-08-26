@@ -66,7 +66,7 @@ public class TreeVisual {
     private long realtimeItv;
     private long realtimeNbNodeDrawer;
 
-
+    private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
     /**
      * <b>Note: </b> Defines the time interval after which the tree must be refreshed
      * to draw new nodes during a real-time search.
@@ -76,6 +76,27 @@ public class TreeVisual {
         Platform.runLater(()->{
             this.realtimeItv = _realtimeItv;
         });
+    }
+
+    public void onDrawFinished(Procedure listener)
+    {
+        dfsListeners.add(new DrawListener() {
+            /**
+             * Will be called at the end of draw
+             */
+            @Override
+            public void onFinish() {
+                listener.call();
+            }
+        });
+    }
+
+    /**
+     * Will be called at end
+     */
+    private void notifyEndDraw()
+    {
+        dfsListeners.forEach(l-> l.onFinish());
     }
 
     /**
@@ -668,6 +689,7 @@ public class TreeVisual {
      */
     public void refresh(Boolean exit, Timer time){
         if (exit){
+            notifyEndDraw();
             time.cancel();
         }
         Platform.runLater(()->{
