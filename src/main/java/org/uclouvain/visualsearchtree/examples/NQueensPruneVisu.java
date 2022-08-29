@@ -38,15 +38,21 @@ import java.util.Map;
  */
 public class NQueensPruneVisu {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
-            NQueensPrune nqueens = new NQueensPrune(7);
-            TreeVisual tv = new TreeVisual();
-            Gson gson = new Gson();
+        NQueensPrune nqueens = new NQueensPrune(5);
+        TreeVisual tv = new TreeVisual();
+        Gson gson = new Gson();
 
-            tv.setRealtimeNbNodeDrawer(50);
-            tv.setRealtimeItv(300);
-            Visualizer.show(tv);
+        tv.setRealtimeNbNodeDrawer(20);
+        tv.setRealtimeItv(3000);
+        Visualizer.show(tv);
+
+
+        tv.onDrawFinished(()->{
+            System.out.println("END OF DRAWING...");
+        });
+
         Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
                 @Override
                 public void solution(int id, int pId) {
@@ -71,6 +77,7 @@ public class NQueensPruneVisu {
                 }
             }));
             t2.start();
+
     }
 
     /**
