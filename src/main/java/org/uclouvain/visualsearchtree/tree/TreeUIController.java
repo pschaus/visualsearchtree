@@ -2,7 +2,6 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -15,6 +14,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -23,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.uclouvain.visualsearchtree.util.Helper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,6 +39,7 @@ public class TreeUIController {
     public TabPane tabPane;
     public Tab graph;
     public Tab infoTab;
+    public ScrollPane treeScrollPane;
     public StackPane treeroot;
     public Slider zoomSlider;
     public TableView infoTableView;
@@ -173,6 +178,13 @@ public class TreeUIController {
      * Attach keyEvent on the scene
      */
     public void attachEvent(){
+        var tv = new TreeVisual();
+        tv.onDrawFinished(() ->{
+            var values = Helper.centerScrollPaneBar(treeroot, treeScrollPane);
+
+            treeScrollPane.setVvalue(values.get(0));
+            treeScrollPane.setHvalue(values.get(1));
+        });
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
                 showAllLabels();

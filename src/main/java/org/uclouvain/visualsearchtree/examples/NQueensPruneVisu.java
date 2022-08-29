@@ -17,7 +17,6 @@ package org.uclouvain.visualsearchtree.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -45,13 +44,8 @@ public class NQueensPruneVisu {
         Gson gson = new Gson();
 
         tv.setRealtimeNbNodeDrawer(20);
-        tv.setRealtimeItv(3000);
+        tv.setRealtimeItv(300);
         Visualizer.show(tv);
-
-
-        tv.onDrawFinished(()->{
-            System.out.println("END OF DRAWING...");
-        });
 
         Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
                 @Override
