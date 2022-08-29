@@ -16,5 +16,8 @@ public class Constant {
     public static final int LEGEND_SHAPE_SIZE = 12;
     public static final int LEGEND_SHAPE_ARC_VALUE = LEGEND_SHAPE_SIZE*2;
     public static final double DEFAULT_SLIDER_VALUE = 25;
+    public static final double DEFAULT_STACKPANE_MIN_WIDTH = 400;
+    public static final double DEFAULT_STACKPANE_MIN_HEIGHT = 400;
+
 
 }
