@@ -53,21 +53,23 @@ public class NQueensPruneVisu {
                     System.out.println("solution");
                     String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
                     TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {showNewVisualisation(infoData,Tree.NodeType.SOLUTION);}, info);
+                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {
+                        showChessBoard(infoData,Tree.NodeType.SOLUTION);}, info);
                 }
                 @Override
                 public void fail(int id, int pId) {
                     System.out.println("fail");
                     String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
                     TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {showNewVisualisation(infoData,Tree.NodeType.FAIL);}, info);
+                    tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {showChessBoard(infoData,Tree.NodeType.FAIL);}, info);
                 }
                 @Override
                 public void branch(int id, int pId, int nChilds) {
                     System.out.println("branch");
                     String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
                     TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.INNER,() -> {showNewVisualisation(infoData, Tree.NodeType.INNER);}, info);
+                    tv.createNode(id,pId, Tree.NodeType.INNER,() -> {
+                        showChessBoard(infoData, Tree.NodeType.INNER);}, info);
                 }
             }));
             t2.start();
@@ -110,7 +112,7 @@ public class NQueensPruneVisu {
      * Draw a visualisation : Here a chess with fixed value of node is drawn
      * @param nodeInfoData info parse to gson object of the concerned node
      */
-    public static void showNewVisualisation(TreeVisual.NodeInfoData nodeInfoData, Tree.NodeType type){
+    public static void showChessBoard(TreeVisual.NodeInfoData nodeInfoData, Tree.NodeType type){
         int n = NQueensPrune.nVisu;
         Map<Integer, Integer> coordinates = new Gson().fromJson(nodeInfoData.other, new TypeToken<HashMap<Integer, Integer>>() {}.getType());
         GridPane chess = new GridPane();
