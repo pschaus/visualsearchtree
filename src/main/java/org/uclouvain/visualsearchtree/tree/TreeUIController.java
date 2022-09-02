@@ -2,6 +2,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -11,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,14 +22,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.uclouvain.visualsearchtree.util.Helper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,9 +47,12 @@ public class TreeUIController {
     public StackPane treeroot;
     public Slider zoomSlider;
     public TableView infoTableView;
+    public Button skipBtn;
+    public AnchorPane anchorSkip;
     private TreeVisual instance;
     private final double stackPaneMinWidth = 400;
     private double stackPaneMinHeight = 400;
+//    private Button skipBtn;
 
     //Menu items variables
     public MenuBar menuBar;
@@ -77,19 +84,40 @@ public class TreeUIController {
     }
 
     // Init methods
-    public  void init(){
+    public  void init() throws FileNotFoundException {
         resize();
+        makeSkipButtonSticky();
         alignMenuItemText();
         attachEvent();
         initTableInfo();
         initBookMarksTable();
     }
+
     public void resize(){
         int depth = instance.getLegendStats().get(3);
         if(depth>5){
             treeroot.setMinHeight(depth*60);
             stackPaneMinHeight = treeroot.getMinHeight();
         }
+    }
+    private void makeSkipButtonSticky() {
+//        Tooltip t = new Tooltip("Skip the search");
+//        Tooltip.install(skipBtn, t);
+        double targetX = 10;
+
+        InvalidationListener listener = o -> {
+            Bounds viewportBounds = treeScrollPane.getViewportBounds();
+            Bounds contentBounds = treeroot.getBoundsInLocal();
+            Bounds labelBounds = skipBtn.getBoundsInLocal();
+
+            double factorX = Math.max(contentBounds.getWidth() - viewportBounds.getWidth(), 0);
+
+            skipBtn.setTranslateX(targetX + treeScrollPane.getHvalue() * factorX - labelBounds.getMinX());
+        };
+
+        treeScrollPane.viewportBoundsProperty().addListener(listener);
+        treeScrollPane.hvalueProperty().addListener(listener);
+        skipBtn.boundsInLocalProperty().addListener(listener);
     }
 
     private void initTableInfo () {
@@ -178,13 +206,14 @@ public class TreeUIController {
      * Attach keyEvent on the scene
      */
     public void attachEvent(){
-        var tv = new TreeVisual();
-        tv.onDrawFinished(() ->{
-            var values = Helper.centerScrollPaneBar(treeroot, treeScrollPane);
+//        var tv = new TreeVisual();
+//        tv.onDrawFinished(() ->{
+//            var values = Helper.centerScrollPaneBar(treeroot, treeScrollPane);
+//
+//            treeScrollPane.setVvalue(values.get(0));
+//            treeScrollPane.setHvalue(values.get(1));
+//        });
 
-            treeScrollPane.setVvalue(values.get(0));
-            treeScrollPane.setHvalue(values.get(1));
-        });
         menuBar.getScene().setOnKeyPressed(ev ->{
             if(ev.getCode()== KeyCode.L){
                 showAllLabels();
@@ -401,5 +430,12 @@ public class TreeUIController {
         showGraph.setText("Show Graph \t\t\t\t O");
         showBookMarksItem.setText("Show BookMarks \t\t\t B");
         manageBookMarksItem.setText("Add/ Remove BookMarks \t Ctrl+B");
+    }
+
+    public void skipButtonIsClicked(MouseEvent mouseEvent) {
+        if( anchorSkip.getChildren().contains(skipBtn) ){
+            System.out.println("Skip Button has been clicked");
+            anchorSkip.getChildren().remove(skipBtn);
+        }
     }
 }

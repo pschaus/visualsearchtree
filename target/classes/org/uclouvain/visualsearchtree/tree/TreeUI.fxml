@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -11,6 +12,8 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -37,38 +40,49 @@
    </MenuBar>
 
    <ScrollPane fx:id="treeScrollPane" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
-      <StackPane fx:id="treeroot" minHeight="400" minWidth="400" maxHeight="Infinity" maxWidth="Infinity" />
+      <StackPane fx:id="treeroot" onMouseClicked="#skipButtonIsClicked" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
+         <AnchorPane fx:id="anchorSkip">
+            <Button fx:id="skipBtn" maxHeight="40" maxWidth="50" minHeight="30" minWidth="40" prefHeight="30" prefWidth="40" textAlignment="CENTER" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="420">
+               <graphic>
+                  <ImageView fitHeight="25" fitWidth="25">
+                     <Image url="@ ./right.png" />
+                  </ImageView>
+               </graphic>
+            </Button>
+         </AnchorPane>
+      </StackPane>
    </ScrollPane>
-   <Slider fx:id="zoomSlider" value="25" max="50" />
+   <Slider fx:id="zoomSlider" max="50" value="25" />
    <VBox fx:id="legendbox" maxHeight="50" maxWidth="300" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="graph" text="Optimization Graph">
          <AnchorPane id="Content">
             <VBox>
                <fx:define>
-                  <ToggleGroup fx:id="graphType"/>
+                  <ToggleGroup fx:id="graphType" />
                </fx:define>
                <HBox alignment="TOP_CENTER" prefWidth="500" spacing="10">
-                  <RadioButton fx:id="radioOnlySol" toggleGroup="$graphType">per solutions</RadioButton>
-                  <RadioButton fx:id="radioAllNodes" toggleGroup="$graphType" selected="true">per choices
+                  <RadioButton fx:id="radioOnlySol">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="graphType" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="radioAllNodes" selected="true" toggleGroup="$graphType">per choices
                   </RadioButton>
                </HBox>
 
                <HBox>
-                  <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370"
-                        prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair"/>
+                  <VBox fx:id="chartUI" maxHeight="Infinity" maxWidth="Infinity" minHeight="150" minWidth="370" prefHeight="170" prefWidth="500" style="-fx-cursor: crosshair" />
                </HBox>
             </VBox>
          </AnchorPane>
       </Tab>
       <Tab fx:id="infoTab" onSelectionChanged="#showNodeInfos" text="Node Infos">
-         <TableView fx:id="infoTableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150"
-                    prefWidth="300">
+         <TableView fx:id="infoTableView" maxHeight="Infinity" minHeight="150" minWidth="500" prefHeight="150" prefWidth="300">
          </TableView>
       </Tab>
       <Tab fx:id="bookMarksTab" onSelectionChanged="#showBookMarks" text="BookMarks">
-         <HBox fx:id="tableHbox" alignment="CENTER" maxHeight="Infinity" minWidth="500" prefHeight="150"
-               prefWidth="300">
+         <HBox fx:id="tableHbox" alignment="CENTER" maxHeight="Infinity" minWidth="500" prefHeight="150" prefWidth="300">
             <!-- Here will be displayed the TableView for BookMarks -->
          </HBox>
       </Tab>
