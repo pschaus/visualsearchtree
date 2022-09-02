@@ -35,7 +35,6 @@ import java.io.IOException;
  * </ul>
  */
 public class VisualTree {
-    public static Stage pStage = new Stage();
 
     /**
      * <p>
@@ -47,7 +46,6 @@ public class VisualTree {
      */
     public static void treeProfilerLauncher(Tree.Node<String> node, Stage primaryStage) {
         TreeVisual instance = new TreeVisual(node);
-        pStage = primaryStage;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {

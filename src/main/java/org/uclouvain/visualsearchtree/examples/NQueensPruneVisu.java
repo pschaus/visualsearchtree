@@ -39,7 +39,7 @@ public class NQueensPruneVisu {
 
     public static void main(String[] args) throws InterruptedException {
 
-        NQueensPrune nqueens = new NQueensPrune(5);
+        NQueensPrune nqueens = new NQueensPrune(4);
         TreeVisual tv = new TreeVisual();
         Gson gson = new Gson();
 
@@ -131,11 +131,6 @@ public class NQueensPruneVisu {
                 }
             }
         }
-        chessWindow.initModality(Modality.WINDOW_MODAL);
-        chessWindow.initOwner(VisualTree.pStage);
-        chessWindow.setX(VisualTree.pStage.getX());
-        chessWindow.setY(VisualTree.pStage.getY());
-
         chessWindow.show();
     }
 }
