@@ -137,14 +137,17 @@ public class TreeUIController {
         Map<String, String> bookMarksMap = instance.getBookMarks();
 
         TableColumn<Map.Entry<String, String>, String> idColumn = new TableColumn<>("Node Id");
+        idColumn.setId("bookmarkIdCol");
         idColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         idColumn.setMinWidth(150);
 
         TableColumn<Map.Entry<String, String>, String> valueColumn = new TableColumn<>("BookMarks");
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
+        valueColumn.setId("bookmarkValueCol");
 
         ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(bookMarksMap.entrySet());
         bookMarksTableView = new TableView<>(items);
+        bookMarksTableView.setId("bookmarkTable");
         bookMarksTableView.setMinHeight(150);
         bookMarksTableView.setPlaceholder(new Label("No bookmarks added. Please press CTRL+B to add a bookmark to a node"));
         bookMarksTableView.prefWidthProperty().bind(tableHbox.widthProperty());

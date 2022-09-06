@@ -52,7 +52,7 @@
          </AnchorPane>
       </StackPane>
    </ScrollPane>
-   <Slider fx:id="zoomSlider" max="50" value="25" />
+<!--   <Slider fx:id="zoomSlider" max="50" value="25" />-->
    <VBox fx:id="legendbox" maxHeight="50" maxWidth="300" minHeight="50" prefHeight="50" prefWidth="500" />
    <TabPane fx:id="tabPane" maxHeight="Infinity" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="graph" text="Optimization Graph">

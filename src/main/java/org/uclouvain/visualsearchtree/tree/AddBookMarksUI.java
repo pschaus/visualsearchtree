@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 public class AddBookMarksUI {
     public TextArea nodeBookmark;
+    public Button addButton;
     private TreeVisual instance;
 
     public Button cancelButton;
