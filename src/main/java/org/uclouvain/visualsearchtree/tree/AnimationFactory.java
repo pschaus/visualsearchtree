@@ -286,38 +286,22 @@ public class AnimationFactory {
                 double scale = oldScale * factor;
                 double f = (scale / oldScale) - 1;
 
-//                if(scale <= 1.5){
-                    // Center first stackpane in scrollpane
-//                    StackPane sp = (StackPane) parent;
-//                    Scene scene = sp.getScene();
-//                    ScrollPane scrollPane = (ScrollPane) scene.lookup("#treeScrollPane");
-//
-//                    var values = Helper.centerScrollPaneBar(sp, scrollPane);
-//                    System.out.println(values);
-//
-//                    scrollPane.setVvalue(values.get(0));
-//                    scrollPane.setHvalue(values.get(1));
+                // determine offset that we will have to move the group
+                Bounds bounds = parent.localToScene(parent.getBoundsInLocal());
+                double dx = (x - (bounds.getWidth() / 2 + bounds.getMinX()));
+                double dy = (y - (bounds.getHeight() / 2 + bounds.getMinY()));
 
-                    // determine offset that we will have to move the group
-                    Bounds bounds = parent.localToScene(parent.getBoundsInLocal());
-                    double dx = (x - (bounds.getWidth() / 2 + bounds.getMinX()));
-                    double dy = (y - (bounds.getHeight() / 2 + bounds.getMinY()));
-
-                    // timeline that scales and moves the group
-                    Timeline timeline = new Timeline();
-                    timeline.getKeyFrames().clear();
-                    timeline.getKeyFrames().addAll(
-                        new KeyFrame(Duration.millis(150), new KeyValue(parent.translateXProperty(), parent.getTranslateX() - f * dx)),
-                        new KeyFrame(Duration.millis(150), new KeyValue(parent.translateYProperty(), parent.getTranslateY() - f * dy)),
-                        new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleXProperty(), scale)),
-                        new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleYProperty(), scale))
-                    );
-                    timeline.play();
-//                    sp.setMinHeight(400 * scale);
-//                    sp.setMinWidth(400 * (ZOOM_X_COEFFICIENT/ (0.25+ scale)));
-//                }
+                // timeline that scales and moves the group
+                Timeline timeline = new Timeline();
+                timeline.getKeyFrames().clear();
+                timeline.getKeyFrames().addAll(
+                    new KeyFrame(Duration.millis(150), new KeyValue(parent.translateXProperty(), parent.getTranslateX() - f * dx)),
+                    new KeyFrame(Duration.millis(150), new KeyValue(parent.translateYProperty(), parent.getTranslateY() - f * dy)),
+                    new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleXProperty(), scale)),
+                    new KeyFrame(Duration.millis(150), new KeyValue(parent.scaleYProperty(), scale))
+                );
+                timeline.play();
             }
-
         });
     }
 
