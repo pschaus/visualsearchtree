@@ -31,13 +31,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>18.0.1</version>
-            <scope>import</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>17-ea+11</version>
-            <scope>import</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
