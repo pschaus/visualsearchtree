@@ -295,6 +295,7 @@ public class TreeVisual {
         this.focusedRect.set(2, label);
         this.focusedRect.set(3, nodeId);
     }
+    public XYChart.Series getSeries() {return series;}
 
     /**
      * <b>Note: </b> Use {@link org.uclouvain.visualsearchtree.tree.Tree.PositionedNode PositionedNode} to build tree and return it as {@link javafx.scene.Group Group}
@@ -325,7 +326,7 @@ public class TreeVisual {
         Gson gson = new Gson();
         NodeInfoData info= null;
 
-        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.type);
+        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.type, root.nodeId);
         styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
 
         //Add Event to each rectangle
@@ -375,8 +376,9 @@ public class TreeVisual {
      * @param type Node Type
      * @return Rectangle representing the node
      */
-    private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
+    private Rectangle createRectangle(double x, double y, Tree.NodeType type, int id) {
         Rectangle rect = new Rectangle(x,y,NODE_SHAPE_SIZE,NODE_SHAPE_SIZE);
+        rect.setId(String.valueOf(id));
         rect.setStrokeType(StrokeType.OUTSIDE);
         rect.setStrokeWidth(1);
         rect.setStroke(Color.BLACK);
@@ -514,9 +516,13 @@ public class TreeVisual {
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
         Text  t1 = new Text("  ("+ this.legendStats.get(0)+")");
+        t1.setId("innerCount");
         Text  t2 = new Text("  ("+ this.legendStats.get(1)+")");
+        t2.setId("failCount");
         Text  t3 = new Text("  ("+ this.legendStats.get(2)+")");
+        t3.setId("solutionCount");
         Text  t4 = new  Text("DEPTH : ("+ this.legendStats.get(3)+")");
+        t4.setId("treeDepth");
         s1.getChildren().addAll(branchRect, t1);
         s2.getChildren().addAll(failedRect, t2);
         s3.getChildren().addAll(solvedRect, t3);
@@ -541,7 +547,6 @@ public class TreeVisual {
                 }
             }
         }
-
     }
 
     /**
