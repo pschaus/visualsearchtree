@@ -101,8 +101,6 @@ public class TreeUIController {
         }
     }
     private void makeSkipButtonSticky() {
-//        Tooltip t = new Tooltip("Skip the search");
-//        Tooltip.install(skipBtn, t);
         double targetX = 10;
 
         InvalidationListener listener = o -> {
@@ -122,10 +120,12 @@ public class TreeUIController {
 
     private void initTableInfo () {
         TableColumn<Map, String> keyColumn = new TableColumn<>("Key");
+        keyColumn.setId("infoKey");
         keyColumn.setCellValueFactory(new MapValueFactory<>("Key"));
         keyColumn.setMinWidth(150);
 
         TableColumn<Map, String> valueColumn = new TableColumn<>("Value");
+        valueColumn.setId("infoValue");
         valueColumn.setCellValueFactory(new MapValueFactory<>("Value"));
         valueColumn.setMinWidth(350);
 
@@ -254,53 +254,53 @@ public class TreeUIController {
             }
         });
 
-        zoomSlider.setOnMouseClicked(e ->{
-            double zoomValue = zoomSlider.getValue();
-            if (zoomValue == DEFAULT_SLIDER_VALUE) {
-                treeroot.setMinHeight(stackPaneMinHeight);
-                treeroot.setMinWidth(stackPaneMinWidth);
-                treeroot.setScaleY(1);
-                treeroot.setScaleY(1);
-            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
-                zoomOut(zoomValue);
-            }else {
-                zoomIn(zoomValue);
-            }
-        });
+//        zoomSlider.setOnMouseClicked(e ->{
+//            double zoomValue = zoomSlider.getValue();
+//            if (zoomValue == DEFAULT_SLIDER_VALUE) {
+//                treeroot.setMinHeight(stackPaneMinHeight);
+//                treeroot.setMinWidth(stackPaneMinWidth);
+//                treeroot.setScaleY(1);
+//                treeroot.setScaleY(1);
+//            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
+//                zoomOut(zoomValue);
+//            }else {
+//                zoomIn(zoomValue);
+//            }
+//        });
     }
 
     /**
      * Zoom In StackPane containing the tree
      * @param value slider current value
      */
-    public void zoomIn(double value){
-        treeroot.setScaleX(1 + value*SCALE_COEFFICIENT);
-        treeroot.setScaleY(1 + value*SCALE_COEFFICIENT);
-        if(value<=DEFAULT_SLIDER_VALUE+7){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/ZOOM_Y_COEFFICIENT));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/ZOOM_X_COEFFICIENT));
-        }else if(value<=DEFAULT_SLIDER_VALUE+15){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+1)));
-        }else if(value<=DEFAULT_SLIDER_VALUE+20){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+2)));
-        }else{
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+3)));
-        }
-    }
+//    public void zoomIn(double value){
+//        treeroot.setScaleX(1 + value*SCALE_COEFFICIENT);
+//        treeroot.setScaleY(1 + value*SCALE_COEFFICIENT);
+//        if(value<=DEFAULT_SLIDER_VALUE+7){
+//            treeroot.setMinHeight(stackPaneMinHeight * (value/ZOOM_Y_COEFFICIENT));
+//            treeroot.setMinWidth(stackPaneMinWidth * (value/ZOOM_X_COEFFICIENT));
+//        }else if(value<=DEFAULT_SLIDER_VALUE+15){
+//            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+//            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+1)));
+//        }else if(value<=DEFAULT_SLIDER_VALUE+20){
+//            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+//            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+2)));
+//        }else{
+//            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
+//            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+3)));
+//        }
+//    }
 
     /**
      * Zoom Out StackPane containing the tree
      * @param value slider current value
      */
-    public void zoomOut(double value){
-        treeroot.setMinHeight(stackPaneMinHeight);
-        treeroot.setMinWidth(stackPaneMinWidth);
-        treeroot.setScaleX(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
-        treeroot.setScaleY(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
-    }
+//    public void zoomOut(double value){
+//        treeroot.setMinHeight(stackPaneMinHeight);
+//        treeroot.setMinWidth(stackPaneMinWidth);
+//        treeroot.setScaleX(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
+//        treeroot.setScaleY(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
+//    }
 
     /**
      * Switch Tab pane and display the current Node selected infos
