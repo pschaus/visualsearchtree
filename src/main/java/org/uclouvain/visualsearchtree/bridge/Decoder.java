@@ -60,7 +60,7 @@ public class Decoder {
      * @param msgSize
      * @return
      */
-    public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) {
+    public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) throws Exception {
         DecodedMessage formatData = new DecodedMessage();
         byte[] msgBody = new byte[msgSize];
 
@@ -112,7 +112,7 @@ public class Decoder {
                 formatData.msgTypeName = "RESTART";
                 formatData.msgType = RESTART;
             }
-            default -> System.out.println("ERROR: Invalid Message type");
+            default -> throw new Exception("Invalid Message type");
         }
         return formatData;
     };
@@ -125,7 +125,7 @@ public class Decoder {
      * @return
      */
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
-        if (len <= 0 && buffer.size() == 0)
+        if (len <= 0 || buffer.size() == 0)
             return false;
         for (int i = 0; i < len; i++) {
             b[i] = buffer.remove(0);

@@ -116,8 +116,9 @@ class ServerClientThread extends VisualTree implements Runnable {
         catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
-        }
-        finally {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
             System.out.println("Client No:" + clientNo + " exit!! ");
         }
     }
