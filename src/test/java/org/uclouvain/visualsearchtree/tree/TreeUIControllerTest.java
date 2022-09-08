@@ -5,25 +5,24 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
-
 
 
 @ExtendWith(ApplicationExtension.class)
 class TreeUIControllerTest {
 
-    TreeVisual tv;
-    @Start
-    public void start(Stage stage){
+    static TreeVisual tv;
+
+    @BeforeAll
+    public static void before_all(){
         tv = new TreeVisual();
         randomTree(tv);
         Visualizer.show(tv);
+        System.out.println("I'm in the before all method");
     }
 
     @Test
@@ -79,8 +78,7 @@ class TreeUIControllerTest {
 //        robot.clickOn("#radioAllNodes");
     }
 
-
-    private void randomTree(TreeVisual tv){
+    private static void randomTree(TreeVisual tv){
         tv.createNode(0,-1, Tree.NodeType.INNER,()->{System.out.println(0);},"{\"cost\": "+0+", \"domain\": "+0+", \"other\": test}");
         tv.createNode(1,0, Tree.NodeType.FAIL,()->{System.out.println(1);},"{\"cost\": "+1+", \"domain\": "+1+", \"other\": test}");
         tv.createNode(2,0, Tree.NodeType.FAIL,()->{System.out.println(2);},"{\"cost\": "+2+", \"domain\": "+2+", \"other\": test}");
