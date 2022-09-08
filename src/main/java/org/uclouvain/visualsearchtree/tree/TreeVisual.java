@@ -297,6 +297,10 @@ public class TreeVisual {
     }
     public XYChart.Series getSeries() {return series;}
 
+    public Map<String, Rectangle> getAllNodesRects() {return allNodesRects;}
+    public Map<String, Data> getAllNodesChartDatas() {return allNodesChartDatas;}
+    public Map<String, Tree.PositionedNode<String>> getAllNodesPositions() {return allNodesPositions;}
+
     /**
      * <b>Note: </b> Use {@link org.uclouvain.visualsearchtree.tree.Tree.PositionedNode PositionedNode} to build tree and return it as {@link javafx.scene.Group Group}
      * @return {@link javafx.scene.Group}
