@@ -51,7 +51,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.extract_branch.outputs.branch }}
-          name: Release v-${{ steps.extract_branch.outputs.branch }}
+          name: Release v${{ steps.extract_branch.outputs.branch }}
 #          artifacts: "release.tar.gz,foo/*.txt"
           body: ${{ github.event.head_commit.message }}
           generateReleaseNotes: true
