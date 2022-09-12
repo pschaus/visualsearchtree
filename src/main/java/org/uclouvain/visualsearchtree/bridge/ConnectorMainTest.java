@@ -1,10 +1,8 @@
 package org.uclouvain.visualsearchtree.bridge;
 
-import org.uclouvain.visualsearchtree.bridge.Connector;
-
 import java.io.IOException;
 
-public class ConnectorTest {
+public class ConnectorMainTest {
     public static void main(String[] args) {
         Connector connector = new Connector();
         try {
