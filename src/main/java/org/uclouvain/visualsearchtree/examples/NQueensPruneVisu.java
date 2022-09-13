@@ -64,7 +64,7 @@ public class NQueensPruneVisu {
                 TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
                 t.createNode(id,pId, Tree.NodeType.INNER,() -> showChessBoard(infoData, Tree.NodeType.INNER), info);
             }
-        }), t);
+        }), t, false);
 
         Visualizer.show(tv);
     }

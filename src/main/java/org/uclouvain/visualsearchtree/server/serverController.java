@@ -178,13 +178,12 @@ public class serverController implements Initializable {
                                 System.out.println("create tree");
                                 //socket.close();
                                 keepGoing = false;
-                                TreeVisual tv = new TreeVisual(tree);
-                                Platform.runLater(()->{
-                                    Stage stage = new Stage();
-                                    Scene scene = new Scene(tv.getGroup(), 500, 700);
-                                    stage.setScene(scene);
-                                    stage.show();
-                                });
+                                TreeVisual tv = new TreeVisual(tree, true);
+                                try {
+                                    Visualizer.show(tv);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                             sizeRead = false;
                         }
