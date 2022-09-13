@@ -84,9 +84,9 @@ public class TreeUIController {
     }
 
     // Init methods
-    public  void init() throws FileNotFoundException {
+    public  void init() {
         resize();
-        makeSkipButtonSticky();
+        //makeSkipButtonSticky();
         alignMenuItemText();
         attachEvent();
         initTableInfo();
@@ -101,8 +101,6 @@ public class TreeUIController {
         }
     }
     private void makeSkipButtonSticky() {
-//        Tooltip t = new Tooltip("Skip the search");
-//        Tooltip.install(skipBtn, t);
         double targetX = 10;
 
         InvalidationListener listener = o -> {

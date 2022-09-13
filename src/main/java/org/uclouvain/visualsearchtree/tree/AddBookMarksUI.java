@@ -38,7 +38,7 @@ public class AddBookMarksUI {
             //key is made by concatening "node", nodeId and nodeLabel
             String key = "node"+focusedNode.get(3)+" "+nodeLabel;
             instance.setBookMarks(key,bookMark);
-            Rectangle r = (Rectangle) focusedNode.get(0);
+            Anchor r = (Anchor) focusedNode.get(0);
             r.setStrokeWidth(3);
             closeWindow();
             // Update the bookmarks tableview by simulating pressing the B key --- Only for Windows and Linux
