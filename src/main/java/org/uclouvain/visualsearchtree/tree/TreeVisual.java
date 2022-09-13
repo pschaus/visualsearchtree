@@ -231,7 +231,8 @@ public class TreeVisual {
                         if (rootNodes.get(i) == null) {
                             return;
                         }
-                        treeGroup.getChildren().add(rootNodes.get(i));
+                        if (!treeGroup.getChildren().contains(rootNodes.get(i)))
+                            treeGroup.getChildren().add(rootNodes.get(i));
                     }
                     pos[0] = i;
                     if (treeStackPane.getChildren().size() > 0) {
