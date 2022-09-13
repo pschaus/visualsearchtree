@@ -1,11 +1,27 @@
+# Compiled class file
 *.class
-.idea
-.DS_Store
-project/
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+#intellij generated folder
+.idea/
 target/
-.m2
-*.iml
-minicp.zip
-userguide/build/
-userguide/userguideenv/
-dependency-reduced-pom.xml

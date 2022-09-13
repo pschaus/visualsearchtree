@@ -1,19 +1,24 @@
-package org.uclouvain.visualsearchtree;
+package org.uclouvain.visualsearchtree.server;
 
-
-// A Java program for a Serverside
+import org.uclouvain.visualsearchtree.bridge.Decoder;
+import org.uclouvain.visualsearchtree.bridge.Message;
+import org.uclouvain.visualsearchtree.tree.Tree;
+import org.uclouvain.visualsearchtree.tree.VisualTree;
 
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisualTreeServer {
-
+/**
+ * <b>Note: </b> A server thread class. So we can create multiple server by the same
+ * type.
+ */
+class ServerClientThread extends VisualTree implements Runnable {
     // initialize socket and input stream
     private Socket socket = null;
-    private ServerSocket server = null;
     private DataInputStream in = null;
+    private int port = 6666;
 
     // are there enough bytes to read something
     private boolean canReadMore = true;
@@ -23,24 +28,33 @@ public class VisualTreeServer {
     private int msgSize = 0;
     private boolean DEBUG = true;
 
-    // constructor with port
-    public VisualTreeServer(int port) {
-        // starts server and waits for a connection
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Server started");
-            System.out.println("Waiting for a client ...");
-            socket = server.accept();
-            System.out.println("Client accepted");
+    // stack of decoded incoming message
+    private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
 
+    // node we have to send to VisualTree for visualization
+    private Tree tree;
+
+    private int clientNo;
+    private ProfilingData profilingData;
+
+    ServerClientThread(Socket inSocket,int counter, int port, ProfilingData profilingData){
+        socket = inSocket;
+        clientNo = counter;
+        this.port = port;
+        this.profilingData = profilingData;
+    }
+
+    public void run(){
+        try {
+            System.out.println(" start server ..................");
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
-            while (!server.isClosed() || canReadMore) {
+            while (canReadMore) {
                 if (socket.getInputStream().available() > 0)
                     canReadMore = true;
 
                 Decoder.addToBuffer(buffer, socket.getInputStream().readAllBytes());
-                if(DEBUG) {
+                if (DEBUG) {
                     //System.out.println(buffer);
                 }
 
@@ -66,15 +80,22 @@ public class VisualTreeServer {
                     }
 
                     Decoder.DecodedMessage msgBody = Decoder.deserialize(buffer, msgSize);
-                    if(DEBUG) {
+                    if (msgBody.msgType == Message.MsgType.NODE.getNumber()) {
+                        decodedMessagesList.add(msgBody);
+                    }
+
+                    if (DEBUG) {
                         System.out.println(msgBody.toString());
                         System.out.println("-----");
                     }
                     // TODO: WRITE HANDLE MSG FUNCTION TO EMIT INCOMING DATA
                     //handleMessage(msg);
 
-                    if(msgBody.msgType == Message.MsgType.DONE.getNumber()) {
-                        server.close();
+                    if (msgBody.msgType == Message.MsgType.DONE.getNumber()) {
+                        System.out.println("create tree");
+                        //socket.close();
+                        canReadMore = false;
+                        tree = Decoder.treeBuilder(decodedMessagesList);
                     }
 
                     bytesRead = 0;
@@ -82,17 +103,30 @@ public class VisualTreeServer {
                 }
             }
 
+            // LET NOTIFY NEW DATA IN ORDER TO DRAW
+            profilingData.addToProfilingNameList("<new> " + tree.root());
+            profilingData.addToProfilingNodesList(tree.root());
+
+            //VisualTree treeDrawer = new VisualTree(getNodeTree());
             System.out.println("Closing connection");
             // close connection
             socket.close();
             in.close();
-        } catch (IOException i) {
-            System.out.println(i);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
+        }
+        finally {
+            System.out.println("Client No:" + clientNo + " exit!! ");
         }
     }
 
-    public static void main(String args[]) {
-        VisualTreeServer server = new VisualTreeServer(6666);
+    public Tree getTree() {
+        return tree;
+    }
+
+    public int getPort() {
+        return port;
     }
 }
-
