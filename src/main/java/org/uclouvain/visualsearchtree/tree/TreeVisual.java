@@ -112,10 +112,10 @@ public class TreeVisual {
      * @param tree
      */
 
-    public TreeVisual(Tree tree)
+    public TreeVisual(Tree tree, boolean isFx)
     {
         this.tree = tree;
-        initTreeVisual();
+        initTreeVisual_(isFx);
         treeStackPane = new StackPane();
         treeStackPane.getChildren().add(treeGroup);
         //Refresh UI : ADD parameters (time and nb nodes)
@@ -134,6 +134,7 @@ public class TreeVisual {
         });
 
     }
+
 
 
     public TreeVisual(Tree.Node<String> node) {
@@ -166,10 +167,10 @@ public class TreeVisual {
      *     <b>Use case: </b> Used for  Realtime constructor
      * </p>
      */
-    public TreeVisual(Procedure procedure , Tree tree){
+    public TreeVisual(Procedure procedure , Tree tree, boolean isFx){
 
         this.tree = tree;
-        initTreeVisual();
+        initTreeVisual_(isFx);
         treeStackPane = new StackPane();
         treeStackPane.getChildren().add(treeGroup);
 
@@ -248,7 +249,7 @@ public class TreeVisual {
     /**
      * Used to initialized parameters
      */
-    public void initTreeVisual()
+    public void initTreeVisual_(Boolean isFx)
     {
         boookMarks = new HashMap<>();
         rootNodes = new HashMap<>();
@@ -260,7 +261,17 @@ public class TreeVisual {
         treeGroup = new Group();
         treeGroup.getChildren().add(_start);
 
-        fxInitializer();
+        initTreeVisual(isFx);
+    }
+
+    public void initTreeVisual(Boolean isFx)
+    {
+        if (!isFx) {
+            fxInitializer();
+        }
+        else{
+            nonFxInitializer();
+        }
     }
 
     /**
@@ -269,6 +280,15 @@ public class TreeVisual {
     public void fxInitializer()
     {
         Platform.startup(()->{
+            nonFxInitializer();
+        });
+    }
+
+    /**
+     * Init these parameters on FX thread
+     */
+    public void nonFxInitializer()
+    {
             treeStackPane = new StackPane();
             boookMarks = new HashMap<String,String>();
             legendbox = new HBox();
@@ -297,9 +317,7 @@ public class TreeVisual {
             allNodesChartDatas = new Hashtable<>();
             series =  new XYChart.Series();
             lineChart.getData().add(series);
-        });
     }
-
     /**
      * <b>Note: </b> Return the stack Pane that contain visualization search Tree
      * @return {@link javafx.scene.layout.StackPane}
