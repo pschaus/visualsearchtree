@@ -2,6 +2,8 @@ package org.uclouvain.visualsearchtree.tree;
 
 // https://www.microsoft.com/en-us/research/wp-content/uploads/1996/01/drawingtrees.pdf
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.*;
 
 public class Tree {
@@ -39,6 +41,11 @@ public class Tree {
         this.rootId = rootId;
         System.out.println("put root " + rootId);
         nodeMap.put(rootId, new Node("root"));
+        try {
+            System.setErr(new PrintStream("/dev/null"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
