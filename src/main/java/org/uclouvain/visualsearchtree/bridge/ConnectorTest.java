@@ -8,7 +8,7 @@ public class ConnectorTest {
     public static void main(String[] args) {
         Connector connector = new Connector();
         try {
-            connector.connect(6666);
+            connector.connect(6650);
             connector.start("premier_test",-1);
 
             connector.sendNode(0,-1,-1,2, Connector.NodeStatus.BRANCH);

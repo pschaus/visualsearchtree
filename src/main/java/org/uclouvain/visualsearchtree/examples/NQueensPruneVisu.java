@@ -17,12 +17,14 @@ package org.uclouvain.visualsearchtree.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
-import javafx.stage.Modality;
+
 import javafx.stage.Stage;
 import org.uclouvain.visualsearchtree.tree.*;
 
@@ -37,43 +39,34 @@ import java.util.Map;
  */
 public class NQueensPruneVisu {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
 
         NQueensPrune nqueens = new NQueensPrune(4);
-        TreeVisual tv = new TreeVisual();
         Gson gson = new Gson();
+        Tree t = new Tree(-1);
 
-        tv.setRealtimeNbNodeDrawer(20);
-        tv.setRealtimeItv(300);
+        TreeVisual tv = new TreeVisual(()-> nqueens.dfs(new DFSListener() {
+            @Override
+            public void solution(int id, int pId) {
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> showChessBoard(infoData,Tree.NodeType.SOLUTION), info);
+            }
+            @Override
+            public void fail(int id, int pId) {
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                t.createNode(id,pId, Tree.NodeType.FAIL,() -> showChessBoard(infoData,Tree.NodeType.FAIL), info);
+            }
+            @Override
+            public void branch(int id, int pId, int nChilds) {
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
+                t.createNode(id,pId, Tree.NodeType.INNER,() -> showChessBoard(infoData, Tree.NodeType.INNER), info);
+            }
+        }), t);
+
         Visualizer.show(tv);
-
-        Thread t2 = new Thread(() -> nqueens.dfs(new DFSListener() {
-                @Override
-                public void solution(int id, int pId) {
-                    System.out.println("solution");
-                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
-                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.SOLUTION,() -> {
-                        showChessBoard(infoData,Tree.NodeType.SOLUTION);}, info);
-                }
-                @Override
-                public void fail(int id, int pId) {
-                    System.out.println("fail");
-                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
-                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.FAIL,() -> {showChessBoard(infoData,Tree.NodeType.FAIL);}, info);
-                }
-                @Override
-                public void branch(int id, int pId, int nChilds) {
-                    System.out.println("branch");
-                    String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
-                    TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
-                    tv.createNode(id,pId, Tree.NodeType.INNER,() -> {
-                        showChessBoard(infoData, Tree.NodeType.INNER);}, info);
-                }
-            }));
-            t2.start();
-
     }
 
     /**

@@ -7,11 +7,27 @@ import java.util.*;
 public class Tree {
     HashMap<Integer,Node> nodeMap;
     int rootId;
+
+    public List<TreeListener> listeners = new ArrayList<TreeListener>();
     public enum NodeType {
         INNER,
         SKIP,
         FAIL,
         SOLUTION
+    }
+
+    private void notifyNodeCreated(int id, int pId, NodeType type, NodeAction nodeAction, String info)
+    {
+        listeners.forEach(lst->lst.onNodeCreated(id, pId, type, nodeAction, info));
+    }
+
+    /**
+     * Add tree listener
+     * @param list
+     */
+    public void addListener(TreeListener list)
+    {
+        listeners.add(list);
     }
 
     /**
@@ -36,6 +52,7 @@ public class Tree {
     public void createNode(int id, int pId, NodeType type, NodeAction nodeAction, String info) {
         Node n = nodeMap.get(pId).addChild(id,"child",type,"branch", nodeAction, info);
         nodeMap.put(id,n);
+        notifyNodeCreated(id, pId, type, nodeAction,info);
     }
 
     /**
@@ -69,7 +86,6 @@ public class Tree {
     static record Pair<L, R>(L left, R right) {
 
     }
-
 
     /**
      * <b>Note: </b> Used to create Tree
@@ -405,8 +421,5 @@ public class Tree {
         }
     }
 }
-
-
-
 
 

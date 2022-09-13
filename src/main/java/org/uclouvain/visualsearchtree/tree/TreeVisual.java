@@ -2,12 +2,20 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -21,6 +29,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
@@ -28,6 +37,8 @@ import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.uclouvain.visualsearchtree.util.Constant.*;
 
@@ -54,7 +65,7 @@ public class TreeVisual {
     private Map<String, Rectangle> allNodesRects;
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
-    private ConcurrentHashMap<Integer, Integer> tempList;
+
     private  Tree tree;
 
     NumberAxis xAxis;
@@ -63,20 +74,11 @@ public class TreeVisual {
     private LineChart lineChart;
     private XYChart.Series series;
     private HBox legendbox;
-    private long realtimeItv;
-    private long realtimeNbNodeDrawer;
 
+    private Group treeGroup;
+
+    private Map<Integer, Group> rootNodes;
     private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
-    /**
-     * <b>Note: </b> Defines the time interval after which the tree must be refreshed
-     * to draw new nodes during a real-time search.
-     * @param _realtimeItv
-     */
-    public void setRealtimeItv(long _realtimeItv) {
-        Platform.runLater(()->{
-            this.realtimeItv = _realtimeItv;
-        });
-    }
 
     public void onDrawFinished(Procedure listener)
     {
@@ -99,22 +101,41 @@ public class TreeVisual {
         dfsListeners.forEach(l-> l.onFinish());
     }
 
-    /**
-     * <b>Note: </b> Defines the maximum number of nodes to add to the existing tree
-     * during a realtime search at each refresh interval.
-     * @param realtimeNbNodeDrawer
-     */
-    public void setRealtimeNbNodeDrawer(long realtimeNbNodeDrawer) {
-        Platform.runLater(()->{
-            this.realtimeNbNodeDrawer = realtimeNbNodeDrawer;
-        });
+    private void notifyNewUINodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info)
+    {
+        dfsListeners.forEach(l->l.onUINodeCreated(id,pId,type,nodeAction,info));
     }
 
 
     /**
      * <b>Note: </b> Create an instance of the search tree from a {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} object.
-     * @param node
+     * @param tree
      */
+
+    public TreeVisual(Tree tree)
+    {
+        this.tree = tree;
+        initTreeVisual();
+        treeStackPane = new StackPane();
+        treeStackPane.getChildren().add(treeGroup);
+        //Refresh UI : ADD parameters (time and nb nodes)
+        periodicUIRefresher();
+
+        // Listen to new node added on the Tree : ADD a listener that return the Node UI element
+        tree.addListener(new TreeListener() {
+            @Override
+            public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
+                if (rootNodes.get(pId) == null){return;}
+                System.out.println("in it");
+                Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
+                Group temp = drawNode(parent, id, pId, type, nodeAction, info);
+                rootNodes.put(id, temp);
+            }
+        });
+
+    }
+
+
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
         this.labels = new ArrayList<>(){};
@@ -145,57 +166,137 @@ public class TreeVisual {
      *     <b>Use case: </b> Used for  Realtime constructor
      * </p>
      */
-    public TreeVisual(){
-        if (Platform.isFxApplicationThread())
-        {
-            initTreeVisual();
-        }
-        else
-        {
-            Platform.startup(()->{
-                initTreeVisual();
-            });
-        }
+    public TreeVisual(Procedure procedure , Tree tree){
+
+        this.tree = tree;
+        initTreeVisual();
+        treeStackPane = new StackPane();
+        treeStackPane.getChildren().add(treeGroup);
+
+        //
+        startExploringTask(procedure);
+
+        //Refresh UI : ADD parameters (time and nb nodes)
+        periodicUIRefresher();
+
+        // Listen to new node added on the Tree : ADD a listener that return the Node UI element
+        tree.addListener(new TreeListener() {
+            @Override
+            public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
+                if (rootNodes.get(pId) == null){return;}
+                Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
+                Group temp = drawNode(parent, id, pId, type, nodeAction, info);
+                rootNodes.put(id, temp);
+            }
+        });
     }
 
+    /**
+     * Draw a new node from its parent
+     * @param parent
+     * @return
+     */
+    private Group drawNode(Anchor parent, int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info)
+    {
+        Group child_group = parent.addChild();
+        //To get the child node as Circle(Anchor)=>
+        Anchor child = (Anchor) child_group.getChildren().get(0);
+        // ADD EVENT ON IT
+        return child_group;
+    }
+
+    /**
+     * Perform callback exploring task in background
+     * @param p
+     */
+    private void startExploringTask(Procedure p)
+    {
+        ExplorerTask explore = new ExplorerTask(p);
+        Thread th = new Thread(explore);
+        th.setDaemon(true);
+        th.start();
+    }
+
+    /**
+     * Periodically add node on UI
+     */
+    private void periodicUIRefresher()
+    {
+        final int[] pos = {1};
+        Timeline fiveSecondsWonder = new Timeline(
+            new KeyFrame(Duration.seconds(1),
+                event -> {
+                    int i;
+                    for (i = pos[0]; i < pos[0] + 7; i++) {
+                        if (rootNodes.get(i) == null) {
+                            return;
+                        }
+                        treeGroup.getChildren().add(rootNodes.get(i));
+                    }
+                    pos[0] = i;
+                    if (treeStackPane.getChildren().size() > 0) {
+                        treeStackPane.getChildren().clear();
+                    }
+                    treeStackPane.getChildren().add(treeGroup);
+            })
+        );
+        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+        fiveSecondsWonder.play();
+    }
+
+    /**
+     * Used to initialized parameters
+     */
     public void initTreeVisual()
     {
-        this.treeStackPane = new StackPane();
-        this.boookMarks = new HashMap<String,String>();
-        tree = new Tree(-1);
-        this.node = tree.root();
-        this.legendbox = new HBox();
+        boookMarks = new HashMap<>();
+        rootNodes = new HashMap<>();
+        DoubleProperty startX = new SimpleDoubleProperty(0);
+        DoubleProperty startY = new SimpleDoubleProperty(50);
+        Anchor start   = new Anchor(Color.PALEGREEN, startX, startY);
+        Group _start = new Group(start);
+        rootNodes.put(tree.root().nodeId, _start);
+        treeGroup = new Group();
+        treeGroup.getChildren().add(_start);
 
-        this.xAxis = new NumberAxis();
-        this.yAxis = new NumberAxis();
-        lineChart = new LineChart<>(xAxis, yAxis);
-        tempList = new ConcurrentHashMap<>();
-        this.labels = new ArrayList<>(){};
-        this.info = "";
-        this.focusedRect = new ArrayList<>(){{
-            add(new Rectangle());
-            add(Tree.NodeType.INNER);
-            Text  t = new Text(" ");
-            add(t);
-            add(0);
-        }};
+        fxInitializer();
+    }
 
+    /**
+     * Init these parameters on FX thread
+     */
+    public void fxInitializer()
+    {
+        Platform.startup(()->{
+            treeStackPane = new StackPane();
+            boookMarks = new HashMap<String,String>();
+            legendbox = new HBox();
+            xAxis = new NumberAxis();
+            yAxis = new NumberAxis();
+            lineChart = new LineChart<>(xAxis, yAxis);
+            labels = new ArrayList<>(){};
+            info = "";
+            focusedRect = new ArrayList<>(){{
+                add(new Rectangle());
+                add(Tree.NodeType.INNER);
+                Text  t = new Text(" ");
+                add(t);
+                add(0);
+            }};
 
-        this.legendStats = new ArrayList<>(){{
-            add(0);
-            add(0);
-            add(0);
-            add(0);
-        }};
-        //
-        this.allNodesRects = new Hashtable<>();
-        this.allNodesPositions = new Hashtable<>();
-        this.allNodesChartDatas = new Hashtable<>();
-        this.series =  new XYChart.Series();
-        lineChart.getData().add(series);
-        this.realtimeItv = 100;
-        this.realtimeNbNodeDrawer = 5;
-        periodicDrawer();
+            legendStats = new ArrayList<>(){{
+                add(0);
+                add(0);
+                add(0);
+                add(0);
+            }};
+            //
+            allNodesRects = new Hashtable<>();
+            allNodesPositions = new Hashtable<>();
+            allNodesChartDatas = new Hashtable<>();
+            series =  new XYChart.Series();
+            lineChart.getData().add(series);
+        });
     }
 
     /**
@@ -301,14 +402,15 @@ public class TreeVisual {
      * @return {@link javafx.scene.Group}
      */
     public Group getGroup() {
-        Group root = new Group();
-        Tree.PositionedNode<String> pnode = this.getNode().design();
-        Text nodeLabel = new Text();
-        nodeLabel.setTextAlignment(TextAlignment.RIGHT);
-        drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
-        getTreeChart(true);
-        generateLegendsStack();
-        return root;
+//        Group root = new Group();
+//        Tree.PositionedNode<String> pnode = this.getNode().design();
+//        Text nodeLabel = new Text();
+//        nodeLabel.setTextAlignment(TextAlignment.RIGHT);
+//        drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
+        //getTreeChart(true);
+        //generateLegendsStack();
+        //return root;
+        return treeGroup;
     }
 
     /**
@@ -363,8 +465,6 @@ public class TreeVisual {
             this.allNodesPositions.put(nodeID, root);
             this.allNodesRects.put(nodeID, r);
         }
-        info = null;
-        gson = null;
         return r;
     }
 
@@ -407,6 +507,7 @@ public class TreeVisual {
             }
         }
         rect.setCursor(Cursor.HAND);
+        treeStackPane.getChildren().add(rect);
         return rect;
     }
 
@@ -647,97 +748,26 @@ public class TreeVisual {
     }
 
     /**
-     * <b>Note: </b>Periodic Drawer
+     * Used to call dfs task in background
      */
-    public void periodicDrawer(){
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            int intv = 0;
-            @Override
-            public void run() {
-                boolean check;
-                int nbNodes = 0;
-                Iterator<Map.Entry<Integer, Integer>> it = tempList.entrySet().iterator();
-                while (it.hasNext() && (nbNodes < realtimeNbNodeDrawer))
-                {
-                    // Get the entry at this iteration
-                    Map.Entry<Integer, Integer> entry = it.next();
-                    tree.attachToParent(entry.getValue(), tree.nodeMap.get(entry.getKey()));
-                    it.remove();
-                    nbNodes++;
-                }
-                if ( (intv > 3) && (tempList.size() == 0))
-                {
-                    refresh(true, timer);
-                }else {
-                    refresh(false, timer);
-                }
-                intv ++;
-                try {
-                    Thread.sleep(realtimeItv);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        },0, 100);
-    }
+    class ExplorerTask extends Task<Boolean>
+    {
+        private final Procedure action;
 
-    /**
-     * <b>Note: </b> Used to refresh screen in order to draw another  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} on screen during search
-     * @param exit
-     * @param time
-     */
-    public void refresh(Boolean exit, Timer time){
-        if (exit){
-            notifyEndDraw();
-            time.cancel();
-        }
-        Platform.runLater(()->{
-            if (treeStackPane.getChildren().size() >  0)
-            {
-                treeStackPane.getChildren().remove(0);
-            }
-            //System.gc();
-            this.resetAllBeforeRedraw();
-            treeStackPane.getChildren().add(getGroup());
-        });
-    }
-
-    /**
-     * <b>Note: </b>Used to create a new  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
-     * @param id
-     * @param pId
-     * @param type
-     * @param onClick
-     * @param info
-     */
-    public void createNode(int id, int pId, Tree.NodeType type, NodeAction onClick, String info){
-        Platform.runLater(()->{
-            tree.crateIndNode(id, pId, type, onClick, info);
-            this.tempList.put(id,pId);
-        });
-    }
-
-    /**
-     * <b>Note: </b>Used to reset all parameters
-     */
-    public void resetAllBeforeRedraw(){
-        // Reset all saved nodes data
-        this.allNodesRects = new Hashtable<>();
-        this.allNodesPositions = new Hashtable<>();
-        this.allNodesChartDatas = new Hashtable<>();
-        this.labels = new ArrayList<>(){};
-
-        //Empty legendBox
-        if (legendbox.getChildren().size() >  0)
+        /**
+         *
+         * @param action is callback function to be performed by the task
+         */
+        public ExplorerTask(Procedure action)
         {
-            legendbox.getChildren().remove(0, legendbox.getChildren().size());
+            this.action = action;
         }
-        this.legendStats = new ArrayList<>(){{
-            add(0);
-            add(0);
-            add(0);
-            add(0);
-        }};
+        @Override
+        protected Boolean call() throws Exception {
+            this.action.call();
+            return true;
+        }
     }
+
+
 }

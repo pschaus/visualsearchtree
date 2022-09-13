@@ -188,7 +188,6 @@ public class Decoder {
             System.out.println("create node ==================>"+msg.nodeId);
             tree.createNode(msg.nodeId, msg.nodePid,nodeType(msg.nodeStatus),() -> {}, msg.nodeInfo);
         }
-
         return tree;
     }
 
@@ -197,7 +196,7 @@ public class Decoder {
      * @param type
      * @return
      */
-    private static Tree.NodeType nodeType(int type) {
+    public static Tree.NodeType nodeType(int type) {
         switch (type) {
             case 0:
                 return Tree.NodeType.SOLUTION;

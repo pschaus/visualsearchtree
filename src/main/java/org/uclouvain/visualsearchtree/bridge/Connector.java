@@ -2,6 +2,8 @@ package org.uclouvain.visualsearchtree.bridge;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,6 +13,8 @@ public class Connector {
     // ATTRIBUTE
     private Socket clientSocket;
     private DataOutputStream out;
+    private ObjectInputStream is;
+    private ObjectOutputStream os;
     private Message msg;
     private boolean DEBUG;
 
@@ -51,6 +55,7 @@ public class Connector {
         this.clientSocket = new Socket("localhost", port);
         this.out = new DataOutputStream(clientSocket.getOutputStream());
         this.msg = new Message(this);
+
         System.out.println("Connected to 'localhost:'" + port + "\n");
     }
 
@@ -183,13 +188,11 @@ public class Connector {
         int msg_size = msg.length;
         byte[] size_buffer = new byte[4];
         ByteBuffer.wrap(size_buffer).order(ByteOrder.LITTLE_ENDIAN).putInt(msg_size);
-
         if(DEBUG) {
             System.out.print("SENT: ");
             System.out.print(bytesToString(size_buffer));
             System.out.println(bytesToString(msg));
         }
-
         // 01 -> SEND MSG SIZE
         out.write(size_buffer);
         // 02 -> SEND MSG NOW
