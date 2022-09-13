@@ -25,7 +25,7 @@ public class TestTreeDraw extends Application {
         DoubleProperty startX = new SimpleDoubleProperty(100);
         DoubleProperty startY = new SimpleDoubleProperty(100);
 
-        Anchor start   = new Anchor(Color.PALEGREEN, startX, startY);
+        Anchor start   = new Anchor(startX, startY);
 
         stage.setTitle("Line Manipulation Sample");
         Group child1g = start.addChild();

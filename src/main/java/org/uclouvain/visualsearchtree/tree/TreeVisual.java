@@ -9,13 +9,10 @@ import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -28,17 +25,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.uclouvain.visualsearchtree.util.Constant.*;
 
@@ -200,9 +192,13 @@ public class TreeVisual {
     private Group drawNode(Anchor parent, int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info)
     {
         Group child_group = parent.addChild();
-        //To get the child node as Circle(Anchor)=>
         Anchor child = (Anchor) child_group.getChildren().get(0);
-        // ADD EVENT ON IT
+        BoundLine line = (BoundLine) child_group.getChildren().get(1);
+        child.setId(String.valueOf(id));
+        setShapeColor(child, type);
+        addEventsOnNode(child, id, type, info, nodeAction);
+//        child.toFront();
+        line.toFront();
         return child_group;
     }
 
@@ -253,9 +249,22 @@ public class TreeVisual {
     {
         boookMarks = new HashMap<>();
         rootNodes = new HashMap<>();
+        info = "";
+        focusedRect = new ArrayList<>(){{
+            add(new Anchor());
+            add(Tree.NodeType.INNER);
+            add(new Text(" "));
+            add(0);
+        }};
+        legendStats = new ArrayList<>(){{
+            add(0);
+            add(0);
+            add(0);
+            add(0);
+        }};
         DoubleProperty startX = new SimpleDoubleProperty(0);
         DoubleProperty startY = new SimpleDoubleProperty(50);
-        Anchor start   = new Anchor(Color.PALEGREEN, startX, startY);
+        Anchor start   = new Anchor(startX, startY);
         Group _start = new Group(start);
         rootNodes.put(tree.root().nodeId, _start);
         treeGroup = new Group();
@@ -284,6 +293,51 @@ public class TreeVisual {
         });
     }
 
+
+    public void setShapeColor(Anchor node, Tree.NodeType type)
+    {
+        switch (type) {
+            case INNER -> {
+                node.setFill(Color.CORNFLOWERBLUE);
+                this.setLegendStats(0,this.legendStats.get(0) +1);
+            }
+            case FAIL -> {
+                node.setFill(Color.RED);
+                this.setLegendStats(1,this.legendStats.get(1) +1);
+            }
+            case SOLUTION -> {
+                node.setFill(Color.GREEN);
+                this.setLegendStats(2,this.legendStats.get(2) +1);
+            }
+            default -> {
+            }
+        }
+        if(node.levels.size()-1 > this.getLegendStats().get(3)){
+            this.setLegendStats(3, node.levels.size() - 1);
+        }
+    }
+
+    public void addEventsOnNode(Anchor node, int nodeId, Tree.NodeType type, String info, NodeAction nodeAction){
+        node.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2 || e.getButton()== MouseButton.SECONDARY) {
+                node.nodeAction = nodeAction;
+                node.nodeAction.nodeAction();
+            }
+            node.fireEvent(new BackToNormalEvent());
+            node.setFill(Color.ORANGE);
+//            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
+//            nLabel.setText(root.label);
+            this.setInfo(info);
+            this.setFocusedRect(node, type, new Text("default"), nodeId);
+        });
+        node.addEventHandler(CustomEvent.CUSTOM_EVENT_TYPE, new BackToNormalEventHandler() {
+            @Override
+            public void unClick() {
+                makeNotFocus();
+            }
+        });
+    }
+
     /**
      * Init these parameters on FX thread
      */
@@ -296,21 +350,6 @@ public class TreeVisual {
             yAxis = new NumberAxis();
             lineChart = new LineChart<>(xAxis, yAxis);
             labels = new ArrayList<>(){};
-            info = "";
-            focusedRect = new ArrayList<>(){{
-                add(new Rectangle());
-                add(Tree.NodeType.INNER);
-                Text  t = new Text(" ");
-                add(t);
-                add(0);
-            }};
-
-            legendStats = new ArrayList<>(){{
-                add(0);
-                add(0);
-                add(0);
-                add(0);
-            }};
             //
             allNodesRects = new Hashtable<>();
             allNodesPositions = new Hashtable<>();
@@ -383,7 +422,6 @@ public class TreeVisual {
         this.info = info;
     }
 
-
     /**
      * <b>Note: </b> Get bookMarks from Tree
      * @return
@@ -391,7 +429,6 @@ public class TreeVisual {
     public Map<String, String> getBookMarks() {
         return boookMarks;
     }
-
 
     /**
      * <b>Note: </b> Define nookmark on specific {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node}
@@ -409,7 +446,7 @@ public class TreeVisual {
      * @param label
      * @param nodeId
      */
-    public void setFocusedRect(Rectangle r, Tree.NodeType type, Text label, int nodeId) {
+    public void setFocusedRect(Anchor r, Tree.NodeType type, Text label, int nodeId) {
         this.focusedRect.set(0, r);
         this.focusedRect.set(1, type);
         this.focusedRect.set(2, label);
@@ -432,105 +469,7 @@ public class TreeVisual {
         return treeGroup;
     }
 
-    /**
-     * <b>Note: </b>Draw Node recursively
-     * @param g group to add node
-     * @param root root node
-     * @param center double value for centering the tree
-     * @param depth depth of the tree
-     * @param nLabel Text widget for containing the node Label
-     * @return Rectangle which can be circle or losange representing node and depending of its type
-     */
-    public  Rectangle drawNodeRecur(Group g, Tree.PositionedNode<String> root, double center, int depth, Text nLabel) {
-        double absolute = center + root.position;
-        Gson gson = new Gson();
-        NodeInfoData info= null;
-
-        Rectangle r = createRectangle(400 + absolute * 40, 50 + depth * 50, root.type);
-        styleLabel(nLabel, absolute, depth, root.label, root.position, root.children.size());
-
-        //Add Event to each rectangle
-        r.setOnMouseClicked(e -> {
-            if (e.getClickCount() == 2 || e.getButton()== MouseButton.SECONDARY) {
-                root.nodeAction.nodeAction();
-            }
-            r.fireEvent(new BackToNormalEvent());
-            r.setFill(Color.ORANGE);
-            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
-            nLabel.setText(root.label);
-            this.setInfo(root.info);
-            this.setFocusedRect(r, root.type, nLabel, root.nodeId);
-        });
-
-        g.getChildren().add(r);
-        g.getChildren().add(nLabel);
-
-        for (Tree.PositionedNode<String> child : root.children) {
-            Rectangle childR = drawNodeRecur(g, child, absolute, depth + 1, new Text());
-            Line line = connectRectangle(r, childR);
-            g.getChildren().add(line);
-
-            //Make rectangle toFront
-            r.toFront();
-            childR.toFront();
-        }
-
-        if (depth > this.legendStats.get(3)) {
-            this.setLegendStats(3, depth);
-        }
-        info = gson.fromJson(root.info, new TypeToken<NodeInfoData>(){}.getType());
-        if (info != null) {
-            String nodeID = UUID.randomUUID().toString();
-            this.allNodesPositions.put(nodeID, root);
-            this.allNodesRects.put(nodeID, r);
-        }
-        return r;
-    }
-
-    /**
-     <b>Note: </b>This Method is used to create Tre Nodes objects.
-     * @param x width of the rectangle
-     * @param y height of the rectangle
-     * @param type Node Type
-     * @return Rectangle representing the node
-     */
-    private Rectangle createRectangle(double x, double y, Tree.NodeType type) {
-        Rectangle rect = new Rectangle(x,y,NODE_SHAPE_SIZE,NODE_SHAPE_SIZE);
-        rect.setStrokeType(StrokeType.OUTSIDE);
-        rect.setStrokeWidth(1);
-        rect.setStroke(Color.BLACK);
-        rect.addEventHandler(CustomEvent.CUSTOM_EVENT_TYPE, new BackToNormalEventHandler() {
-            @Override
-            public void unClick() {
-                makeNotFocus();
-            }
-        });
-
-        switch (type) {
-            case INNER -> {
-                rect.setArcHeight(NODE_SHAPE_ARC_VALUE);
-                rect.setArcWidth(NODE_SHAPE_ARC_VALUE);
-                rect.setFill(Color.CORNFLOWERBLUE);
-                this.setLegendStats(0,this.legendStats.get(0) +1);
-            }
-            case FAIL -> {
-                rect.setFill(Color.RED);
-                this.setLegendStats(1,this.legendStats.get(1) +1);
-            }
-            case SOLUTION -> {
-                rect.setFill(Color.GREEN);
-                rect.setRotate(45);
-                this.setLegendStats(2,this.legendStats.get(2) +1);
-            }
-            default -> {
-            }
-        }
-        rect.setCursor(Cursor.HAND);
-        treeStackPane.getChildren().add(rect);
-        return rect;
-    }
-
-    /**
+   /**
      * <b>Note: </b>Draw Rectangle for Legend HBox
      * @param type Node Type
      * @return Rectangle representing a type of node
@@ -634,9 +573,13 @@ public class TreeVisual {
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
         Text  t1 = new Text("  ("+ this.legendStats.get(0)+")");
+        t1.setId("innerCount");
         Text  t2 = new Text("  ("+ this.legendStats.get(1)+")");
+        t2.setId("failCount");
         Text  t3 = new Text("  ("+ this.legendStats.get(2)+")");
+        t3.setId("solutionCount");
         Text  t4 = new  Text("DEPTH : ("+ this.legendStats.get(3)+")");
+        t4.setId("treeDepth");
         s1.getChildren().addAll(branchRect, t1);
         s2.getChildren().addAll(failedRect, t2);
         s3.getChildren().addAll(solvedRect, t3);
@@ -648,12 +591,12 @@ public class TreeVisual {
      * <b>Note: </b>Make the previous node selected to it initial state : No more focus color...
      */
     public void makeNotFocus(){
-        var r = (Rectangle) this.focusedRect.get(0);
-        var branch = (Tree.NodeType) this.focusedRect.get(1);
-        var label = (Text) this.focusedRect.get(2);
-        label.setOpacity(0);
-        if(!Objects.equals(branch, " ")){
-            switch (branch) {
+        var r = (Anchor) this.focusedRect.get(0);
+        var type = (Tree.NodeType) this.focusedRect.get(1);
+        //var label = (Text) this.focusedRect.get(2);
+        //label.setOpacity(0);
+        if(!Objects.equals(type, " ")){
+            switch (type) {
                 case INNER -> r.setFill(Color.CORNFLOWERBLUE);
                 case FAIL -> r.setFill(Color.RED);
                 case SOLUTION -> r.setFill(Color.GREEN);
@@ -661,7 +604,6 @@ public class TreeVisual {
                 }
             }
         }
-
     }
 
     /**
