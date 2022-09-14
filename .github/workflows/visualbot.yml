@@ -52,7 +52,7 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          #tag: v${{ steps.extract_branch.outputs.branch }}
+          tag: ${{ steps.vars.outputs.tag }}
           name: Release v${{ steps.extract_branch.outputs.branch }}
           body: ${{ github.event.head_commit.message }}
           generateReleaseNotes: true
