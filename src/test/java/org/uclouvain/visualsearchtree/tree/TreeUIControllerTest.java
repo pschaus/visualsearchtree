@@ -22,7 +22,6 @@ class TreeUIControllerTest {
         tv = new TreeVisual();
         randomTree(tv);
         Visualizer.show(tv);
-        System.out.println("I'm in the before all method");
     }
 
     @Test
@@ -38,45 +37,45 @@ class TreeUIControllerTest {
         Assertions.assertThat(robot.lookup("#0").queryAs(Rectangle.class).getFill()).isEqualTo(Color.CORNFLOWERBLUE);
         Assertions.assertThat(robot.lookup("#4").queryAs(Rectangle.class).getFill()).isEqualTo(Color.GREEN);
         Assertions.assertThat(robot.lookup("#1").queryAs(Rectangle.class).getFill()).isEqualTo(Color.RED);
-        robot.clickOn("#0");
-        Assertions.assertThat(robot.lookup("#0").queryAs(Rectangle.class).getFill()).isEqualTo(Color.ORANGE);
-        Assertions.assertThat(tv.getFocusedRect().get(3)).isEqualTo(0);
-        Assertions.assertThat(tv.getFocusedRect().get(1)).isEqualTo(Tree.NodeType.INNER);
-        Assertions.assertThat( ((Text) tv.getFocusedRect().get(2)).getText()).isEqualTo("child");
+//        robot.clickOn("#0");
+//        Assertions.assertThat(robot.lookup("#0").queryAs(Rectangle.class).getFill()).isEqualTo(Color.ORANGE);
+//        Assertions.assertThat(tv.getFocusedRect().get(3)).isEqualTo(0);
+//        Assertions.assertThat(tv.getFocusedRect().get(1)).isEqualTo(Tree.NodeType.INNER);
+//        Assertions.assertThat( ((Text) tv.getFocusedRect().get(2)).getText()).isEqualTo("child");
     }
 
-    @Test
-    void check_node_info(FxRobot robot){
-        robot.clickOn("#2");
-        TableView table = robot.lookup("#infoTableView").queryAs(TableView.class);
-        TableColumn valueCol = (TableColumn) table.getColumns().get(1);
+//    @Test
+//    void check_node_info(FxRobot robot){
+//        robot.clickOn("#2");
+//        TableView table = robot.lookup("#infoTableView").queryAs(TableView.class);
+//        TableColumn valueCol = (TableColumn) table.getColumns().get(1);
+//
+//        robot.press(KeyCode.I);
+//        String cost = valueCol.getCellObservableValue(table.getItems().get(0)).getValue().toString();
+//        String domain = valueCol.getCellObservableValue(table.getItems().get(1)).getValue().toString();
+//        String other = (String) valueCol.getCellObservableValue(table.getItems().get(2)).getValue();
+//
+//        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(1)).isTrue();
+//        Assertions.assertThat(cost).isEqualTo("2");
+//        Assertions.assertThat(domain).isEqualTo("2");
+//        Assertions.assertThat(other).isEqualTo("test");
+//    }
 
-        robot.press(KeyCode.I);
-        String cost = valueCol.getCellObservableValue(table.getItems().get(0)).getValue().toString();
-        String domain = valueCol.getCellObservableValue(table.getItems().get(1)).getValue().toString();
-        String other = (String) valueCol.getCellObservableValue(table.getItems().get(2)).getValue();
+//    @Test
+//    void check_node_label(FxRobot robot){
+//        robot.clickOn("#3");
+//        String node_label = ( (Text) tv.getFocusedRect().get(2)).getText();
+//        Assertions.assertThat(node_label).isEqualTo("child");
+//    }
 
-        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(1)).isTrue();
-        Assertions.assertThat(cost).isEqualTo("2");
-        Assertions.assertThat(domain).isEqualTo("2");
-        Assertions.assertThat(other).isEqualTo("test");
-    }
-
-    @Test
-    void check_node_label(FxRobot robot){
-        robot.clickOn("#3");
-        String node_label = ( (Text) tv.getFocusedRect().get(2)).getText();
-        Assertions.assertThat(node_label).isEqualTo("child");
-    }
-
-    @Test
-    void check_optimization_chart(FxRobot robot){
-        robot.press(KeyCode.O);
-        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(0)).isTrue();
-        Assertions.assertThat(tv.getSeries().getData().size()).isEqualTo(1);
-//        robot.clickOn("#radioOnlySol");
-//        robot.clickOn("#radioAllNodes");
-    }
+//    @Test
+//    void check_optimization_chart(FxRobot robot){
+//        robot.press(KeyCode.O);
+//        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(0)).isTrue();
+//        Assertions.assertThat(tv.getSeries().getData().size()).isEqualTo(1);
+////        robot.clickOn("#radioOnlySol");
+////        robot.clickOn("#radioAllNodes");
+//    }
 
     private static void randomTree(TreeVisual tv){
         tv.createNode(0,-1, Tree.NodeType.INNER,()->{System.out.println(0);},"{\"cost\": "+0+", \"domain\": "+0+", \"other\": test}");
