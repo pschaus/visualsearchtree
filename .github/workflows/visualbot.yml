@@ -5,8 +5,10 @@ name: visualsearchtree CI-CD
 
 on:
   push:
-    branches:
-      - '*.*.*'
+    #     branches:
+    #       - '*.*.*'
+    tags:
+      - '*'
 
 jobs:
   CI:
@@ -50,9 +52,8 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ steps.extract_branch.outputs.branch }}
+          #tag: v${{ steps.extract_branch.outputs.branch }}
           name: Release v${{ steps.extract_branch.outputs.branch }}
-#          artifacts: "release.tar.gz,foo/*.txt"
           body: ${{ github.event.head_commit.message }}
           generateReleaseNotes: true
           replacesArtifacts: true
