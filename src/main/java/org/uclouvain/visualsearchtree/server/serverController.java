@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public class serverController implements Initializable {
 
     @FXML
-    private Label portLabel;
+    public Label portLabel;
 
     private ServerUtil server;
     /**
@@ -79,13 +79,14 @@ public class serverController implements Initializable {
             try
             {
                 ServerSocket serverSocket = new ServerSocket(port);
+                final ProfilingData pData = new ProfilingData(new ArrayList<>(), new ArrayList<>());
                 while (keepGoing)
                 {
                     System.out.println("Server waiting for Clients on port " + port + ".");
                     Socket socket = serverSocket.accept();
                     if (!keepGoing)
                         break;
-                    ClientThread t = new ClientThread(socket);
+                    ClientThread t = new ClientThread(socket, pData);
                     al.add(t);
                     t.start();
                 }
@@ -113,27 +114,25 @@ public class serverController implements Initializable {
             private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
             private int msgSize = 0;
             private boolean sizeRead = false;
+            private ProfilingData profilingData;
             // client id
             private Tree tree;
+
             int id;
 
-            ClientThread(Socket s) {
+            ClientThread(Socket s, ProfilingData profilingData) {
+                this.profilingData = profilingData;
                 id = uniqueID++;
                 this.socket = s;
                 System.out.println("Thread trying to create Object Input/Output Streams");
                 socket = s;
                 tree = new Tree(-1);
-                tree.addListener(new TreeListener() {
-                    @Override
-                    public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
-                        System.out.println(type);
-                    }
-                });
             }
 
             // run it forever
             public void run(){
                 try {
+                    TreeVisual tv = new TreeVisual(tree, true);
                     in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                     System.out.println(" start server ..................");
                     while (keepGoing) {
@@ -167,18 +166,9 @@ public class serverController implements Initializable {
                                 decodedMessagesList.add(msgBody);
                             }
 
-                            //if (DEBUG)
-                            {
-                                //System.out.println(msgBody);
-                                System.out.println("-----");
-                            }
-
                             if (msgBody.msgType == Message.MsgType.DONE.getNumber()) {
                                 tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.msgType), ()->{},msgBody.nodeInfo);
-                                System.out.println("create tree");
-                                //socket.close();
                                 keepGoing = false;
-                                TreeVisual tv = new TreeVisual(tree, true);
                                 try {
                                     Visualizer.show(tv);
                                 } catch (Exception e) {
@@ -188,19 +178,12 @@ public class serverController implements Initializable {
                             sizeRead = false;
                         }
                     }
-                    
 
                     System.out.println("Closing connection");
-                    // close connection
-                    socket.close();
-                    in.close();
+                    close();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-                    System.out.println(e);
-                }
-                finally {
-                    System.out.println("Client No:" + 56 + " exit!! ");
                 }
             }
 

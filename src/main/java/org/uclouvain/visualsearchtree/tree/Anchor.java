@@ -1,29 +1,30 @@
 package org.uclouvain.visualsearchtree.tree;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeType;
+import javafx.scene.shape.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class Anchor extends Circle {
+public class Anchor extends Rectangle {
     DoubleProperty x, y;
+    Tree.Node<String> node;
     int nbChild;
     int depth;
     NodeAction nodeAction;
     Anchor parent = null;
     List<Anchor> children = new ArrayList<>();
-    List<DoubleProperty> levels = null;
-    int position = 0;
 
     Anchor()
     {
@@ -34,89 +35,54 @@ public class Anchor extends Circle {
      * @param x
      * @param y
      */
-    Anchor(DoubleProperty x, DoubleProperty y) {
-        super(x.get(), y.get(), 10);
+    Anchor(DoubleProperty x, DoubleProperty y, Tree.Node<String> mNode) {
+        super(x.get(), y.get(), 20, 20);
         this.x = x;
         this.y = y;
         nbChild = 0;
         depth = 0;
+        this.node = mNode;
         //setFill(color.deriveColor(1, 1, 1, 0.5));
         setFill(Color.OLIVE);
         setStroke(Color.BLACK.deriveColor(0, 1, 1, 0.5));
         setStrokeWidth(1);
         setStrokeType(StrokeType.OUTSIDE);
-        levels = new ArrayList<>();
-        levels.add(this.x);
-        x.bind(centerXProperty());
-        y.bind(centerYProperty());
+        x.bind(xProperty());
+        y.bind(yProperty());
         enableDrag();
     }
 
-    public Group addChild()
+
+    /**
+     * Add new child to the node and return a Group
+     * @param child_node
+     * @return
+     */
+    public Group addChild(Tree.Node<String> child_node)
     {
         nbChild++;
-
-        DoubleProperty endX = new SimpleDoubleProperty(levels.get(depth).get() + 30);
-        DoubleProperty endY   = new SimpleDoubleProperty(getCenterY() + 50);
-        Anchor child = new Anchor(endX, endY);
+        DoubleProperty endX = new SimpleDoubleProperty(0);
+        DoubleProperty endY   = new SimpleDoubleProperty(0);
+        Anchor child = new Anchor(endX, endY, child_node);
         Line line = new BoundLine(x, y, endX, endY);
-
         child.depth = depth + 1;
         child.parent = this;
-        child.levels = levels;
-        child.position = nbChild;
-
-        levels.set(depth, endX);
-        if ((depth + 1) >= levels.size()) {levels.add(endX);}
-
-        //test something
-        Anchor _parent = this;
-        while (_parent.parent != null){ _parent = _parent.parent;}
         children.add(child);
-        child.recenterParent();
-        child.toFront();
         return new Group(child, line);
     }
 
-    /**
-     *
-     */
-    private void recenterParent()
-    {
-        Anchor _parent = parent;
-        if ( _parent == null || _parent.children.size() == 0){return;}
 
-        double val = parent.getCenterX();
-        double posX = _parent.children.get(0).getCenterX() + _parent.children.get(_parent.children.size()-1).getCenterX();
-        _parent.setCenterX(posX/2);
-        val = (parent.getCenterX() - val);
-        Anchor __parent = this;
-        while (__parent.parent != null){ __parent = __parent.parent;}
-        __parent.moveSibling(_parent.depth, val, _parent);
-    }
-
-    /**
-     *
-     * @param _depth
-     * @param val
-     * @param src
-     */
-    private void moveSibling(int _depth, Number val, Anchor src)
+    public static void positionNode(Tree.PositionedNode<String> root, Map<Integer, Anchor> anchMap, double center, int depth)
     {
-        for (Anchor anchor : children) {
-            if (_depth == anchor.depth && anchor != src) {
-                Anchor child = anchor;
-                if (src.position < child.position)
-                {
-                    child.setCenterX(child.getCenterX() + val.doubleValue());
-                }
-                else
-                {
-                    child.setCenterX( child.getCenterX() + val.doubleValue());
-                }
-            } else {
-                anchor.moveSibling(_depth, val, src);
-            }
+        double absolute = center + root.position;
+        if (anchMap.get(root.nodeId) == null)
+            return;
+        System.out.println("noooot null");
+        anchMap.get(root.nodeId).setX(400 + absolute * 40);
+        anchMap.get(root.nodeId).setY(depth * 50);
+        for (Tree.PositionedNode<String> child : root.children)
+        {
+            positionNode(child, anchMap, absolute, depth+1);
         }
     }
 
@@ -126,8 +92,8 @@ public class Anchor extends Circle {
         setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent mouseEvent) {
                 // record a delta distance for the drag and drop operation.
-                dragDelta.x = getCenterX() - mouseEvent.getX();
-                dragDelta.y = getCenterY() - mouseEvent.getY();
+                dragDelta.x = getX() - mouseEvent.getX();
+                dragDelta.y = getY() - mouseEvent.getY();
                 getScene().setCursor(Cursor.MOVE);
             }
         });
@@ -140,11 +106,11 @@ public class Anchor extends Circle {
             @Override public void handle(MouseEvent mouseEvent) {
                 double newX = mouseEvent.getX() + dragDelta.x;
                 if (newX > 0 && newX < getScene().getWidth()) {
-                    setCenterX(newX);
+                    setX(newX);
                 }
                 double newY = mouseEvent.getY() + dragDelta.y;
                 if (newY > 0 && newY < getScene().getHeight()) {
-                    setCenterY(newY);
+                    setY(newY);
                 }
             }
         });
@@ -175,7 +141,37 @@ class BoundLine extends Line {
         setStrokeWidth(2);
         setStroke(Color.BLACK.deriveColor(0, 1, 1, 0.5));
         setStrokeLineCap(StrokeLineCap.BUTT);
-//        getStrokeDashArray().setAll(10.0, 5.0);
         setMouseTransparent(true);
+    }
+}
+
+class Center {
+    private ReadOnlyDoubleWrapper centerX = new ReadOnlyDoubleWrapper();
+    private ReadOnlyDoubleWrapper centerY = new ReadOnlyDoubleWrapper();
+
+    public Center(Node node) {
+        calcCenter(node.getBoundsInParent());
+        node.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+            @Override public void changed(
+                    ObservableValue<? extends Bounds> observableValue,
+                    Bounds oldBounds,
+                    Bounds bounds
+            ) {
+                calcCenter(bounds);
+            }
+        });
+    }
+
+    private void calcCenter(Bounds bounds) {
+        centerX.set(bounds.getMinX() + bounds.getWidth()  / 2);
+        centerY.set(bounds.getMinY() + bounds.getHeight() / 2);
+    }
+
+    ReadOnlyDoubleProperty centerXProperty() {
+        return centerX.getReadOnlyProperty();
+    }
+
+    ReadOnlyDoubleProperty centerYProperty() {
+        return centerY.getReadOnlyProperty();
     }
 }

@@ -70,6 +70,7 @@ public class TreeVisual {
     private Group treeGroup;
 
     private Map<Integer, Group> rootNodes;
+    private Map<Integer, Anchor> anchNodes;
     private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
 
     public void onDrawFinished(Procedure listener)
@@ -107,6 +108,8 @@ public class TreeVisual {
     public TreeVisual(Tree tree, boolean isFx)
     {
         this.tree = tree;
+        this.node = tree.root();
+        anchNodes = new HashMap<>();
         initTreeVisual_(isFx);
         treeStackPane = new StackPane();
         treeStackPane.getChildren().add(treeGroup);
@@ -122,6 +125,7 @@ public class TreeVisual {
                 Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
                 Group temp = drawNode(parent, id, pId, type, nodeAction, info);
                 rootNodes.put(id, temp);
+                Anchor.positionNode(getNode().design(), anchNodes, 0.0, 0);
             }
         });
 
@@ -132,6 +136,7 @@ public class TreeVisual {
     public TreeVisual(Tree.Node<String> node) {
         this.node = node;
         this.labels = new ArrayList<>(){};
+        anchNodes = new HashMap<>();
         this.info = "";
         this.boookMarks = new HashMap<String,String>();
         this.focusedRect = new ArrayList<>(){{
@@ -162,9 +167,8 @@ public class TreeVisual {
     public TreeVisual(Procedure procedure , Tree tree, boolean isFx){
 
         this.tree = tree;
+        this.node = tree.root();
         initTreeVisual_(isFx);
-        treeStackPane = new StackPane();
-        treeStackPane.getChildren().add(treeGroup);
 
         //
         startExploringTask(procedure);
@@ -176,10 +180,13 @@ public class TreeVisual {
         tree.addListener(new TreeListener() {
             @Override
             public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
-                if (rootNodes.get(pId) == null){return;}
-                Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
-                Group temp = drawNode(parent, id, pId, type, nodeAction, info);
-                rootNodes.put(id, temp);
+                Platform.runLater(()->{
+                    if (rootNodes.get(pId) == null){return;}
+                    Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
+                    Group temp = drawNode(parent, id, pId, type, nodeAction, info);
+                    rootNodes.put(id, temp);
+                    Anchor.positionNode(getNode().design(), anchNodes, 0.0, 0);
+                });
             }
         });
     }
@@ -191,14 +198,13 @@ public class TreeVisual {
      */
     private Group drawNode(Anchor parent, int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info)
     {
-        Group child_group = parent.addChild();
+        Group child_group = parent.addChild(tree.nodeMap.get(id));
         Anchor child = (Anchor) child_group.getChildren().get(0);
+        anchNodes.put(id, child);
         BoundLine line = (BoundLine) child_group.getChildren().get(1);
         child.setId(String.valueOf(id));
         setShapeColor(child, type);
         addEventsOnNode(child, id, type, info, nodeAction);
-//        child.toFront();
-        line.toFront();
         return child_group;
     }
 
@@ -224,7 +230,7 @@ public class TreeVisual {
             new KeyFrame(Duration.seconds(1),
                 event -> {
                     int i;
-                    for (i = pos[0]; i < pos[0] + 7; i++) {
+                    for (i = pos[0]; i < pos[0] + 50; i++) {
                         if (rootNodes.get(i) == null) {
                             return;
                         }
@@ -232,10 +238,6 @@ public class TreeVisual {
                             treeGroup.getChildren().add(rootNodes.get(i));
                     }
                     pos[0] = i;
-                    if (treeStackPane.getChildren().size() > 0) {
-                        treeStackPane.getChildren().clear();
-                    }
-                    treeStackPane.getChildren().add(treeGroup);
             })
         );
         fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
@@ -262,13 +264,6 @@ public class TreeVisual {
             add(0);
             add(0);
         }};
-        DoubleProperty startX = new SimpleDoubleProperty(0);
-        DoubleProperty startY = new SimpleDoubleProperty(50);
-        Anchor start   = new Anchor(startX, startY);
-        Group _start = new Group(start);
-        rootNodes.put(tree.root().nodeId, _start);
-        treeGroup = new Group();
-        treeGroup.getChildren().add(_start);
 
         initTreeVisual(isFx);
     }
@@ -288,9 +283,7 @@ public class TreeVisual {
      */
     public void fxInitializer()
     {
-        Platform.startup(()->{
-            nonFxInitializer();
-        });
+        Platform.startup(this::nonFxInitializer);
     }
 
 
@@ -312,9 +305,9 @@ public class TreeVisual {
             default -> {
             }
         }
-        if(node.levels.size()-1 > this.getLegendStats().get(3)){
-            this.setLegendStats(3, node.levels.size() - 1);
-        }
+//        if(node.levels.size()-1 > this.getLegendStats().get(3)){
+//            this.setLegendStats(3, node.levels.size() - 1);
+//        }
     }
 
     public void addEventsOnNode(Anchor node, int nodeId, Tree.NodeType type, String info, NodeAction nodeAction){
@@ -343,7 +336,17 @@ public class TreeVisual {
      */
     public void nonFxInitializer()
     {
+            anchNodes = new HashMap<>();
+            DoubleProperty startX = new SimpleDoubleProperty(0);
+            DoubleProperty startY = new SimpleDoubleProperty(50);
+            Anchor start   = new Anchor(startX, startY, this.getNode());
+            anchNodes.put(tree.root().nodeId, start);
+            Group _start = new Group(start);
+            rootNodes.put(tree.root().nodeId, _start);
+            treeGroup = new Group();
+            treeGroup.getChildren().add(_start);
             treeStackPane = new StackPane();
+            treeStackPane.getChildren().add(treeGroup);
             boookMarks = new HashMap<String,String>();
             legendbox = new HBox();
             xAxis = new NumberAxis();

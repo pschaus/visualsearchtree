@@ -41,11 +41,6 @@ public class Tree {
         this.rootId = rootId;
         System.out.println("put root " + rootId);
         nodeMap.put(rootId, new Node("root"));
-        try {
-            System.setErr(new PrintStream("/dev/null"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

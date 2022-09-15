@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Server extends Application {
     /**
      * @param stage
@@ -13,7 +15,7 @@ public class Server extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Server.fxml"));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(Server.class.getResource("Server.fxml")));
         Scene scene = new Scene(root, 300, 400);
         stage.setScene(scene);
         stage.setTitle("miniCp Profiler");
