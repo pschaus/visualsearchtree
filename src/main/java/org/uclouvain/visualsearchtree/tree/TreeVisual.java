@@ -2,6 +2,7 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
@@ -58,6 +59,7 @@ public class TreeVisual {
     private Map<String, XYChart.Data> allNodesChartDatas;
     private Map<String, Tree.PositionedNode<String>> allNodesPositions;
 
+    private Map<Integer, Tree.Node<String>> temNodesMap;
     private  Tree tree;
 
     NumberAxis xAxis;
@@ -69,7 +71,6 @@ public class TreeVisual {
 
     private Group treeGroup;
 
-    private Map<Integer, Group> rootNodes;
     private Map<Integer, Anchor> anchNodes;
     private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
 
@@ -109,26 +110,18 @@ public class TreeVisual {
     {
         this.tree = tree;
         this.node = tree.root();
-        anchNodes = new HashMap<>();
-        initTreeVisual_(isFx);
-        treeStackPane = new StackPane();
-        treeStackPane.getChildren().add(treeGroup);
-        //Refresh UI : ADD parameters (time and nb nodes)
-        periodicUIRefresher();
+        this.temNodesMap = new HashMap<>();
+        temNodesMap.put(-1, tree.root());
 
+        initTreeVisual_(isFx);
         // Listen to new node added on the Tree : ADD a listener that return the Node UI element
         tree.addListener(new TreeListener() {
             @Override
             public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
-                if (rootNodes.get(pId) == null){return;}
-                System.out.println("in it");
-                Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
-                Group temp = drawNode(parent, id, pId, type, nodeAction, info);
-                rootNodes.put(id, temp);
-                Anchor.positionNode(getNode().design(), anchNodes, 0.0, 0);
+                temNodesMap.put(id, tree.nodeMap.get(id));
             }
         });
-
+        periodicUIRefresher();
     }
 
 
@@ -168,27 +161,23 @@ public class TreeVisual {
 
         this.tree = tree;
         this.node = tree.root();
+        this.temNodesMap = new HashMap<>();
+        temNodesMap.put(-1, tree.root());
+
+
         initTreeVisual_(isFx);
 
-        //
+        // Run callback function in a Thread
         startExploringTask(procedure);
 
-        //Refresh UI : ADD parameters (time and nb nodes)
-        periodicUIRefresher();
-
-        // Listen to new node added on the Tree : ADD a listener that return the Node UI element
+        // Listen to new node added on the Tree
         tree.addListener(new TreeListener() {
             @Override
             public void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info) {
-                Platform.runLater(()->{
-                    if (rootNodes.get(pId) == null){return;}
-                    Anchor parent = (Anchor)rootNodes.get(pId).getChildren().get(0);
-                    Group temp = drawNode(parent, id, pId, type, nodeAction, info);
-                    rootNodes.put(id, temp);
-                    Anchor.positionNode(getNode().design(), anchNodes, 0.0, 0);
-                });
+                temNodesMap.put(id, tree.nodeMap.get(id));
             }
         });
+        periodicUIRefresher();
     }
 
     /**
@@ -200,8 +189,6 @@ public class TreeVisual {
     {
         Group child_group = parent.addChild(tree.nodeMap.get(id));
         Anchor child = (Anchor) child_group.getChildren().get(0);
-        anchNodes.put(id, child);
-        BoundLine line = (BoundLine) child_group.getChildren().get(1);
         child.setId(String.valueOf(id));
         setShapeColor(child, type);
         addEventsOnNode(child, id, type, info, nodeAction);
@@ -225,23 +212,53 @@ public class TreeVisual {
      */
     private void periodicUIRefresher()
     {
-        final int[] pos = {1};
-        Timeline fiveSecondsWonder = new Timeline(
-            new KeyFrame(Duration.seconds(1),
-                event -> {
-                    int i;
-                    for (i = pos[0]; i < pos[0] + 50; i++) {
-                        if (rootNodes.get(i) == null) {
-                            return;
+        final int[] currentTemp = {-1,2};
+        Tree tempTree;
+        Tree.Node tempRoot;
+        Anchor start;
+
+        // Init
+        anchNodes = new HashMap<>();
+        tempTree = new Tree(-1);
+        tempRoot = tempTree.root();
+        start   = new Anchor(new SimpleDoubleProperty(0), new SimpleDoubleProperty(50), tempRoot);
+        anchNodes.put(-1, start);
+        treeStackPane = new StackPane();
+        Group _start = new Group(start);
+        treeGroup = new Group(_start);
+        treeStackPane.getChildren().add(treeGroup);
+        PeriodicPulse pulse = new PeriodicPulse(1) {
+            @Override
+            void run() {
+                int i;
+                //Performance: 5000 / second => computer hot after 214781
+                //           : 1000 / second => after 211209
+                //
+                for ( i = currentTemp[0]; i <= currentTemp[0] + 500; i++)
+                {
+                    Tree.Node<String> curNode = temNodesMap.get(i);
+                    //check if different from parent
+                    if (i != -1 && curNode != null)
+                    {
+                        tempTree.createNode(curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
+                        if (anchNodes.get(curNode.nodePid) != null) {
+                            Anchor _parent = anchNodes.get(curNode.nodePid);
+                            if (_parent != null)
+                            {
+                                Group temp = drawNode(_parent, curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
+                                Anchor child = (Anchor) temp.getChildren().get(0);
+                                anchNodes.put(curNode.nodeId, child);
+                                treeGroup.getChildren().add(temp);
+                            }
                         }
-                        if (!treeGroup.getChildren().contains(rootNodes.get(i)))
-                            treeGroup.getChildren().add(rootNodes.get(i));
                     }
-                    pos[0] = i;
-            })
-        );
-        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-        fiveSecondsWonder.play();
+                }
+                currentTemp[0] = i;
+                currentTemp[1]++;
+                Anchor.positionNode(tempTree.root().design(), anchNodes, 0.0, 0);
+            }
+        };
+        pulse.start();
     }
 
     /**
@@ -250,7 +267,6 @@ public class TreeVisual {
     public void initTreeVisual_(Boolean isFx)
     {
         boookMarks = new HashMap<>();
-        rootNodes = new HashMap<>();
         info = "";
         focusedRect = new ArrayList<>(){{
             add(new Anchor());
@@ -336,29 +352,17 @@ public class TreeVisual {
      */
     public void nonFxInitializer()
     {
-            anchNodes = new HashMap<>();
-            DoubleProperty startX = new SimpleDoubleProperty(0);
-            DoubleProperty startY = new SimpleDoubleProperty(50);
-            Anchor start   = new Anchor(startX, startY, this.getNode());
-            anchNodes.put(tree.root().nodeId, start);
-            Group _start = new Group(start);
-            rootNodes.put(tree.root().nodeId, _start);
-            treeGroup = new Group();
-            treeGroup.getChildren().add(_start);
-            treeStackPane = new StackPane();
-            treeStackPane.getChildren().add(treeGroup);
-            boookMarks = new HashMap<String,String>();
-            legendbox = new HBox();
-            xAxis = new NumberAxis();
-            yAxis = new NumberAxis();
-            lineChart = new LineChart<>(xAxis, yAxis);
-            labels = new ArrayList<>(){};
-            //
-            allNodesRects = new Hashtable<>();
-            allNodesPositions = new Hashtable<>();
-            allNodesChartDatas = new Hashtable<>();
-            series =  new XYChart.Series();
-            lineChart.getData().add(series);
+        boookMarks = new HashMap<String,String>();
+        legendbox = new HBox();
+        xAxis = new NumberAxis();
+        yAxis = new NumberAxis();
+        lineChart = new LineChart<>(xAxis, yAxis);
+        labels = new ArrayList<>(){};
+        allNodesRects = new Hashtable<>();
+        allNodesPositions = new Hashtable<>();
+        allNodesChartDatas = new Hashtable<>();
+        series =  new XYChart.Series();
+        lineChart.getData().add(series);
     }
     /**
      * <b>Note: </b> Return the stack Pane that contain visualization search Tree
@@ -731,6 +735,30 @@ public class TreeVisual {
             this.action.call();
             return true;
         }
+    }
+
+    public abstract class PeriodicPulse extends AnimationTimer {
+        long nanosBetweenPulses;
+        long lastPulseTimeStamp;
+        public PeriodicPulse(double secondsBetweenPulses){
+            //if negative time, default to 0.5 seconds.
+            if(secondsBetweenPulses < 0) secondsBetweenPulses = 500000L;
+            //convert seconds to nanos;
+            nanosBetweenPulses = (long) (secondsBetweenPulses * 1000000000L);
+        }
+        @Override
+        public void handle(long now) {
+            //calculate time since last pulse in nanoseconds
+            long nanosSinceLastPulse = now - lastPulseTimeStamp;
+            //work out whether to fire another pulse
+            if(nanosSinceLastPulse > nanosBetweenPulses){
+                //reset timestamp
+                lastPulseTimeStamp = now;
+                //execute user's code
+                run();
+            }
+        }
+        abstract void run();
     }
 
 

@@ -77,7 +77,6 @@ public class Anchor extends Rectangle {
         double absolute = center + root.position;
         if (anchMap.get(root.nodeId) == null)
             return;
-        System.out.println("noooot null");
         anchMap.get(root.nodeId).setX(400 + absolute * 40);
         anchMap.get(root.nodeId).setY(depth * 50);
         for (Tree.PositionedNode<String> child : root.children)

@@ -52,7 +52,7 @@ public class Tree {
      * @param info
      */
     public void createNode(int id, int pId, NodeType type, NodeAction nodeAction, String info) {
-        Node n = nodeMap.get(pId).addChild(id,"child",type,"branch", nodeAction, info);
+        Node n = nodeMap.get(pId).addChild(id, pId,"child",type,"branch", nodeAction, info);
         nodeMap.put(id,n);
         notifyNodeCreated(id, pId, type, nodeAction,info);
     }
@@ -189,8 +189,8 @@ public class Tree {
             this.info = info;
         }
 
-        public Node addChild(int nodeId, T nodeLabel, NodeType type, T branchLabel, NodeAction nodeAction, T info) {
-            Node child = new Node(nodeId,nodeLabel, type, new LinkedList<>(), new LinkedList(), nodeAction, info);
+        public Node addChild(int nodeId, int nodePid, T nodeLabel, NodeType type, T branchLabel, NodeAction nodeAction, T info) {
+            Node child = new Node(nodeId, nodePid,nodeLabel, type, new LinkedList<>(), new LinkedList(), nodeAction, info);
             children.add(child);
             edgeLabels.add(branchLabel);
             return child;
