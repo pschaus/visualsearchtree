@@ -1,11 +1,11 @@
 package org.uclouvain.visualsearchtree.server;
 
-import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import javafx.scene.control.ListView;
 import org.uclouvain.visualsearchtree.bridge.Decoder;
 import org.uclouvain.visualsearchtree.bridge.Message;
 import org.uclouvain.visualsearchtree.tree.*;
@@ -23,6 +23,8 @@ public class serverController implements Initializable {
 
     @FXML
     public Label portLabel;
+    public ListView threelistView;
+    ObservableList<String> items = FXCollections.observableArrayList ("MINICP CPProfiler Connector Initializing", "Connected to : localhost 6650");
 
     private ServerUtil server;
     /**
@@ -37,6 +39,8 @@ public class serverController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         portLabel.setText("6650");
+        items.add("Server waiting for Client on port 6650");
+        threelistView.setItems(items);
         server = null;
         runServer();
     }
@@ -178,7 +182,6 @@ public class serverController implements Initializable {
                             sizeRead = false;
                         }
                     }
-
                     System.out.println("Closing connection");
                     close();
                 }

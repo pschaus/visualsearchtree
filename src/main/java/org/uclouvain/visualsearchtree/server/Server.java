@@ -16,7 +16,7 @@ public class Server extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(Server.class.getResource("Server.fxml")));
-        Scene scene = new Scene(root, 300, 400);
+        Scene scene = new Scene(root, 300, 300);
         stage.setScene(scene);
         stage.setTitle("miniCp Profiler");
         stage.show();

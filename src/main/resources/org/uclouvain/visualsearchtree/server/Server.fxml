@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox id="vbox" prefHeight="400" prefWidth="300"
+<VBox id="vbox" prefHeight="300" prefWidth="300"
       xmlns:fx="http://javafx.com/fxml" alignment="CENTER"
       fx:controller="org.uclouvain.visualsearchtree.server.serverController"
 >
