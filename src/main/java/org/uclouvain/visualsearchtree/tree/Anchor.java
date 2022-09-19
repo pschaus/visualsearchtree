@@ -1,5 +1,6 @@
 package org.uclouvain.visualsearchtree.tree;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
@@ -61,10 +62,10 @@ public class Anchor extends Rectangle {
     public Group addChild(Tree.Node<String> child_node)
     {
         nbChild++;
-        DoubleProperty endX = new SimpleDoubleProperty(0);
-        DoubleProperty endY   = new SimpleDoubleProperty(0);
+        DoubleProperty endX = new SimpleDoubleProperty(10);
+        DoubleProperty endY   = new SimpleDoubleProperty(10);
         Anchor child = new Anchor(endX, endY, child_node);
-        Line line = new BoundLine(x, y, endX, endY);
+        Line line = new BoundLine(x.add(child.getWidth()/2), y.add(0), endX.add(child.getWidth()/2), endY.add(0));
         child.depth = depth + 1;
         child.parent = this;
         children.add(child);
@@ -77,6 +78,7 @@ public class Anchor extends Rectangle {
         double absolute = center + root.position;
         if (anchMap.get(root.nodeId) == null)
             return;
+        System.out.println("noooot null");
         anchMap.get(root.nodeId).setX(400 + absolute * 40);
         anchMap.get(root.nodeId).setY(depth * 50);
         for (Tree.PositionedNode<String> child : root.children)
@@ -132,7 +134,7 @@ public class Anchor extends Rectangle {
 }
 
 class BoundLine extends Line {
-    BoundLine(DoubleProperty startX, DoubleProperty startY, DoubleProperty endX, DoubleProperty endY) {
+    BoundLine(DoubleBinding startX, DoubleBinding startY, DoubleBinding endX, DoubleBinding endY) {
         startXProperty().bind(startX);
         startYProperty().bind(startY);
         endXProperty().bind(endX);
