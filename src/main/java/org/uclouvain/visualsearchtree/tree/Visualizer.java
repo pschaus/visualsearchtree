@@ -1,6 +1,5 @@
 package org.uclouvain.visualsearchtree.tree;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,7 +16,7 @@ public class Visualizer{
     TreeVisual tv;
     public Visualizer(TreeVisual tv){this.tv = tv;}
 
-    public static void show(TreeVisual tv) throws Exception {
+    public static void show(TreeVisual tv){
 
         Platform.runLater(()->{
             Parent root = null;
@@ -44,8 +43,10 @@ public class Visualizer{
 
             AnimationFactory.zoomOnSCroll(sp);
 
-            VBox legendbox = (VBox) scene.lookup("#legendbox");
-            legendbox.getChildren().add(tv.generateLegendsStack());
+            tv.onDrawFinished(()->{
+                VBox legendbox = (VBox) scene.lookup("#legendbox");
+                legendbox.getChildren().add(tv.generateLegendsStack());
+            });
             treeController.init();
         });
     }
