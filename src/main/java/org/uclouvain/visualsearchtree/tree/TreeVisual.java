@@ -227,6 +227,15 @@ public class TreeVisual {
         Group _start = new Group(start);
         treeGroup = new Group(_start);
         treeStackPane.getChildren().add(treeGroup);
+        final Boolean[] keepGoing = {true};
+
+        tree.addListener(new TreeListener() {
+            @Override
+            public void onSearchEnd() {
+                keepGoing[0] = false;
+            }
+        });
+
         PeriodicPulse pulse = new PeriodicPulse(1) {
             @Override
             void run() {
@@ -240,6 +249,7 @@ public class TreeVisual {
                     //check if different from parent
                     if (i != -1 && curNode != null)
                     {
+                        System.out.println(curNode.nodePid);
                         tempTree.createNode(curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
                         if (anchNodes.get(curNode.nodePid) != null) {
                             Anchor _parent = anchNodes.get(curNode.nodePid);
@@ -256,6 +266,12 @@ public class TreeVisual {
                 currentTemp[0] = i;
                 currentTemp[1]++;
                 Anchor.positionNode(tempTree.root().design(), anchNodes, 0.0, 0);
+                if (temNodesMap.get(i) == null && !keepGoing[0])
+                {
+                    tempTree.stopSearch();
+                    System.out.println("stopping .. ");
+                    stop();
+                }
             }
         };
         pulse.start();

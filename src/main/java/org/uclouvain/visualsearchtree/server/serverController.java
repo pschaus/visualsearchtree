@@ -162,12 +162,13 @@ public class serverController implements Initializable {
 
                             Decoder.DecodedMessage msgBody = Decoder.deserialize(buffer, msgSize);
                             if (msgBody.msgType == Message.MsgType.NODE.getNumber()) {
-                                tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.nodeStatus), ()->{},msgBody.nodeInfo);
+                                if (msgBody.nodeId != -1)
+                                    tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.nodeStatus), ()->{},msgBody.nodeInfo);
                                 decodedMessagesList.add(msgBody);
                             }
 
                             if (msgBody.msgType == Message.MsgType.DONE.getNumber()) {
-                                tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.msgType), ()->{},msgBody.nodeInfo);
+                                tree.stopSearch();
                                 keepGoing = false;
                                 try {
                                     Visualizer.show(tv);
