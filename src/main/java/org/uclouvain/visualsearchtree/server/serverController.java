@@ -171,7 +171,7 @@ public class serverController implements Initializable {
                             }
 
                             if (msgBody.msgType == Message.MsgType.DONE.getNumber()) {
-                                tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.msgType), ()->{},msgBody.nodeInfo);
+                                //tree.createNode(msgBody.nodeId, msgBody.nodePid, Decoder.nodeType(msgBody.msgType), ()->{},msgBody.nodeInfo);
                                 keepGoing = false;
                                 try {
                                     Visualizer.show(tv);
