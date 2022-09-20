@@ -41,7 +41,7 @@ public class NQueensPruneVisu {
 
     public static void main(String[] args) throws Exception {
 
-        NQueensPrune nqueens = new NQueensPrune(4);
+        NQueensPrune nqueens = new NQueensPrune(7);
         Gson gson = new Gson();
         Tree t = new Tree(-1);
 
@@ -65,7 +65,7 @@ public class NQueensPruneVisu {
                 t.createNode(id,pId, Tree.NodeType.INNER,() -> showChessBoard(infoData, Tree.NodeType.INNER), info);
             }
         }), t, false);
-
+        t.stopSearch();
         Visualizer.show(tv);
     }
 

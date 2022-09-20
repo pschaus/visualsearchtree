@@ -24,6 +24,21 @@ public class Tree {
     }
 
     /**
+     *
+     */
+    private void notifyEnd()
+    {
+        listeners.forEach(l->l.onSearchEnd());
+    }
+
+    /**
+     *
+     */
+    public void stopSearch()
+    {
+        notifyEnd();
+    }
+    /**
      * Add tree listener
      * @param list
      */
