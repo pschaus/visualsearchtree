@@ -95,9 +95,9 @@ public class TreeVisual {
         dfsListeners.forEach(l-> l.onFinish());
     }
 
-    private void notifyNewUINodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info)
+    private void notifyNewUINodeCreated(int id, Tree.NodeType type, NodeAction nodeAction, String info)
     {
-        dfsListeners.forEach(l->l.onUINodeCreated(id,pId,type,nodeAction,info));
+        dfsListeners.forEach(l->l.onUINodeCreated(id, type,nodeAction,info));
     }
 
 
@@ -190,8 +190,10 @@ public class TreeVisual {
         Group child_group = parent.addChild(tree.nodeMap.get(id));
         Anchor child = (Anchor) child_group.getChildren().get(0);
         child.setId(String.valueOf(id));
-        setShapeColor(child, type);
+        child.toBack();
+        setShapeStyle(child, type);
         addEventsOnNode(child, id, type, info, nodeAction);
+
         return child_group;
     }
 
@@ -319,11 +321,18 @@ public class TreeVisual {
     }
 
 
-    public void setShapeColor(Anchor node, Tree.NodeType type)
+    /**
+     * Set the node form and color according to its type
+     * @param node node to represent
+     * @param type node type
+     */
+    public void setShapeStyle(Anchor node, Tree.NodeType type)
     {
         switch (type) {
             case INNER -> {
                 node.setFill(Color.CORNFLOWERBLUE);
+                node.setArcHeight(LEGEND_SHAPE_ARC_VALUE);
+                node.setArcWidth(LEGEND_SHAPE_ARC_VALUE);
                 this.setLegendStats(0,this.legendStats.get(0) +1);
             }
             case FAIL -> {
@@ -332,16 +341,27 @@ public class TreeVisual {
             }
             case SOLUTION -> {
                 node.setFill(Color.GREEN);
+                node.setRotate(45);
+                node.setFill(Color.GREEN);
                 this.setLegendStats(2,this.legendStats.get(2) +1);
+                System.out.println(this.getLegendStats().get(2));
             }
             default -> {
             }
         }
-//        if(node.levels.size()-1 > this.getLegendStats().get(3)){
-//            this.setLegendStats(3, node.levels.size() - 1);
-//        }
+        if(node.depth > this.getLegendStats().get(3)){
+            this.setLegendStats(3, node.depth);
+        }
     }
 
+    /**
+     * Add events on shape representing a node
+     * @param node node to represent
+     * @param nodeId id of node to represent
+     * @param type type of node to represent
+     * @param info info property of node to represent
+     * @param nodeAction callback method of node to represent
+     */
     public void addEventsOnNode(Anchor node, int nodeId, Tree.NodeType type, String info, NodeAction nodeAction){
         node.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 || e.getButton()== MouseButton.SECONDARY) {
@@ -350,8 +370,6 @@ public class TreeVisual {
             }
             node.fireEvent(new BackToNormalEvent());
             node.setFill(Color.ORANGE);
-//            nLabel.setOpacity((nLabel.getOpacity())==1? 0:1);
-//            nLabel.setText(root.label);
             this.setInfo(info);
             this.setFocusedRect(node, type, new Text("default"), nodeId);
         });
@@ -481,14 +499,6 @@ public class TreeVisual {
      * @return {@link javafx.scene.Group}
      */
     public Group getGroup() {
-//        Group root = new Group();
-//        Tree.PositionedNode<String> pnode = this.getNode().design();
-//        Text nodeLabel = new Text();
-//        nodeLabel.setTextAlignment(TextAlignment.RIGHT);
-//        drawNodeRecur(root, pnode, 0.0, 0, nodeLabel);
-        //getTreeChart(true);
-        //generateLegendsStack();
-        //return root;
         return treeGroup;
     }
 
@@ -523,66 +533,6 @@ public class TreeVisual {
     }
 
     /**
-     * <b>Note: </b>Style Each node Label by setting its content and positioning it to a suitable position on the scene
-     * @param theLabel Text Widget
-     * @param absolute absolute position value
-     * @param depth tree depth
-     * @param content Node label to show
-     * @param pos position value
-     * @param nChild number of children the current node has
-     */
-    private void styleLabel(Text theLabel, double absolute , double depth, String content, double pos, int nChild) {
-
-        theLabel.setFont(Font.font("Roboto", 10));
-        theLabel.setFill(Color.rgb(13, 15, 16));
-        if (nChild == 0) {
-            theLabel.setX(400 + absolute * LABEL_X_COEFFICIENT);
-            theLabel.setY(82 + depth * LABEL_Y_COEFFICIENT);
-        } else {
-            if (pos == 0.0) {
-                theLabel.setX(402 + absolute * LABEL_X_COEFFICIENT);
-                theLabel.setY(45 + depth * LABEL_Y_COEFFICIENT);
-            } else if (pos < 0) {
-                if(pos == -1){
-                    theLabel.setX(378 + absolute * LABEL_X_COEFFICIENT);
-                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
-                }
-                else{
-                    theLabel.setX(420 + absolute * LABEL_X_COEFFICIENT);
-                    theLabel.setY(50 + depth * LABEL_Y_COEFFICIENT);
-                }
-            } else {
-                theLabel.setX(422 + absolute * LABEL_X_COEFFICIENT);
-                theLabel.setY(48 + depth * LABEL_Y_COEFFICIENT);
-            }
-        }
-        theLabel.setOpacity(0);
-        theLabel.setText(content);
-        theLabel.toFront();
-        this.setLabels(theLabel);
-
-    }
-
-    /**
-     * <b>Note: </b>Create a line for connecting two Nodes represented by a rectangle
-     * @param r1 first rectangle
-     * @param r2 second rectangle
-     * @return Line for connecting rectangles
-     */
-    private Line connectRectangle(Rectangle r1, Rectangle r2) {
-        Line line = new Line();
-        line.setStartX(r1.getX()+r1.getWidth()/2);
-        line.setStartY(r1.getY());
-
-        line.setEndX(r2.getX()+r2.getWidth()/2);
-        line.setEndY(r2.getY());
-
-        line.setStrokeWidth(1);
-
-        return line;
-    }
-
-    /**
      * <b>Note: </b>Generate Legend Box for specify number of each type of nodes
      * @return HBox
      */
@@ -595,13 +545,13 @@ public class TreeVisual {
         FlowPane s1 = new FlowPane();
         FlowPane s2 = new FlowPane();
         FlowPane s3 = new FlowPane();
-        Text  t1 = new Text("  ("+ this.legendStats.get(0)+")");
+        Text  t1 = new Text("  ("+ this.getLegendStats().get(0)+")");
         t1.setId("innerCount");
-        Text  t2 = new Text("  ("+ this.legendStats.get(1)+")");
+        Text  t2 = new Text("  ("+ this.getLegendStats().get(1)+")");
         t2.setId("failCount");
-        Text  t3 = new Text("  ("+ this.legendStats.get(2)+")");
+        Text  t3 = new Text("  ("+ this.getLegendStats().get(2)+")");
         t3.setId("solutionCount");
-        Text  t4 = new  Text("DEPTH : ("+ this.legendStats.get(3)+")");
+        Text  t4 = new  Text("DEPTH : ("+ this.getLegendStats().get(3)+")");
         t4.setId("treeDepth");
         s1.getChildren().addAll(branchRect, t1);
         s2.getChildren().addAll(failedRect, t2);
@@ -776,6 +726,4 @@ public class TreeVisual {
         }
         abstract void run();
     }
-
-
 }

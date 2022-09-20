@@ -49,6 +49,7 @@ public class TreeUIController {
     public TableView infoTableView;
     public Button skipBtn;
     public AnchorPane anchorSkip;
+    public VBox legendbox;
     private TreeVisual instance;
     private final double stackPaneMinWidth = 400;
     private double stackPaneMinHeight = 400;
