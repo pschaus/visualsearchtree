@@ -253,19 +253,19 @@ public class TreeUIController {
             }
         });
 
-        zoomSlider.setOnMouseClicked(e ->{
-            double zoomValue = zoomSlider.getValue();
-            if (zoomValue == DEFAULT_SLIDER_VALUE) {
-                treeroot.setMinHeight(stackPaneMinHeight);
-                treeroot.setMinWidth(stackPaneMinWidth);
-                treeroot.setScaleY(1);
-                treeroot.setScaleY(1);
-            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
-                zoomOut(zoomValue);
-            }else {
-                zoomIn(zoomValue);
-            }
-        });
+//        zoomSlider.setOnMouseClicked(e ->{
+//            double zoomValue = zoomSlider.getValue();
+//            if (zoomValue == DEFAULT_SLIDER_VALUE) {
+//                treeroot.setMinHeight(stackPaneMinHeight);
+//                treeroot.setMinWidth(stackPaneMinWidth);
+//                treeroot.setScaleY(1);
+//                treeroot.setScaleY(1);
+//            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
+//                zoomOut(zoomValue);
+//            }else {
+//                zoomIn(zoomValue);
+//            }
+//        });
     }
 
     /**
