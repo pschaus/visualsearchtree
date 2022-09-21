@@ -38,11 +38,29 @@ public class serverController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        portLabel.setText("6650");
+        //Set the port
+        int port;
+        port = 6650;
+        while (!portIsAvailable(port)){port++;}
+        portLabel.setText(String.valueOf(port));
+
         items.add("Server waiting for Client on port 6650");
         threelistView.setItems(items);
         server = null;
         runServer();
+    }
+
+    /**
+     * Check port availability
+     * @param port
+     * @return
+     */
+    private static boolean portIsAvailable(int port) {
+        try (Socket ignored = new Socket("localhost", port)) {
+            return false;
+        } catch (IOException ignored) {
+            return true;
+        }
     }
 
     /**
@@ -83,14 +101,13 @@ public class serverController implements Initializable {
             try
             {
                 ServerSocket serverSocket = new ServerSocket(port);
-                final ProfilingData pData = new ProfilingData(new ArrayList<>(), new ArrayList<>());
                 while (keepGoing)
                 {
                     System.out.println("Server waiting for Clients on port " + port + ".");
                     Socket socket = serverSocket.accept();
                     if (!keepGoing)
                         break;
-                    ClientThread t = new ClientThread(socket, pData);
+                    ClientThread t = new ClientThread(socket);
                     al.add(t);
                     t.start();
                 }
@@ -118,14 +135,12 @@ public class serverController implements Initializable {
             private List<Decoder.DecodedMessage> decodedMessagesList = new ArrayList<>();
             private int msgSize = 0;
             private boolean sizeRead = false;
-            private ProfilingData profilingData;
             // client id
             private Tree tree;
 
             int id;
 
-            ClientThread(Socket s, ProfilingData profilingData) {
-                this.profilingData = profilingData;
+            ClientThread(Socket s) {
                 id = uniqueID++;
                 this.socket = s;
                 System.out.println("Thread trying to create Object Input/Output Streams");

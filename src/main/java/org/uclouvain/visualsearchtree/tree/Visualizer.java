@@ -17,7 +17,6 @@ public class Visualizer{
     public Visualizer(TreeVisual tv){this.tv = tv;}
 
     public static void show(TreeVisual tv){
-
         Platform.runLater(()->{
             Parent root = null;
             FXMLLoader fxmlLoader;
