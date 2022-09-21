@@ -43,6 +43,7 @@ public class Visualizer{
 
             AnimationFactory.zoomOnSCroll(sp);
 
+
             tv.onDrawFinished(()->{
                 VBox legendbox = (VBox) scene.lookup("#legendbox");
                 legendbox.getChildren().add(tv.generateLegendsStack());

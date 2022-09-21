@@ -66,6 +66,7 @@ public class TreeVisual {
     NumberAxis yAxis;
 
     private LineChart lineChart;
+
     private XYChart.Series series;
     private HBox legendbox;
 
@@ -73,6 +74,7 @@ public class TreeVisual {
 
     private Map<Integer, Anchor> anchNodes;
     private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
+
 
     public void onDrawFinished(Procedure listener)
     {
@@ -121,6 +123,7 @@ public class TreeVisual {
                 temNodesMap.put(id, tree.nodeMap.get(id));
             }
         });
+
         periodicUIRefresher();
     }
 
@@ -235,6 +238,12 @@ public class TreeVisual {
             @Override
             public void onSearchEnd() {
                 keepGoing[0] = false;
+            }
+        });
+        tempTree.addListener(new TreeListener() {
+            @Override
+            public void onSearchEnd() {
+                notifyEndDraw();
             }
         });
 
@@ -493,6 +502,10 @@ public class TreeVisual {
         this.focusedRect.set(2, label);
         this.focusedRect.set(3, nodeId);
     }
+    public XYChart.Series getSeries() {
+        return series;
+    }
+
 
     /**
      * <b>Note: </b> Use {@link org.uclouvain.visualsearchtree.tree.Tree.PositionedNode PositionedNode} to build tree and return it as {@link javafx.scene.Group Group}
@@ -566,8 +579,6 @@ public class TreeVisual {
     public void makeNotFocus(){
         var r = (Anchor) this.focusedRect.get(0);
         var type = (Tree.NodeType) this.focusedRect.get(1);
-        //var label = (Text) this.focusedRect.get(2);
-        //label.setOpacity(0);
         if(!Objects.equals(type, " ")){
             switch (type) {
                 case INNER -> r.setFill(Color.CORNFLOWERBLUE);
