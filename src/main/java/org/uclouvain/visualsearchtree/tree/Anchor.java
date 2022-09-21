@@ -72,13 +72,18 @@ public class Anchor extends Rectangle {
         return new Group(child, line);
     }
 
-
+    /**
+     *
+     * @param root
+     * @param anchMap
+     * @param center
+     * @param depth
+     */
     public static void positionNode(Tree.PositionedNode<String> root, Map<Integer, Anchor> anchMap, double center, int depth)
     {
         double absolute = center + root.position;
         if (anchMap.get(root.nodeId) == null)
             return;
-        System.out.println("noooot null");
         anchMap.get(root.nodeId).setX(400 + absolute * 40);
         anchMap.get(root.nodeId).setY(depth * 50);
         for (Tree.PositionedNode<String> child : root.children)
@@ -87,7 +92,9 @@ public class Anchor extends Rectangle {
         }
     }
 
-    // make a node movable by dragging it around with the mouse.
+    /**
+     * make a node movable by dragging it around with the mouse.
+     */
     private void enableDrag() {
         final Delta dragDelta = new Delta();
         setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -98,35 +105,25 @@ public class Anchor extends Rectangle {
                 getScene().setCursor(Cursor.MOVE);
             }
         });
-        setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent mouseEvent) {
+        setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.HAND));
+        setOnMouseDragged(mouseEvent -> {
+            double newX = mouseEvent.getX() + dragDelta.x;
+            if (newX > 0 && newX < getScene().getWidth()) {
+                setX(newX);
+            }
+            double newY = mouseEvent.getY() + dragDelta.y;
+            if (newY > 0 && newY < getScene().getHeight()) {
+                setY(newY);
+            }
+        });
+        setOnMouseEntered(mouseEvent -> {
+            if (!mouseEvent.isPrimaryButtonDown()) {
                 getScene().setCursor(Cursor.HAND);
             }
         });
-        setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent mouseEvent) {
-                double newX = mouseEvent.getX() + dragDelta.x;
-                if (newX > 0 && newX < getScene().getWidth()) {
-                    setX(newX);
-                }
-                double newY = mouseEvent.getY() + dragDelta.y;
-                if (newY > 0 && newY < getScene().getHeight()) {
-                    setY(newY);
-                }
-            }
-        });
-        setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent mouseEvent) {
-                if (!mouseEvent.isPrimaryButtonDown()) {
-                    getScene().setCursor(Cursor.HAND);
-                }
-            }
-        });
-        setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent mouseEvent) {
-                if (!mouseEvent.isPrimaryButtonDown()) {
-                    getScene().setCursor(Cursor.DEFAULT);
-                }
+        setOnMouseExited(mouseEvent -> {
+            if (!mouseEvent.isPrimaryButtonDown()) {
+                getScene().setCursor(Cursor.DEFAULT);
             }
         });
     }
@@ -143,36 +140,5 @@ class BoundLine extends Line {
         setStroke(Color.BLACK.deriveColor(0, 1, 1, 0.5));
         setStrokeLineCap(StrokeLineCap.BUTT);
         setMouseTransparent(true);
-    }
-}
-
-class Center {
-    private ReadOnlyDoubleWrapper centerX = new ReadOnlyDoubleWrapper();
-    private ReadOnlyDoubleWrapper centerY = new ReadOnlyDoubleWrapper();
-
-    public Center(Node node) {
-        calcCenter(node.getBoundsInParent());
-        node.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
-            @Override public void changed(
-                    ObservableValue<? extends Bounds> observableValue,
-                    Bounds oldBounds,
-                    Bounds bounds
-            ) {
-                calcCenter(bounds);
-            }
-        });
-    }
-
-    private void calcCenter(Bounds bounds) {
-        centerX.set(bounds.getMinX() + bounds.getWidth()  / 2);
-        centerY.set(bounds.getMinY() + bounds.getHeight() / 2);
-    }
-
-    ReadOnlyDoubleProperty centerXProperty() {
-        return centerX.getReadOnlyProperty();
-    }
-
-    ReadOnlyDoubleProperty centerYProperty() {
-        return centerY.getReadOnlyProperty();
     }
 }

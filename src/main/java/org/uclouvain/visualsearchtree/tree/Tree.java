@@ -72,28 +72,6 @@ public class Tree {
         notifyNodeCreated(id, pId, type, nodeAction,info);
     }
 
-    /**
-     * <b>Note: </b>Assign new  {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} to it Parent in order to build tree hierarchy
-     * @param pId parent Id
-     * @param n node to attach
-     */
-    public void attachToParent(int pId, Node n) {
-        if (nodeMap.get(pId) != null) {
-            nodeMap.get(pId).children.add(nodeMap.get(n.nodeId));
-        }
-    }
-
-    /**
-     * <b>Note: </b> Add new node to nodemap without linked it to its parent
-     * @param id node Id
-     * @param pId parent Id
-     * @param type node Type
-     * @param nodeAction node action
-     * @param info node info
-     */
-    public void crateIndNode(int id, int pId, NodeType type, NodeAction nodeAction, String info){
-        nodeMap.put(id, new Tree.Node(id, pId,"child", type, new LinkedList<>(), new LinkedList(), nodeAction, info));
-    }
 
     public Node root() {
         return nodeMap.get(rootId);
@@ -245,9 +223,6 @@ public class Tree {
             return new Pair(resTree, resExtent);
         }
 
-        public void addChildren(Node<T> newChild) {
-            children.add(newChild);
-        }
 
         public T getLabel() {
             return label;

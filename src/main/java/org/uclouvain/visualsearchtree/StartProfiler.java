@@ -9,7 +9,8 @@
  */
 package org.uclouvain.visualsearchtree;
 
-import org.uclouvain.visualsearchtree.server.StartServer;
+import org.uclouvain.visualsearchtree.server.Server;
+
 import static javafx.application.Application.launch;
 
 /**
@@ -30,6 +31,6 @@ public class StartProfiler {
      * @return Nothing
      */
     public static void main(String[] args) {
-        launch(StartServer.class, args);
+        launch(Server.class, args);
     }
 }

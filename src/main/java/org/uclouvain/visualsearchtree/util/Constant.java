@@ -2,7 +2,7 @@ package org.uclouvain.visualsearchtree.util;
 
 /**
  * <h1>Visualization screen constant</h1>
- * <p>This class describe all constant used in {@link org.uclouvain.visualsearchtree.tree.VisualTree Visualization Object}
+ * <p>This class describe all constant used in {@link  Object}
  * screen such as NODE_SHAPE_SIZE, LEGEND_SIZE, ...</p>
  */
 public class Constant {
