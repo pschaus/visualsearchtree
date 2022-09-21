@@ -39,28 +39,28 @@ import java.util.Map;
  */
 public class NQueensPruneVisu {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        NQueensPrune nqueens = new NQueensPrune(7);
+        NQueensPrune queens = new NQueensPrune(4);
         Gson gson = new Gson();
         Tree t = new Tree(-1);
 
-        TreeVisual tv = new TreeVisual(()-> nqueens.dfs(new DFSListener() {
+        TreeVisual tv = new TreeVisual(()-> queens.dfs(new DFSListener() {
             @Override
             public void solution(int id, int pId) {
-                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(queens.q)+"\"}";
                 TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
                 t.createNode(id,pId, Tree.NodeType.SOLUTION,() -> showChessBoard(infoData,Tree.NodeType.SOLUTION), info);
             }
             @Override
             public void fail(int id, int pId) {
-                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(queens.q)+"\"}";
                 TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
                 t.createNode(id,pId, Tree.NodeType.FAIL,() -> showChessBoard(infoData,Tree.NodeType.FAIL), info);
             }
             @Override
             public void branch(int id, int pId, int nChilds) {
-                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(nqueens.q)+"\"}";
+                String info = "{\"cost\": "+id+", \"domain\": "+id+", \"other\": \""+ getNodeValue(queens.q)+"\"}";
                 TreeVisual.NodeInfoData infoData = gson.fromJson(info, new TypeToken<TreeVisual.NodeInfoData>(){}.getType());
                 t.createNode(id,pId, Tree.NodeType.INNER,() -> showChessBoard(infoData, Tree.NodeType.INNER), info);
             }

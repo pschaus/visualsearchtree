@@ -13,9 +13,6 @@ import java.util.Objects;
 
 public class Visualizer{
 
-    TreeVisual tv;
-    public Visualizer(TreeVisual tv){this.tv = tv;}
-
     public static void show(TreeVisual tv){
         Platform.runLater(()->{
             Parent root = null;
@@ -37,17 +34,50 @@ public class Visualizer{
             stage.setTitle("miniCp Profiler");
             stage.show();
 
-            StackPane sp = (StackPane) scene.lookup("#treeroot");
-            sp.getChildren().add(tv.getTreeStackPane());
+            addTreeStackPane(scene, tv);
+            addOptimizationChart(scene, tv);
+            addTreeLegendBox(scene, tv);
 
-            AnimationFactory.zoomOnSCroll(sp);
-
-
-            tv.onDrawFinished(()->{
-                VBox legendbox = (VBox) scene.lookup("#legendbox");
-                legendbox.getChildren().add(tv.generateLegendsStack());
-            });
             treeController.init();
         });
+    }
+
+    /**
+     * add Legend to tree
+     * @param scene
+     * @param tv
+     */
+    private static void addTreeLegendBox(Scene scene, TreeVisual tv)
+    {
+        tv.onDrawFinished(()->{
+            VBox legendbox = (VBox) scene.lookup("#legendbox");
+            legendbox.getChildren().add(tv.generateLegendsStack());
+        });
+    }
+
+    /**
+     * add the tree to UI
+     * @param scene
+     * @param tv
+     */
+    private static void addTreeStackPane(Scene scene, TreeVisual tv)
+    {
+        StackPane sp = (StackPane) scene.lookup("#treeroot");
+        if (sp != null)
+            sp.getChildren().add(tv.getTreeStackPane());
+
+        AnimationFactory.zoomOnSCroll(sp);
+    }
+
+    /**
+     * add
+     * @param scene
+     * @param tv
+     */
+    private static void addOptimizationChart(Scene scene, TreeVisual tv)
+    {
+        VBox vBox = (VBox) scene.lookup("#chartUI");
+        if (vBox != null)
+            vBox.getChildren().add(tv.getOptimizationChart());
     }
 }

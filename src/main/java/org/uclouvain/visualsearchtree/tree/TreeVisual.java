@@ -3,30 +3,22 @@ package org.uclouvain.visualsearchtree.tree;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javafx.animation.AnimationTimer;
-import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEvent;
 import org.uclouvain.visualsearchtree.tree.events.BackToNormalEventHandler;
 import org.uclouvain.visualsearchtree.tree.events.CustomEvent;
@@ -48,19 +40,16 @@ import static org.uclouvain.visualsearchtree.util.Constant.*;
  * </ul>
  */
 public class TreeVisual {
-    private Tree.Node<String> node;
+    private final Tree.Node<String> node;
     private List<Integer> legendStats;
     private List<Text> labels;
     private String info;
     private List focusedRect;
     private  StackPane treeStackPane;
-    private Map<String,String> boookMarks;
-    private Map<String, Rectangle> allNodesRects;
-    private Map<String, XYChart.Data> allNodesChartDatas;
-    private Map<String, Tree.PositionedNode<String>> allNodesPositions;
+    private Map<String,String> bookMarks;
 
-    private Map<Integer, Tree.Node<String>> temNodesMap;
-    private  Tree tree;
+    private final Map<Integer, Tree.Node<String>> temNodesMap;
+    private final Tree tree;
 
     NumberAxis xAxis;
     NumberAxis yAxis;
@@ -68,12 +57,12 @@ public class TreeVisual {
     private LineChart lineChart;
 
     private XYChart.Series series;
-    private HBox legendbox;
+    private HBox legend;
 
     private Group treeGroup;
 
-    private Map<Integer, Anchor> anchNodes;
-    private List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
+    private Map<Integer, Anchor> anchorNodes;
+    private final List<DrawListener> dfsListeners = new LinkedList<DrawListener>();
 
 
     public void onDrawFinished(Procedure listener)
@@ -97,17 +86,10 @@ public class TreeVisual {
         dfsListeners.forEach(l-> l.onFinish());
     }
 
-    private void notifyNewUINodeCreated(int id, Tree.NodeType type, NodeAction nodeAction, String info)
-    {
-        dfsListeners.forEach(l->l.onUINodeCreated(id, type,nodeAction,info));
-    }
-
-
     /**
      * <b>Note: </b> Create an instance of the search tree from a {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} object.
      * @param tree
      */
-
     public TreeVisual(Tree tree, boolean isFx)
     {
         this.tree = tree;
@@ -128,31 +110,6 @@ public class TreeVisual {
     }
 
 
-
-    public TreeVisual(Tree.Node<String> node) {
-        this.node = node;
-        this.labels = new ArrayList<>(){};
-        anchNodes = new HashMap<>();
-        this.info = "";
-        this.boookMarks = new HashMap<String,String>();
-        this.focusedRect = new ArrayList<>(){{
-            add(new Rectangle());
-            add(Tree.NodeType.INNER);
-            Text  t = new Text(" ");
-            add(t);
-            add(0);
-        }};
-        this.legendStats = new ArrayList<>(){{
-            add(0);
-            add(0);
-            add(0);
-            add(0);
-        }};
-        this.allNodesRects = new Hashtable<>();
-        this.allNodesPositions = new Hashtable<>();
-        this.allNodesChartDatas = new Hashtable<>();
-    }
-
     /**
      * Create an instance of the search without {@link org.uclouvain.visualsearchtree.tree.Tree.Node Node} object pass argument.
      * <br/><br/>
@@ -167,9 +124,7 @@ public class TreeVisual {
         this.temNodesMap = new HashMap<>();
         temNodesMap.put(-1, tree.root());
 
-
         initTreeVisual_(isFx);
-
         // Run callback function in a Thread
         startExploringTask(procedure);
 
@@ -223,11 +178,11 @@ public class TreeVisual {
         Anchor start;
 
         // Init
-        anchNodes = new HashMap<>();
+        anchorNodes = new HashMap<>();
         tempTree = new Tree(-1);
         tempRoot = tempTree.root();
         start   = new Anchor(new SimpleDoubleProperty(0), new SimpleDoubleProperty(50), tempRoot);
-        anchNodes.put(-1, start);
+        anchorNodes.put(-1, start);
         treeStackPane = new StackPane();
         Group _start = new Group(start);
         treeGroup = new Group(_start);
@@ -262,21 +217,22 @@ public class TreeVisual {
                     {
                         System.out.println(curNode.nodePid);
                         tempTree.createNode(curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
-                        if (anchNodes.get(curNode.nodePid) != null) {
-                            Anchor _parent = anchNodes.get(curNode.nodePid);
+                        if (anchorNodes.get(curNode.nodePid) != null) {
+                            Anchor _parent = anchorNodes.get(curNode.nodePid);
                             if (_parent != null)
                             {
                                 Group temp = drawNode(_parent, curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
                                 Anchor child = (Anchor) temp.getChildren().get(0);
-                                anchNodes.put(curNode.nodeId, child);
+                                anchorNodes.put(curNode.nodeId, child);
                                 treeGroup.getChildren().add(temp);
+                                addToChart(curNode, anchorNodes.size());
                             }
                         }
                     }
                 }
                 currentTemp[0] = i;
                 currentTemp[1]++;
-                Anchor.positionNode(tempTree.root().design(), anchNodes, 0.0, 0);
+                Anchor.positionNode(tempTree.root().design(), anchorNodes, 0.0, 0);
                 if (temNodesMap.get(i) == null && !keepGoing[0])
                 {
                     tempTree.stopSearch();
@@ -293,7 +249,7 @@ public class TreeVisual {
      */
     public void initTreeVisual_(Boolean isFx)
     {
-        boookMarks = new HashMap<>();
+        bookMarks = new HashMap<>();
         info = "";
         focusedRect = new ArrayList<>(){{
             add(new Anchor());
@@ -395,15 +351,14 @@ public class TreeVisual {
      */
     public void nonFxInitializer()
     {
-        boookMarks = new HashMap<String,String>();
-        legendbox = new HBox();
+        bookMarks = new HashMap<>();
+        legend = new HBox();
         xAxis = new NumberAxis();
         yAxis = new NumberAxis();
+        yAxis.setLabel("Node Cost");
+        xAxis.setLabel("Nodes");
         lineChart = new LineChart<>(xAxis, yAxis);
         labels = new ArrayList<>(){};
-        allNodesRects = new Hashtable<>();
-        allNodesPositions = new Hashtable<>();
-        allNodesChartDatas = new Hashtable<>();
         series =  new XYChart.Series();
         lineChart.getData().add(series);
     }
@@ -477,7 +432,7 @@ public class TreeVisual {
      * @return
      */
     public Map<String, String> getBookMarks() {
-        return boookMarks;
+        return bookMarks;
     }
 
     /**
@@ -486,7 +441,7 @@ public class TreeVisual {
      * @param value
      */
     public void setBookMarks(String key, String value) {
-        this.boookMarks.put(key, value);
+        this.bookMarks.put(key, value);
     }
 
     /**
@@ -550,8 +505,8 @@ public class TreeVisual {
      * @return HBox
      */
     public HBox generateLegendsStack(){
-        legendbox.setPadding(new Insets(10));
-        legendbox.setAlignment(Pos.BASELINE_LEFT);
+        legend.setPadding(new Insets(10));
+        legend.setAlignment(Pos.BASELINE_LEFT);
         Rectangle branchRect = createRectangleForLegendBox(Tree.NodeType.INNER);
         Rectangle solvedRect = createRectangleForLegendBox(Tree.NodeType.SOLUTION);
         Rectangle failedRect = createRectangleForLegendBox(Tree.NodeType.FAIL);
@@ -569,8 +524,8 @@ public class TreeVisual {
         s1.getChildren().addAll(branchRect, t1);
         s2.getChildren().addAll(failedRect, t2);
         s3.getChildren().addAll(solvedRect, t3);
-        legendbox.getChildren().addAll(s1,s2,s3,t4);
-        return legendbox;
+        legend.getChildren().addAll(s1,s2,s3,t4);
+        return legend;
     }
 
     /**
@@ -591,61 +546,70 @@ public class TreeVisual {
     }
 
     /**
-     * <b>Note: </b>Create the optimization chart
-     * @param all_sol boolean
-     * @return LineChart
+     *
+     * @param node
      */
-    public LineChart<Number, Number> getTreeChart(boolean all_sol){
-        // variables
-        series.getData().clear();
-        this.allNodesChartDatas = new HashMap<>();
+    private void addToChart(Tree.Node<String> node, double number)
+    {
         Gson gz = new Gson();
-        NodeInfoData _info = null;
-        yAxis.setLabel("Cost");
-        xAxis.setLabel("Number of Choices");
-        //creating the chart
-        if (all_sol)
+        NodeInfoData _info;
+
+        if (node.getType() != Tree.NodeType.SOLUTION)
+            return;
+        _info = gz.fromJson(node.info, new TypeToken<NodeInfoData>(){}.getType());
+        if (_info != null)
         {
-            for (String key: this.allNodesPositions.keySet())
-            {
-                if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
-                {
-                    _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
-                    if (_info != null)
-                    {
-                        this.allNodesChartDatas.put(key, (new XYChart.Data(_info.domain, _info.cost)));
-                        series.getData().add(this.allNodesChartDatas.get(key));
-                    }
-                }
-            }
+            addDataToChart(number, _info.cost);
         }
-        else
-        {
-            xAxis.setLabel("Number of Solutions");
-            Map<String, Float> only_sol = new HashMap<>();
-            for (String key: this.allNodesPositions.keySet())
-            {
-                if (this.allNodesPositions.get(key).type == Tree.NodeType.SOLUTION)
-                {
-                    _info = gz.fromJson(this.allNodesPositions.get(key).info, new TypeToken<NodeInfoData>(){}.getType());
-                    if (_info != null) {
-                        only_sol.put(key, (float) _info.domain);
-                    }
-                }
-            }
-            // sort by value
-            List<Map.Entry<String, Float>> list = new ArrayList<>(only_sol.entrySet());
-            list.sort(Map.Entry.comparingByValue());
-            for (int i = 0; i < list.size(); i++) {
-                String _key = list.get(i).getKey();
-                _info = gz.fromJson(this.allNodesPositions.get(_key).info, new TypeToken<NodeInfoData>(){}.getType());
-                this.allNodesChartDatas.put(_key, (new XYChart.Data(i+1, _info.cost)));
-                series.getData().add(this.allNodesChartDatas.get(_key));
-            }
-        }
-        return  lineChart;
     }
 
+    /**
+     *
+     * @return
+     */
+    public LineChart<Number, Number> getOptimizationChart()
+    {
+        return  lineChart;
+    }
+    /**
+     * <b>Note: </b>Create the optimization chart
+     * @param onlySolution boolean
+     * @return LineChart
+     */
+    public void setTreeChart(boolean onlySolution){
+        // variables
+        int currentNb;
+
+        currentNb = 0;
+        series.getData().clear();
+        if (onlySolution){
+            for (Integer key : anchorNodes.keySet()) {
+                currentNb++;
+                addToChart(anchorNodes.get(key).node, currentNb);
+            }
+            return;
+        }
+        for (Integer key : anchorNodes.keySet())
+        {
+            if (anchorNodes.get(key).node.getType() == Tree.NodeType.SOLUTION)
+            {
+                currentNb++;
+                addToChart(anchorNodes.get(key).node, currentNb);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    private XYChart.Data addDataToChart(double x, double y)
+    {
+        XYChart.Data tmp = new XYChart.Data(x,y);
+        series.getData().add(tmp);
+        return (XYChart.Data) series.getData().get(series.getData().size() - 1);
+    }
     /**
      * <b>Note: </b> Node Info Data
      */
@@ -659,37 +623,37 @@ public class TreeVisual {
      * <b>Note: </b>Use function to add event on chart
      */
     public void addEventOnChart() {
-        for (String key: this.allNodesChartDatas.keySet())
-        {
-            if (this.allNodesChartDatas.get(key) != null)
-            {
-                //variables
-                Data tmp_data = (Data)this.allNodesChartDatas.get(key);
-                Rectangle tmp_rect = this.allNodesRects.get(key);
-                tmp_data.getNode().setCursor(Cursor.HAND);
-                Color old_col = (Color) tmp_rect.getFill();
-
-                tmp_data.getNode().setOnMousePressed(event -> {
-                    //Make focus and animate to ease visibility
-                    //Animate
-                    ScaleTransition st = new ScaleTransition(Duration.millis(200), tmp_rect);
-                    st.setByX(0.5f);
-                    st.setByY(0.5f);
-                    st.setCycleCount(4);
-                    st.setAutoReverse(true);
-                    st.play();
-
-                    //focus
-                    //tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
-                    tmp_rect.getParent().setTranslateX(tmp_rect.getParent().getLayoutX() -  tmp_rect.getX());
-                    tmp_rect.getParent().setTranslateY(tmp_rect.getParent().getLayoutY() -  tmp_rect.getY());
-                    tmp_rect.setFill(Color.ORANGE);
-                });
-                tmp_data.getNode().setOnMouseExited(event -> {
-                    this.allNodesRects.get(key).setFill(old_col);
-                });
-            }
-        }
+//        for (String key: this.allNodesChartDatas.keySet())
+//        {
+//            if (this.allNodesChartDatas.get(key) != null)
+//            {
+//                //variables
+//                Data tmp_data = (Data)this.allNodesChartDatas.get(key);
+//                Rectangle tmp_rect = this.allNodesRects.get(key);
+//                tmp_data.getNode().setCursor(Cursor.HAND);
+//                Color old_col = (Color) tmp_rect.getFill();
+//
+//                tmp_data.getNode().setOnMousePressed(event -> {
+//                    //Make focus and animate to ease visibility
+//                    //Animate
+//                    ScaleTransition st = new ScaleTransition(Duration.millis(200), tmp_rect);
+//                    st.setByX(0.5f);
+//                    st.setByY(0.5f);
+//                    st.setCycleCount(4);
+//                    st.setAutoReverse(true);
+//                    st.play();
+//
+//                    //focus
+//                    //tmp_rect.getParent().setTranslateX( (tmp_rect.getParent().getScene().getWidth()) - tmp_rect.getX());
+//                    tmp_rect.getParent().setTranslateX(tmp_rect.getParent().getLayoutX() -  tmp_rect.getX());
+//                    tmp_rect.getParent().setTranslateY(tmp_rect.getParent().getLayoutY() -  tmp_rect.getY());
+//                    tmp_rect.setFill(Color.ORANGE);
+//                });
+//                tmp_data.getNode().setOnMouseExited(event -> {
+//                    this.allNodesRects.get(key).setFill(old_col);
+//                });
+//            }
+//        }
     }
 
     /**
@@ -714,6 +678,9 @@ public class TreeVisual {
         }
     }
 
+    /**
+     *
+     */
     public abstract class PeriodicPulse extends AnimationTimer {
         long nanosBetweenPulses;
         long lastPulseTimeStamp;

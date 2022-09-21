@@ -53,7 +53,6 @@ public class TreeUIController {
     private TreeVisual instance;
     private final double stackPaneMinWidth = 400;
     private double stackPaneMinHeight = 400;
-//    private Button skipBtn;
 
     //Menu items variables
     public MenuBar menuBar;
@@ -87,7 +86,6 @@ public class TreeUIController {
     // Init methods
     public  void init() {
         resize();
-        //makeSkipButtonSticky();
         alignMenuItemText();
         attachEvent();
         initTableInfo();
@@ -100,23 +98,6 @@ public class TreeUIController {
             treeroot.setMinHeight(depth*60);
             stackPaneMinHeight = treeroot.getMinHeight();
         }
-    }
-    private void makeSkipButtonSticky() {
-        double targetX = 10;
-
-        InvalidationListener listener = o -> {
-            Bounds viewportBounds = treeScrollPane.getViewportBounds();
-            Bounds contentBounds = treeroot.getBoundsInLocal();
-            Bounds labelBounds = skipBtn.getBoundsInLocal();
-
-            double factorX = Math.max(contentBounds.getWidth() - viewportBounds.getWidth(), 0);
-
-            skipBtn.setTranslateX(targetX + treeScrollPane.getHvalue() * factorX - labelBounds.getMinX());
-        };
-
-        treeScrollPane.viewportBoundsProperty().addListener(listener);
-        treeScrollPane.hvalueProperty().addListener(listener);
-        skipBtn.boundsInLocalProperty().addListener(listener);
     }
 
     private void initTableInfo () {
@@ -237,69 +218,21 @@ public class TreeUIController {
         });
 
         // Check if radio btn changed
-        graphType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                RadioButton tmp = (RadioButton)newValue;
+        graphType.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            RadioButton tmp = (RadioButton)newValue;
 
-                //chartUI.getChildren().remove(0);
-                if (tmp.getText() == radioAllNodes.getText()) {
-                        instance.getTreeChart(true);
-                        instance.addEventOnChart();
-                }else {
-                        instance.getTreeChart(false);
-                        instance.addEventOnChart();
-                }
+            //chartUI.getChildren().remove(0);
+            if (tmp.getText() == radioAllNodes.getText()) {
+                    instance.setTreeChart(true);
+                    instance.addEventOnChart();
+            }else {
+                    instance.setTreeChart(false);
+                    instance.addEventOnChart();
             }
         });
 
-//        zoomSlider.setOnMouseClicked(e ->{
-//            double zoomValue = zoomSlider.getValue();
-//            if (zoomValue == DEFAULT_SLIDER_VALUE) {
-//                treeroot.setMinHeight(stackPaneMinHeight);
-//                treeroot.setMinWidth(stackPaneMinWidth);
-//                treeroot.setScaleY(1);
-//                treeroot.setScaleY(1);
-//            }else if (zoomValue <DEFAULT_SLIDER_VALUE) {
-//                zoomOut(zoomValue);
-//            }else {
-//                zoomIn(zoomValue);
-//            }
-//        });
     }
 
-    /**
-     * Zoom In StackPane containing the tree
-     * @param value slider current value
-     */
-    public void zoomIn(double value){
-        treeroot.setScaleX(1 + value*SCALE_COEFFICIENT);
-        treeroot.setScaleY(1 + value*SCALE_COEFFICIENT);
-        if(value<=DEFAULT_SLIDER_VALUE+7){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/ZOOM_Y_COEFFICIENT));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/ZOOM_X_COEFFICIENT));
-        }else if(value<=DEFAULT_SLIDER_VALUE+15){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+1)));
-        }else if(value<=DEFAULT_SLIDER_VALUE+20){
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+2)));
-        }else{
-            treeroot.setMinHeight(stackPaneMinHeight * (value/(ZOOM_Y_COEFFICIENT+10)));
-            treeroot.setMinWidth(stackPaneMinWidth * (value/(ZOOM_X_COEFFICIENT+3)));
-        }
-    }
-
-    /**
-     * Zoom Out StackPane containing the tree
-     * @param value slider current value
-     */
-    public void zoomOut(double value){
-        treeroot.setMinHeight(stackPaneMinHeight);
-        treeroot.setMinWidth(stackPaneMinWidth);
-        treeroot.setScaleX(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
-        treeroot.setScaleY(1 + (-DEFAULT_SLIDER_VALUE + value)*SCALE_COEFFICIENT);
-    }
 
     /**
      * Switch Tab pane and display the current Node selected infos

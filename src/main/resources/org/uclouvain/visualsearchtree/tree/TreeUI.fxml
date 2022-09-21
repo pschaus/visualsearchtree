@@ -41,15 +41,6 @@
 
    <ScrollPane fx:id="treeScrollPane" maxHeight="400" maxWidth="Infinity" minHeight="400" minWidth="400">
       <StackPane fx:id="treeroot" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
-<!--         <AnchorPane fx:id="anchorSkip">-->
-<!--            <Button fx:id="skipBtn" maxHeight="40" maxWidth="50" minHeight="30" minWidth="40" prefHeight="30" prefWidth="40" textAlignment="CENTER" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="420">-->
-<!--               <graphic>-->
-<!--                  <ImageView fitHeight="25" fitWidth="25">-->
-<!--                     <Image url="@ ./right.png" />-->
-<!--                  </ImageView>-->
-<!--               </graphic>-->
-<!--            </Button>-->
-<!--         </AnchorPane>-->
       </StackPane>
    </ScrollPane>
 <!--   <Slider fx:id="zoomSlider" max="50" value="25" />-->
@@ -63,6 +54,7 @@
                </fx:define>
                <HBox alignment="TOP_CENTER" prefWidth="500" spacing="10">
                   <RadioButton fx:id="radioOnlySol">
+                     per solution
                      <toggleGroup>
                         <ToggleGroup fx:id="graphType" />
                      </toggleGroup>

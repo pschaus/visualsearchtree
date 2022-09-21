@@ -97,13 +97,11 @@ public class Anchor extends Rectangle {
      */
     private void enableDrag() {
         final Delta dragDelta = new Delta();
-        setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent mouseEvent) {
-                // record a delta distance for the drag and drop operation.
-                dragDelta.x = getX() - mouseEvent.getX();
-                dragDelta.y = getY() - mouseEvent.getY();
-                getScene().setCursor(Cursor.MOVE);
-            }
+        setOnMousePressed(mouseEvent -> {
+            // record a delta distance for the drag and drop operation.
+            dragDelta.x = getX() - mouseEvent.getX();
+            dragDelta.y = getY() - mouseEvent.getY();
+            getScene().setCursor(Cursor.MOVE);
         });
         setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.HAND));
         setOnMouseDragged(mouseEvent -> {
