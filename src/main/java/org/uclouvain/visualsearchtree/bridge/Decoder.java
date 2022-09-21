@@ -125,7 +125,7 @@ public class Decoder {
      * @return
      */
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
-        if (len <= 0 && buffer.size() == 0)
+        if (len <= 0 || buffer.size() == 0)
             return false;
         for (int i = 0; i < len; i++) {
             b[i] = buffer.remove(0);
