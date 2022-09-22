@@ -184,8 +184,7 @@ public class TreeVisual {
         start   = new Anchor(new SimpleDoubleProperty(0), new SimpleDoubleProperty(50), tempRoot);
         anchorNodes.put(-1, start);
         treeStackPane = new StackPane();
-        Group _start = new Group(start);
-        treeGroup = new Group(_start);
+        treeGroup = new Group();
         treeStackPane.getChildren().add(treeGroup);
         final Boolean[] keepGoing = {true};
 
@@ -206,16 +205,12 @@ public class TreeVisual {
             @Override
             void run() {
                 int i;
-                //Performance: 5000 / second => computer hot after 214781
-                //           : 1000 / second => after 211209
-                //
-                for ( i = currentTemp[0]; i <= currentTemp[0] + 500; i++)
+                for ( i = currentTemp[0]; i <= currentTemp[0] + NUMBER_OF_NODES_PER_SECONDS; i++)
                 {
                     Tree.Node<String> curNode = temNodesMap.get(i);
                     //check if different from parent
                     if (i != -1 && curNode != null)
                     {
-                        System.out.println(curNode.nodePid);
                         tempTree.createNode(curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
                         if (anchorNodes.get(curNode.nodePid) != null) {
                             Anchor _parent = anchorNodes.get(curNode.nodePid);
@@ -224,7 +219,10 @@ public class TreeVisual {
                                 Group temp = drawNode(_parent, curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
                                 Anchor child = (Anchor) temp.getChildren().get(0);
                                 anchorNodes.put(curNode.nodeId, child);
-                                treeGroup.getChildren().add(temp);
+                                if (_parent == start)
+                                    treeGroup.getChildren().add(child);
+                                else
+                                    treeGroup.getChildren().add(temp);
                                 addToChart(curNode, anchorNodes.size());
                             }
                         }

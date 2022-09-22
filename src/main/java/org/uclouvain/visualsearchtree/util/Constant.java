@@ -19,5 +19,6 @@ public class Constant {
     public static final double DEFAULT_STACKPANE_MIN_WIDTH = 400;
     public static final double DEFAULT_STACKPANE_MIN_HEIGHT = 400;
 
+    public static final int NUMBER_OF_NODES_PER_SECONDS = 1000;
 
 }
