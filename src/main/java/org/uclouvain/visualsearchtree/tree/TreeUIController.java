@@ -2,17 +2,13 @@ package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,8 +18,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -31,13 +25,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.uclouvain.visualsearchtree.util.Constant.*;
 
 public class TreeUIController {
     public TabPane tabPane;
@@ -47,11 +39,8 @@ public class TreeUIController {
     public StackPane treeroot;
     public Slider zoomSlider;
     public TableView infoTableView;
-    public Button skipBtn;
-    public AnchorPane anchorSkip;
     public VBox legendbox;
     private TreeVisual instance;
-    private final double stackPaneMinWidth = 400;
     private double stackPaneMinHeight = 400;
 
     //Menu items variables
@@ -84,6 +73,10 @@ public class TreeUIController {
     }
 
     // Init methods
+
+    /**
+     * Init method called first to re-set menu item, attach event to scene, init TabPane and resize the stackpane;
+     */
     public  void init() {
         resize();
         alignMenuItemText();
@@ -92,6 +85,9 @@ public class TreeUIController {
         initBookMarksTable();
     }
 
+    /**
+     * Resize the stackpane height once the depth becomes bigger
+     */
     public void resize(){
         int depth = instance.getLegendStats().get(3);
         if(depth>5){
@@ -100,6 +96,9 @@ public class TreeUIController {
         }
     }
 
+    /**
+     * Init the info Table View : Create columns, and add data Structure to the tableView
+     */
     private void initTableInfo () {
         TableColumn<Map, String> keyColumn = new TableColumn<>("Key");
         keyColumn.setCellValueFactory(new MapValueFactory<>("Key"));
@@ -113,6 +112,10 @@ public class TreeUIController {
         infoTableView.getColumns().add(keyColumn);
         infoTableView.getColumns().add(valueColumn);
     }
+
+    /**
+     * Init the bookmarks Table View : Create columns, and add data Structure to the tableView
+     */
     public void initBookMarksTable(){
         Map<String, String> bookMarksMap = instance.getBookMarks();
 
@@ -135,26 +138,59 @@ public class TreeUIController {
         tableHbox.getChildren().add(bookMarksTableView);
     }
 
-    // Menu nodeAction methods
+    /**
+     * Method called once L is pressed or Show Label menu item clicked
+     * @param actionEvent event
+     */
     public void showNodeLabels(ActionEvent actionEvent) {
         showAllLabels();
     }
+
+    /**
+     * Method called once I is pressed or Show Info menu item clicked
+     * @param actionEvent event
+     */
     public void showNodeInfos(Event actionEvent) {
         displayNodeInfos();
     }
+
+    /**
+     * Method called once O is pressed or Show Optimization Graph menu item clicked
+     * @param actionEvent event
+     */
     public void showGraph(Event actionEvent){
         displayGraph();
     }
+
+    /**
+     * Method called once Exit menu item clicked
+     * @param actionEvent event
+     */
     public void closeWindow(ActionEvent actionEvent) {
         Stage st = (Stage) menuBar.getScene().getWindow();
         st.close();
     }
+
+    /**
+     * Method called once CTRL+ B is pressed or Add/Remove BookMarks menu item clicked
+     * @param actionEvent event
+     */
     public void manageBookMarks(Event actionEvent) throws IOException {
         addOrRemoveBookMarks();
     }
+
+    /**
+     * Method called once B is pressed or Show BookMarks menu item clicked
+     * @param actionEvent event
+     */
     public void showBookMarks(Event actionEvent) {
         displayBookMarks();
     }
+
+    /**
+     * Method called once Help menu item clicked
+     * @param actionEvent event
+     */
     public void aboutUs(ActionEvent actionEvent) {
         String message = """
                 MiniCP-Profiler version 2022.1.0
@@ -186,6 +222,7 @@ public class TreeUIController {
      * Attach keyEvent on the scene
      */
     public void attachEvent(){
+        // The following lines center the tree at the end of the draw
 //        var tv = new TreeVisual();
 //        tv.onDrawFinished(() ->{
 //            var values = Helper.centerScrollPaneBar(treeroot, treeScrollPane);
@@ -354,7 +391,7 @@ public class TreeUIController {
     }
 
     /**
-     * Modify menu text for add the shortcut key
+     * Modify menu item text for adding the shortcut key
      */
     public void alignMenuItemText() {
         showLabels.setText("Show Labels \t\t\t\t L");
@@ -364,10 +401,4 @@ public class TreeUIController {
         manageBookMarksItem.setText("Add/ Remove BookMarks \t Ctrl+B");
     }
 
-    public void skipButtonIsClicked(MouseEvent mouseEvent) {
-        if( anchorSkip.getChildren().contains(skipBtn) ){
-            System.out.println("Skip Button has been clicked");
-            anchorSkip.getChildren().remove(skipBtn);
-        }
-    }
 }
