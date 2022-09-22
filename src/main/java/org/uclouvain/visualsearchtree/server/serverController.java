@@ -84,6 +84,10 @@ public class serverController implements Initializable {
         new ServerRunning().start();
     }
 
+    /**
+     * Class for server managing
+     */
+
     class ServerUtil {
         // unique ID for each connection
         private int uniqueID;
@@ -96,6 +100,9 @@ public class serverController implements Initializable {
             al = new ArrayList<ClientThread>();
         }
 
+        /**
+         * Start the server for listening
+         */
         public void start(){
             keepGoing = true;
             /* create socket server and wait for connection requests */
@@ -117,6 +124,9 @@ public class serverController implements Initializable {
             }
         }
 
+        /**
+         * Stop the server
+         */
         public void stop(){
             keepGoing = false;
             try {
