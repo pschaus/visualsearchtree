@@ -15,7 +15,6 @@
 
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-
     </properties>
 
     <repositories>
@@ -102,7 +101,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.uclouvain.visualsearchtree/org.uclouvain.visualsearchtree.HelloApplication
+                            <mainClass>org.uclouvain.visualsearchtree/org.uclouvain.visualsearchtree.StartProfiler
                             </mainClass>
                         </configuration>
                     </execution>

@@ -4,12 +4,6 @@ module org.uclouvain.visualsearchtree {
     requires java.desktop;
     requires com.google.gson;
 
-//    opens org.uclouvain.visualsearchtree to javafx.fxml;
-//    opens org.uclouvain.visualsearchtree.tree to javafx.fxml;
-//    opens org.uclouvain.visualsearchtree.bridge to javafx.fxml;
-//    opens org.uclouvain.visualsearchtree.server to javafx.fxml;
-//    opens org.uclouvain.visualsearchtree.examples to javafx.fxml;
-
     opens org.uclouvain.visualsearchtree to javafx.graphics;
     opens org.uclouvain.visualsearchtree.tree to javafx.graphics;
     opens org.uclouvain.visualsearchtree.bridge to javafx.graphics;
