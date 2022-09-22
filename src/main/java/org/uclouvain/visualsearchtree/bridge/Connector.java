@@ -61,7 +61,7 @@ public class Connector {
 
 
     /**
-     * <b>Note: </b>THis method can be used to end connect to current session.
+     * <b>Note: </b>This method can be used to end connection to current session.
      * It helps to free resources used to join server.
      * @throws IOException
      * @throws InterruptedException
@@ -108,10 +108,28 @@ public class Connector {
         msg.clear();
     }
 
+    /**
+     * <b>Note: </b>This message is supposed to be sent when we have a back track.
+     * WILL BE SUPPORTED IN NEXT VERSION
+     * @param rid
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void restart(int rid) throws IOException, InterruptedException {
         restart("", rid);
     }
 
+    /**
+     * <b>Note: </b>This message is supposed to be sent when we have a back track.
+     * WILL BE SUPPORTED IN NEXT VERSION
+     * <p>
+     *     Here we can define a name to our profiling so this name will be display
+     *     in our server profiling list tab
+     * </p>
+     * @param rid
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void restart(String file_name, int rid) throws IOException, InterruptedException {
         msg = msg.setType(Message.MsgType.RESTART).setLabel(file_name).setRestartId(rid);
         sendThroughSocket(msg.toBytes());
@@ -119,7 +137,7 @@ public class Connector {
     }
 
     /**
-     * <b>Note: </b>This function  help to create a new node
+     * <b>Note: </b>This function help to create a new node.
      * @param sid
      * @param pid
      * @param alt
@@ -137,7 +155,7 @@ public class Connector {
     }
 
     /**
-     * <b>Note: </b>This function  help to create a new node
+     * <b>Note: </b>This function help to create a new node.
      * @param sid
      * @param pid
      * @param alt
@@ -167,7 +185,7 @@ public class Connector {
     }
 
     /**
-     * <b>Note: </b>THis function send new node to our server
+     * <b>Note: </b>This function send new node to our server
      * though socket when this node is passed to it as argument
      * @param msg
      * @throws IOException
@@ -179,7 +197,7 @@ public class Connector {
     }
 
     /**
-     * <b>Note: </b>This function is used to send data through socket.
+     * <b>Note: </b>This function is used to send data through socket taking as arg a list of bytes.
      * @param msg
      * @throws IOException
      * @throws InterruptedException

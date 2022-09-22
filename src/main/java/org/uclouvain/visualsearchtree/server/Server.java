@@ -10,6 +10,7 @@ import java.util.Objects;
 
 public class Server extends Application {
     /**
+     * <b>Note: </b>This is the main method called to launch our server screen
      * @param stage Stage
      * @throws Exception Exception
      */

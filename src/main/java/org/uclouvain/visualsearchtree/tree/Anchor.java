@@ -32,7 +32,7 @@ public class Anchor extends Rectangle {
         super();
     }
     /**
-     *
+     * <b>Note: </b>It is a circle with a bound line. It is used to represent node and line while drawing tree
      * @param x x coordinate
      * @param y y coordinate
      */
@@ -72,7 +72,7 @@ public class Anchor extends Rectangle {
     }
 
     /**
-     *
+     * <b>Note: </b> Is used to set a position for a node while drawing tree
      * @param root node root
      * @param anchMap Map
      * @param center double

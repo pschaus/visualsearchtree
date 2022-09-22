@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class serverController implements Initializable {
-
     @FXML
     public Label portLabel;
     public ListView threelistView;
@@ -28,7 +27,7 @@ public class serverController implements Initializable {
 
     private ServerUtil server;
     /**
-     * Called to initialize a controller after its root element has been
+     * <b>Note: </b>Called to initialize a controller after its root element has been
      * completely processed.
      *
      * @param location  The location used to resolve relative paths for the root object, or
@@ -52,7 +51,8 @@ public class serverController implements Initializable {
     }
 
     /**
-     * Check port availability
+     * <b>Note: </b>Check port availability. So we can use status return to us to try start
+     * our server on new port if the older is already taken
      * @param port number of the port
      * @return boolean  on port's available
      */
@@ -65,7 +65,7 @@ public class serverController implements Initializable {
     }
 
     /**
-     * run the server
+     * <b>Note: </b>run the server
      */
     public void runServer()
     {
@@ -85,9 +85,8 @@ public class serverController implements Initializable {
     }
 
     /**
-     * Class for server managing
+     * <b>Note: </b>Class for server managing
      */
-
     class ServerUtil {
         // unique ID for each connection
         private int uniqueID;
@@ -233,7 +232,7 @@ public class serverController implements Initializable {
     }
 
     /**
-     * A thread to run the server
+     * <b>Note: </b>A thread to run the server
      */
     class ServerRunning extends Thread {
         public void run() {
@@ -241,5 +240,4 @@ public class serverController implements Initializable {
             server = null;
         }
     }
-
 }

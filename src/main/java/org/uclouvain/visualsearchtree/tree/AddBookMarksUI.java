@@ -67,7 +67,7 @@ public class AddBookMarksUI {
      */
     public void displayAlertError(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("MiniCP-Profiler");
+        alert.setTitle("VisualSearchTree-Profiler");
         alert.setContentText(message);
         alert.initOwner(cancelButton.getScene().getWindow());
         alert.showAndWait();

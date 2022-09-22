@@ -44,7 +44,7 @@ public class Decoder {
     /**
      * <b>Note: </b>This method retrieve incoming data and insert it to server
      * buffer based on our server-socket protocol. This help to draw node on Tree
-     * as data come
+     * as data come. This is one of core function of server realtime functionality
      * @param buffer List of Bytes
      * @param incomingBytes Bytes to add
      */
@@ -55,7 +55,7 @@ public class Decoder {
     }
 
     /**
-     * <b>Note: </b>Convert socket plain data to byte to {@link org.uclouvain.visualsearchtree.bridge.Decoder.DecodedMessage DecodedMessage}
+     * <b>Note: </b>Convert socket plain data from array byte to {@link org.uclouvain.visualsearchtree.bridge.Decoder.DecodedMessage DecodedMessage}
      * @param buffer List of Bytes
      * @param msgSize Size of message to decode
      * @return DecodedMessage object
