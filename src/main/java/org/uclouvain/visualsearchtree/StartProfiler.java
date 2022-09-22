@@ -6,7 +6,7 @@
  * To use this software we have two approach:
  * <h1>1 - Socket approach</h1>
  * <p>
- *     You'll have to start a server by lauching jar file with ' java -jar visualsearchtree.jar'
+ *     You'll have to start a server by launching jar file with ' java -jar visualsearchtree.jar'
  *     or using exec files of your OS.<br>
  *     From any file that implements your search logic, regardless of the development language,
  *     you can send through socket your search data to the available port. Thus the research tree
