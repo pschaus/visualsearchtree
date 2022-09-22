@@ -10,8 +10,8 @@ import java.util.Objects;
 
 public class Server extends Application {
     /**
-     * @param stage
-     * @throws Exception
+     * @param stage Stage
+     * @throws Exception Exception
      */
     @Override
     public void start(Stage stage) throws Exception {

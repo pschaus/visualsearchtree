@@ -3,16 +3,16 @@ package org.uclouvain.visualsearchtree.tree;
 public interface TreeListener {
     /**
      *
-     * @param id
-     * @param pId
-     * @param type
-     * @param nodeAction
-     * @param info
+     * @param id nodeId
+     * @param pId nodePid
+     * @param type nodeType
+     * @param nodeAction nodeAction
+     * @param info nodeInfo
      */
-    default void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info){ };
+    default void onNodeCreated(int id, int pId, Tree.NodeType type, NodeAction nodeAction, String info){ }
 
     /**
      * will be fired at the end of search
      */
-    default void onSearchEnd(){};
+    default void onSearchEnd(){}
 }

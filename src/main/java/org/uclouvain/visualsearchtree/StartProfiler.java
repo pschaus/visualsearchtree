@@ -27,8 +27,7 @@ import static javafx.application.Application.launch;
 public class StartProfiler {
     /**
      * This is the main method which make use of StartServer
-     * @param args
-     * @return Nothing
+     * @param args default main method args
      */
     public static void main(String[] args) {
         launch(Server.class, args);

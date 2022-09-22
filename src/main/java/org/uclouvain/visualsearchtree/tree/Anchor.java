@@ -33,8 +33,8 @@ public class Anchor extends Rectangle {
     }
     /**
      *
-     * @param x
-     * @param y
+     * @param x x coordinate
+     * @param y y coordinate
      */
     Anchor(DoubleProperty x, DoubleProperty y, Tree.Node<String> mNode) {
         super(x.get(), y.get(), 20, 20);
@@ -43,7 +43,6 @@ public class Anchor extends Rectangle {
         nbChild = 0;
         depth = 0;
         this.node = mNode;
-        //setFill(color.deriveColor(1, 1, 1, 0.5));
         setFill(Color.OLIVE);
         setStroke(Color.BLACK.deriveColor(0, 1, 1, 0.5));
         setStrokeWidth(1);
@@ -56,8 +55,8 @@ public class Anchor extends Rectangle {
 
     /**
      * Add new child to the node and return a Group
-     * @param child_node
-     * @return
+     * @param child_node nodeChild
+     * @return Group
      */
     public Group addChild(Tree.Node<String> child_node)
     {
@@ -74,10 +73,10 @@ public class Anchor extends Rectangle {
 
     /**
      *
-     * @param root
-     * @param anchMap
-     * @param center
-     * @param depth
+     * @param root node root
+     * @param anchMap Map
+     * @param center double
+     * @param depth actual depth
      */
     public static void positionNode(Tree.PositionedNode<String> root, Map<Integer, Anchor> anchMap, double center, int depth)
     {
@@ -128,6 +127,9 @@ public class Anchor extends Rectangle {
     private class Delta { double x, y; }
 }
 
+/**
+ * This class extend Line class and return BoundLine
+ */
 class BoundLine extends Line {
     BoundLine(DoubleBinding startX, DoubleBinding startY, DoubleBinding endX, DoubleBinding endY) {
         startXProperty().bind(startX);

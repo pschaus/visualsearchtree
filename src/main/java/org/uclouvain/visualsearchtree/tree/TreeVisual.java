@@ -219,10 +219,12 @@ public class TreeVisual {
                                 Group temp = drawNode(_parent, curNode.nodeId, curNode.nodePid, curNode.getType(), curNode.nodeAction, curNode.info);
                                 Anchor child = (Anchor) temp.getChildren().get(0);
                                 anchorNodes.put(curNode.nodeId, child);
-                                if (_parent == start)
+                                if (_parent == start){
                                     treeGroup.getChildren().add(child);
-                                else
+                                }
+                                else{
                                     treeGroup.getChildren().add(temp);
+                                }
                                 addToChart(curNode, anchorNodes.size());
                             }
                         }

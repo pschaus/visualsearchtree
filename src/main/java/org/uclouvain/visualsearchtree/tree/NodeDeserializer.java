@@ -14,9 +14,8 @@ public class NodeDeserializer implements JsonDeserializer<Tree.Node> {
      * <b>Notes: </b> Convert GSON to TreeNode
      * @param json    The Json data being deserialized
      * @param typeOfT The type of the Object to deserialize to
-     * @param context
-     * @return
-     * @throws JsonParseException
+     * @param context context
+     * @return node
      */
     @Override
     public Tree.Node<String> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -48,16 +47,17 @@ public class NodeDeserializer implements JsonDeserializer<Tree.Node> {
         return des;
     }
 
+    /**
+     * Check the nodeType and return the corresponding type basing on the string passed to the method
+     * @param type nodeType
+     * @return nodeType
+     */
     public Tree.NodeType checkType(String type){
-        switch (type){
-            case "SKIP":
-                return Tree.NodeType.SKIP;
-            case "FAIL":
-                return Tree.NodeType.FAIL;
-            case "SOLUTION":
-                return Tree.NodeType.SOLUTION;
-            default:
-                return Tree.NodeType.INNER;
-        }
+        return switch (type) {
+            case "SKIP" -> Tree.NodeType.SKIP;
+            case "FAIL" -> Tree.NodeType.FAIL;
+            case "SOLUTION" -> Tree.NodeType.SOLUTION;
+            default -> Tree.NodeType.INNER;
+        };
     }
 }

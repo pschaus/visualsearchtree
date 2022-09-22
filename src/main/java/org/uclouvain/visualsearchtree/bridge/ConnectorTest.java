@@ -5,6 +5,11 @@ import org.uclouvain.visualsearchtree.bridge.Connector;
 import java.io.IOException;
 
 public class ConnectorTest {
+
+    /**
+     * Sample method ti test MiniCP profiler server version by sending node to a server listening on a port
+     * @param args default argument for main method
+     */
     public static void main(String[] args) {
         Connector connector = new Connector();
         try {

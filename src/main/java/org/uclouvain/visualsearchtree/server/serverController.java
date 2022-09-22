@@ -53,8 +53,8 @@ public class serverController implements Initializable {
 
     /**
      * Check port availability
-     * @param port
-     * @return
+     * @param port number of the port
+     * @return boolean  on port's available
      */
     private static boolean portIsAvailable(int port) {
         try (Socket ignored = new Socket("localhost", port)) {
@@ -223,7 +223,7 @@ public class serverController implements Initializable {
     }
 
     /**
-     * A tread to run the server
+     * A thread to run the server
      */
     class ServerRunning extends Thread {
         public void run() {

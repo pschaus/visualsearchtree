@@ -44,8 +44,8 @@ public class Visualizer{
 
     /**
      * add Legend to tree
-     * @param scene
-     * @param tv
+     * @param scene Scene
+     * @param tv TreeVisual
      */
     private static void addTreeLegendBox(Scene scene, TreeVisual tv)
     {
@@ -57,8 +57,8 @@ public class Visualizer{
 
     /**
      * add the tree to UI
-     * @param scene
-     * @param tv
+     * @param scene Scene
+     * @param tv TreeVisual
      */
     private static void addTreeStackPane(Scene scene, TreeVisual tv)
     {

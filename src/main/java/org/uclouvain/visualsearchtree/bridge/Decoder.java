@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * <b>Note: </b>THis class help to decode all data that we receive through socket
- * in order to draw our tree node on screen
+ * <b>Note: </b>This class helps to decode all data received through socket
+ * in order to draw a tree node on screen
  */
 public class Decoder {
     private static final int NODE = 0;
@@ -45,8 +45,8 @@ public class Decoder {
      * <b>Note: </b>This method retrieve incoming data and insert it to server
      * buffer based on our server-socket protocol. This help to draw node on Tree
      * as data come
-     * @param buffer
-     * @param incomingBytes
+     * @param buffer List of Bytes
+     * @param incomingBytes Bytes to add
      */
     public static void addToBuffer(List<Byte> buffer, byte[] incomingBytes) {
         for (byte byteData: incomingBytes) {
@@ -56,9 +56,9 @@ public class Decoder {
 
     /**
      * <b>Note: </b>Convert socket plain data to byte to {@link org.uclouvain.visualsearchtree.bridge.Decoder.DecodedMessage DecodedMessage}
-     * @param buffer
-     * @param msgSize
-     * @return
+     * @param buffer List of Bytes
+     * @param msgSize Size of message to decode
+     * @return DecodedMessage object
      */
     public static DecodedMessage deserialize(List<Byte> buffer, int msgSize) {
         DecodedMessage formatData = new DecodedMessage();
@@ -119,10 +119,10 @@ public class Decoder {
 
     /**
      * <b>Note: </b>Read data in server buffer
-     * @param b
-     * @param buffer
-     * @param len
-     * @return
+     * @param b List of Bytes in which the removed bytes will be added
+     * @param buffer List of Bytes in which bytes will be removed
+     * @param len size of Bytes to remove
+     * @return boolean
      */
     public static boolean readBuffer(byte[] b, List<Byte> buffer, int len) {
         if (len <= 0 || buffer.size() == 0)
@@ -135,10 +135,10 @@ public class Decoder {
 
     /**
      * <b>Note: </b>Help function
-     * @param bytes
-     * @param off
-     * @param len
-     * @return
+     * @param bytes List of Bytes
+     * @param off Read Bytes from
+     * @param len Size of List of Bytes
+     * @return read Bytes
      */
     private static byte[] readBytes(byte[] bytes, int off, int len) {
         byte[] b = new byte[len];
@@ -157,9 +157,9 @@ public class Decoder {
     /**
      * <b>Note: </b>Help function. Convert byte Array ti Int.
      * It helps to encode minicp-socket communication protocol
-     * @param bytes
-     * @param endian
-     * @return
+     * @param bytes List of Bytes
+     * @param endian string
+     * @return int
      */
     public static int byteArrayToInt(byte[] bytes, String endian) {
         final ByteBuffer bb = ByteBuffer.wrap(bytes);
@@ -172,8 +172,8 @@ public class Decoder {
 
     /**
      * <b>Note: </b>build tree from decoded messages
-     * @param decodedMessageList
-     * @return
+     * @param decodedMessageList List of DecodedMessage object
+     * @return Tree
      */
     public static Tree treeBuilder(List<Decoder.DecodedMessage> decodedMessageList) {
         Map<Integer, DecodedMessage> preFormat = new HashMap<Integer, DecodedMessage>();
@@ -193,8 +193,8 @@ public class Decoder {
 
     /**
      * <b>Note: </b>Nodes types
-     * @param type
-     * @return
+     * @param type corresponding int nodeType
+     * @return nodeType
      */
     public static Tree.NodeType nodeType(int type) {
         switch (type) {
