@@ -11,6 +11,16 @@ import org.testfx.api.FxRobot;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+// To run test on Tree UI, it is necessary to allow Robot FX class to control the screen for MAC users:
+
+/*
+    Go to:
+        - Settings >> Security and privacy >> Accessibility
+        - Click Privacy tab
+        - Click on the lock which is at bottom to make changes
+        - Select intellij IDEA
+        - Click again on the lock to apply changes
+ */
 
 @ExtendWith(ApplicationExtension.class)
 class TreeUIControllerTest {
@@ -69,14 +79,14 @@ class TreeUIControllerTest {
         Assertions.assertThat(node_label).isEqualTo("default");
     }
 
-//    @Test
-//    void check_optimization_chart(FxRobot robot){
-//        robot.press(KeyCode.O);
-//        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(0)).isTrue();
-//        Assertions.assertThat(tv.getSeries().getData().size()).isEqualTo(1);
-////        robot.clickOn("#radioOnlySol");
-////        robot.clickOn("#radioAllNodes");
-//    }
+    @Test
+    void check_optimization_chart(FxRobot robot){
+        robot.press(KeyCode.O);
+        Assertions.assertThat(robot.lookup("#tabPane").queryAs(TabPane.class).getSelectionModel().isSelected(0)).isTrue();
+        Assertions.assertThat(tv.getSeries().getData().size()).isEqualTo(1);
+//        robot.clickOn("#radioOnlySol");
+//        robot.clickOn("#radioAllNodes");
+    }
 
     private static void randomTree(Tree t){
         t.createNode(0,-1, Tree.NodeType.INNER,()->{System.out.println(0);},"{\"cost\": "+0+", \"domain\": "+0+", \"other\": test}");
