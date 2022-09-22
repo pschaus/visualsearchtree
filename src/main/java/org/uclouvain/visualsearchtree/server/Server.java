@@ -18,7 +18,7 @@ public class Server extends Application {
         Parent root = FXMLLoader.load(Objects.requireNonNull(Server.class.getResource("Server.fxml")));
         Scene scene = new Scene(root, 300, 300);
         stage.setScene(scene);
-        stage.setTitle("miniCp Profiler");
+        stage.setTitle("VisualSearchTree - Profiler");
         stage.show();
     }
 }

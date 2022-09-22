@@ -24,7 +24,7 @@ public class serverController implements Initializable {
     @FXML
     public Label portLabel;
     public ListView threelistView;
-    ObservableList<String> items = FXCollections.observableArrayList ("MINICP CPProfiler Connector Initializing");
+    ObservableList<String> items = FXCollections.observableArrayList ("Profiler Connector Initializing");
 
     private ServerUtil server;
     /**
