@@ -35,8 +35,9 @@ class DecoderTest {
     })
     void addToBuffer(int val1, int val2, int val3, int val4) {
         byte[] new_data = new byte[] {(byte) val1, (byte) val2, (byte) val3, (byte) val4};
+        int bufferSizeBefore = buffer.size();
         Decoder.addToBuffer(buffer, new_data);
-        assertTrue(buffer.size() > new_data.length);
+        assertTrue(buffer.size() == (new_data.length+bufferSizeBefore));
     }
 
     @ParameterizedTest
