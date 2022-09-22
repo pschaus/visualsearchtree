@@ -65,7 +65,7 @@ public class Anchor extends Rectangle {
         DoubleProperty endX = new SimpleDoubleProperty(10);
         DoubleProperty endY   = new SimpleDoubleProperty(10);
         Anchor child = new Anchor(endX, endY, child_node);
-        Line line = new BoundLine(x.add(child.getWidth()/2), y.add(0), endX.add(child.getWidth()/2), endY.add(0));
+        Line line = new BoundLine(x.add(child.getWidth()/2), y.add(20), endX.add(child.getWidth()/2), endY.add(0));
         child.depth = depth + 1;
         child.parent = this;
         children.add(child);
