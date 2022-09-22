@@ -24,7 +24,7 @@ public class serverController implements Initializable {
     @FXML
     public Label portLabel;
     public ListView threelistView;
-    ObservableList<String> items = FXCollections.observableArrayList ("MINICP CPProfiler Connector Initializing", "Connected to : localhost 6650");
+    ObservableList<String> items = FXCollections.observableArrayList ("MINICP CPProfiler Connector Initializing");
 
     private ServerUtil server;
     /**
@@ -44,7 +44,8 @@ public class serverController implements Initializable {
         while (!portIsAvailable(port)){port++;}
         portLabel.setText(String.valueOf(port));
 
-        items.add("Server waiting for Client on port 6650");
+        items.add("Server waiting for Client on port :"+portLabel.getText());
+        items.add("Connected to : localhost :"+portLabel.getText());
         threelistView.setItems(items);
         server = null;
         runServer();
