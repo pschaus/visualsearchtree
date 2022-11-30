@@ -67,6 +67,11 @@ public class Tree {
      * @param info
      */
     public void createNode(int id, int pId, NodeType type, NodeAction nodeAction, String info) {
+        if (!nodeMap.containsKey(pId))
+        {
+            System.out.println("PID: " + pId + " does not exit.");
+            return;
+        }
         Node n = nodeMap.get(pId).addChild(id, pId,"child",type,"branch", nodeAction, info);
         nodeMap.put(id,n);
         notifyNodeCreated(id, pId, type, nodeAction,info);

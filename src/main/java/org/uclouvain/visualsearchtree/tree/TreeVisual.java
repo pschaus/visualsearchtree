@@ -1,6 +1,8 @@
 package org.uclouvain.visualsearchtree.tree;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -207,6 +209,10 @@ public class TreeVisual {
                 int i;
                 for ( i = currentTemp[0]; i <= currentTemp[0] + NUMBER_OF_NODES_PER_SECONDS; i++)
                 {
+                    if (!temNodesMap.containsKey(i))
+                    {
+                        return;
+                    }
                     Tree.Node<String> curNode = temNodesMap.get(i);
                     //check if different from parent
                     if (i != -1 && curNode != null)
@@ -547,14 +553,22 @@ public class TreeVisual {
     private void addToChart(Tree.Node<String> node, double number)
     {
         Gson gz = new Gson();
-        NodeInfoData _info;
+        NodeInfoData _info = null;
 
-        if (node.getType() != Tree.NodeType.SOLUTION)
+        if (node.getType() != Tree.NodeType.SOLUTION){
             return;
-        _info = gz.fromJson(node.info, new TypeToken<NodeInfoData>(){}.getType());
-        if (_info != null)
+        }
+
+        try {
+            _info = gz.fromJson(node.info, new TypeToken<NodeInfoData>(){}.getType());
+            if (_info != null)
+            {
+                addDataToChart(number, _info.cost);
+            }
+        }catch (JsonParseException e)
         {
-            addDataToChart(number, _info.cost);
+            System.out.println("Error on provided Node info");
+            return;
         }
     }
 
