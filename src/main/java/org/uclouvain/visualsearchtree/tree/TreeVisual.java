@@ -211,7 +211,7 @@ public class TreeVisual {
                 {
                     if (!temNodesMap.containsKey(i))
                     {
-                        return;
+                        continue;
                     }
                     Tree.Node<String> curNode = temNodesMap.get(i);
                     //check if different from parent
