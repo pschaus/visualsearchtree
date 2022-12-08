@@ -49,8 +49,8 @@ public class Visualizer{
      */
     private static void addTreeLegendBox(Scene scene, TreeVisual tv)
     {
-        tv.onDrawFinished(()->{
-            VBox legendbox = (VBox) scene.lookup("#legendbox");
+        VBox legendbox = (VBox) scene.lookup("#legendbox");
+        tv.onNodeDrawn(()->{
             legendbox.getChildren().add(tv.generateLegendsStack());
         });
     }

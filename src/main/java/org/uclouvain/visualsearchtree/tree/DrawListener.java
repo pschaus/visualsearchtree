@@ -6,4 +6,6 @@ public interface DrawListener {
      */
     default void onFinish(){};
 
+    default void onNodeDrawn(){};
+
 }

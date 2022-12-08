@@ -80,12 +80,31 @@ public class TreeVisual {
         });
     }
 
+    public void onNodeDrawn(Procedure listener)
+    {
+        dfsListeners.add(new DrawListener() {
+            @Override
+            public void onNodeDrawn() {
+                listener.call();
+            }
+        });
+    }
+
+
+    /**
+     * Used to notify when a node is added to
+     */
+    private void notifyNodeDrawn()
+    {
+        dfsListeners.forEach(l->l.onFinish());
+    }
+
     /**
      * Will be called at end
      */
     private void notifyEndDraw()
     {
-        dfsListeners.forEach(l-> l.onFinish());
+        dfsListeners.forEach(l-> l.onNodeDrawn());
     }
 
     /**
@@ -227,6 +246,7 @@ public class TreeVisual {
                                 anchorNodes.put(curNode.nodeId, child);
                                 if (_parent == start) { treeGroup.getChildren().add(child); } else {treeGroup.getChildren().add(temp);}
                                 addToChart(curNode, anchorNodes.size());
+                                notifyNodeDrawn();
                             }
                         }
                     }

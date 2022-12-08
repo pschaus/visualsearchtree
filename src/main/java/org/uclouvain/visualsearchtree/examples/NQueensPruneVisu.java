@@ -41,7 +41,7 @@ public class NQueensPruneVisu {
 
     public static void main(String[] args) {
 
-        NQueensPrune queens = new NQueensPrune(4);
+        NQueensPrune queens = new NQueensPrune(2);
         Gson gson = new Gson();
         Tree t = new Tree(-1);
 
