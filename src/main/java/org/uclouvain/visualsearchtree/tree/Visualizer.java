@@ -51,6 +51,9 @@ public class Visualizer{
     {
         VBox legendbox = (VBox) scene.lookup("#legendbox");
         tv.onNodeDrawn(()->{
+            if (legendbox.getChildren().size() > 0) {
+                legendbox.getChildren().clear();
+            }
             legendbox.getChildren().add(tv.generateLegendsStack());
         });
     }

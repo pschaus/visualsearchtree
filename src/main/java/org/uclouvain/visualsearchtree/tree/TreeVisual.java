@@ -96,7 +96,7 @@ public class TreeVisual {
      */
     private void notifyNodeDrawn()
     {
-        dfsListeners.forEach(l->l.onFinish());
+        dfsListeners.forEach(l->l.onNodeDrawn());
     }
 
     /**
@@ -526,6 +526,7 @@ public class TreeVisual {
      * @return HBox
      */
     public HBox generateLegendsStack(){
+        legend = new HBox();
         legend.setPadding(new Insets(10));
         legend.setAlignment(Pos.BASELINE_LEFT);
         Rectangle branchRect = createRectangleForLegendBox(Tree.NodeType.INNER);
