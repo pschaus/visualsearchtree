@@ -39,7 +39,7 @@
       </Menu>
    </MenuBar>
 
-   <ScrollPane fx:id="treeScrollPane" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
+   <ScrollPane fx:id="treeScrollPane" maxHeight="400" maxWidth="Infinity" minHeight="400" minWidth="400">
       <StackPane fx:id="treeroot" onMouseClicked="#skipButtonIsClicked" maxHeight="Infinity" maxWidth="Infinity" minHeight="400" minWidth="400">
          <AnchorPane fx:id="anchorSkip">
             <Button fx:id="skipBtn" maxHeight="40" maxWidth="50" minHeight="30" minWidth="40" prefHeight="30" prefWidth="40" textAlignment="CENTER" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="420">
